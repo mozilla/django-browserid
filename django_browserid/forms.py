@@ -1,5 +1,5 @@
 from django import forms
 
 
-class BrowserIdForm(forms.Form):
+class BrowserIDForm(forms.Form):
     assertion = forms.CharField(widget=forms.HiddenInput())
