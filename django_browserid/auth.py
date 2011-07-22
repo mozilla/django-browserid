@@ -53,8 +53,13 @@ class BrowserIDBackend(object):
             return None
         if len(users) == 1:
             return users[0]
-        # todo - support creation of accounts
-        return None
+        create_user = getattr(settings, 'BROWSERID_CREATE_USER', False)
+        if not create_user:
+            return None
+        user = User.objects.create_user(email, email)
+        user.is_active = True
+        user.save()
+        return user
 
     def get_user(self, user_id):
         try:
