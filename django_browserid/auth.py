@@ -23,23 +23,31 @@ class BrowserIDBackend(object):
             return u'%s:%s' % (host, port)
         return host
 
-    def authenticate(self, assertion=None, host=None, port=None):
+    def _verify(self, assertion, audience):
+        """Verify assertion using an external verification service."""
         verify_url = getattr(settings, 'BROWSERID_VERIFICATION_URL',
                              DEFAULT_VERIFICATION_URL)
-        audience = self._construct_audience(host, port)
-        qs = urllib.urlencode(dict(assertion=assertion, audience=audience))
         client = httplib2.Http()
-        response, content = client.request('%s?%s' % (verify_url, qs))
+        response, content = client.request('%s?%s' % (verify_url,
+            urllib.urlencode(dict(assertion=assertion, audience=audience))),
+            'POST')
         result = json.loads(content)
         if result['status'] == OKAY_RESPONSE:
-            email = result['email']
-            try:
-                # todo - by default, email is not unique in contrib.auth.
-                #        more than one result could be returned here.
-                return User.objects.get(email=email)
-            except User.DoesNotExist:
-                # todo - support creation of accounts
-                pass
+            return result
+        return False
+
+    def authenticate(self, assertion=None, host=None, port=None):
+        result = self._verify(assertion, self._construct_audience(host, port))
+        if result is None:
+            return None
+        email = result['email']
+        try:
+            # todo - by default, email is not unique in contrib.auth.
+            #        more than one result could be returned here.
+            return User.objects.get(email=email)
+        except User.DoesNotExist:
+            # todo - support creation of accounts
+            pass
         return None
 
     def get_user(self, user_id):
