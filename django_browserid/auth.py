@@ -3,6 +3,8 @@ try:
 except ImportError:
     import simplejson as json
 
+import base64
+import hashlib
 import logging
 import urllib
 
@@ -56,7 +58,12 @@ class BrowserIDBackend(object):
         create_user = getattr(settings, 'BROWSERID_CREATE_USER', False)
         if not create_user:
             return None
-        user = User.objects.create_user(email, email)
+        # store the username as a base64 encoded sha1 of the email address
+        # this protects against data leakage because usernames are often
+        # treated as public identifiers (so we can't use the email address).
+        username = base64.urlsafe_b64encode(
+            hashlib.sha1(email).digest()).rstrip('=')
+        user = User.objects.create_user(username, email)
         user.is_active = True
         user.save()
         return user
