@@ -17,8 +17,8 @@ def verify(request, redirect_field_name=auth.REDIRECT_FIELD_NAME):
     """Process browserid assertions."""
     redirect_to = request.REQUEST.get(redirect_field_name, '')
     if not redirect_to:
-        redirect_to = settings.LOGIN_REDIRECT_URL
-    redirect_to_failure = settings.LOGIN_REDIRECT_URL_FAILURE
+        redirect_to = getattr(settings, 'LOGIN_REDIRECT_URL', '/')
+    redirect_to_failure = getattr(settings, 'LOGIN_REDIRECT_URL_FAILURE', '/')
     form = BrowserIDForm(data=request.POST)
     if form.is_valid():
         assertion = form.cleaned_data['assertion']
