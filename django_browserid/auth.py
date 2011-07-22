@@ -3,11 +3,15 @@ try:
 except ImportError:
     import simplejson as json
 
+import logging
 import urllib
+
 import httplib2
 
 from django.conf import settings
 from django.contrib.auth.models import User
+
+log = logging.getLogger(__name__)
 
 DEFAULT_HTTP_PORT = '80'
 DEFAULT_VERIFICATION_URL = 'https://browserid.org/verify'
@@ -41,13 +45,15 @@ class BrowserIDBackend(object):
         if result is None:
             return None
         email = result['email']
-        try:
-            # todo - by default, email is not unique in contrib.auth.
-            #        more than one result could be returned here.
-            return User.objects.get(email=email)
-        except User.DoesNotExist:
-            # todo - support creation of accounts
-            pass
+        # in the rare case that two user accounts have the same email address,
+        # log and bail. randomly selecting one seems really wrong.
+        users = User.objects.filter(email=email)
+        if len(users) > 1:
+            log.warn('%d users with email address %s.' % (len(users), email))
+            return None
+        if len(users) == 1:
+            return users[0]
+        # todo - support creation of accounts
         return None
 
     def get_user(self, user_id):
