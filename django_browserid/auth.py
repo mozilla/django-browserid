@@ -6,7 +6,7 @@ except ImportError:
 import urllib
 import httplib2
 
-from djanog.conf import settings
+from django.conf import settings
 from django.contrib.auth.models import User
 
 DEFAULT_HTTP_PORT = '80'
