@@ -24,12 +24,12 @@ class BrowserIDBackend(object):
     supports_anonymous_user = False
     supports_object_permissions = False
 
-    def _construct_audience(self, host, port):
+    def get_audience(self, host, port):
         if port and port != DEFAULT_HTTP_PORT:
             return u'%s:%s' % (host, port)
         return host
 
-    def _verify(self, assertion, audience):
+    def verify(self, assertion, audience):
         """Verify assertion using an external verification service."""
         verify_url = getattr(settings, 'BROWSERID_VERIFICATION_URL',
                              DEFAULT_VERIFICATION_URL)
@@ -43,7 +43,7 @@ class BrowserIDBackend(object):
         return False
 
     def authenticate(self, assertion=None, host=None, port=None):
-        result = self._verify(assertion, self._construct_audience(host, port))
+        result = self.verify(assertion, self.get_audience(host, port))
         if result is None:
             return None
         email = result['email']

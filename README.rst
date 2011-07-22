@@ -69,6 +69,44 @@ Finally, you'll need some Javascript to handle the onclick event. If you use ``d
      });
    });
 
+Creating User Accounts
+----------------------
+
+``django-browserid`` will automatically create a user account for new users if the setting ``BROWSERID_CREATE_USER`` is set to ``True`` in ``settings.py``. The user account will be created with the verified email returned from the BrowserID verification service, and a URL safe base64 encoded SHA1 of the email with the padding removed as the username. 
+
+If you do not wish to automatically create user accounts, you may manually verify a BrowserID assertion with something like the following: ::
+
+   from django_browserid.auth import get_audience, verify
+   from django_browserid.forms import BrowserIDForm
+
+
+   def myview(request):
+      # ...
+      if request.method == 'POST':
+          form = BrowserIDForm(data=request.POST)
+          if not form.is_valid():
+              # do something
+          host = request.get_host()
+          if ':' in host:
+              host, port = host.split(':')
+          else:
+              port = '80'
+          audience = get_audience(host, port)
+          result = verify(form.cleaned_data['assertion'], audience)
+          # ...
+
+``result`` will be False if the assertion failed, or a dictionary similar to the following: ::
+
+   {
+      u'audience': u'mysite.com:443',
+      u'email': u'myemail@example.com',
+      u'issuer': u'browserid.org:443',
+      u'status': u'okay',
+      u'valid-until': 1311377222765
+   }
+
+You are of course then free to store the email in the session and prompt the user to sign up using a chosen identifier as their username, or whatever else makes sense for your site.
+
 License
 -------
 
