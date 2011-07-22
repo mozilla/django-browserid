@@ -14,7 +14,7 @@ DEFAULT_VERIFICATION_URL = 'https://browserid.org/verify'
 OKAY_RESPONSE = 'okay'
 
 
-class BrowserIdBackend(object):
+class BrowserIDBackend(object):
     supports_anonymous_user = False
     supports_object_permissions = False
 
