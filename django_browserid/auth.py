@@ -29,15 +29,19 @@ class BrowserIDBackend(object):
             return u'%s:%s' % (host, port)
         return host
 
+    def _verify_http_request(url, qs):
+        client = httplib2.Http()
+        resp, content = client.request('%s?%s' % (url, qs), 'POST')
+        return json.loads(content)
+
     def verify(self, assertion, audience):
         """Verify assertion using an external verification service."""
         verify_url = getattr(settings, 'BROWSERID_VERIFICATION_URL',
                              DEFAULT_VERIFICATION_URL)
-        client = httplib2.Http()
-        response, content = client.request('%s?%s' % (verify_url,
-            urllib.urlencode(dict(assertion=assertion, audience=audience))),
-            'POST')
-        result = json.loads(content)
+        result = self._verify_http_request(verify_url, urllib.urlencode({
+            'assertion': assertion,
+            'audience': audience
+        }))
         if result['status'] == OKAY_RESPONSE:
             return result
         return False
