@@ -16,6 +16,7 @@ from django.contrib.auth.models import User
 log = logging.getLogger(__name__)
 
 DEFAULT_HTTP_PORT = '80'
+DEFAULT_HTTP_TIMEOUT = 5
 DEFAULT_VERIFICATION_URL = 'https://browserid.org/verify'
 OKAY_RESPONSE = 'okay'
 
@@ -29,8 +30,10 @@ class BrowserIDBackend(object):
             return u'%s:%s' % (host, port)
         return host
 
-    def _verify_http_request(url, qs):
-        client = httplib2.Http()
+    def _verify_http_request(self, url, qs):
+        timeout = getattr(settings, 'BROWSERID_HTTP_TIMEOUT',
+                          DEFAULT_HTTP_TIMEOUT)
+        client = httplib2.Http(timeout=timeout)
         resp, content = client.request('%s?%s' % (url, qs), 'POST')
         return json.loads(content)
 
