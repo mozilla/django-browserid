@@ -9,5 +9,5 @@ setup(
     packages=['django_browserid'],
     author="Paul Osman",
     author_email="paul@mozillafoundation.org",
-    install_requires="httplib2"
+    install_requires="httplib2==0.7.1"
 )

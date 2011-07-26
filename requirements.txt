@@ -1,1 +1,6 @@
-httplib2
+httplib2==0.7.1
+
+# Tests
+fudge==1.0.3
+-e git://github.com/jbalogh/django-nose.git@b130825#egg=django-nose
+Django==1.3
