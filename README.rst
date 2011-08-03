@@ -49,14 +49,24 @@ You can also set the following optional in ``settings.py`` (they have sensible d
    # Path to redirect to on unsuccessful login attempt.
    LOGIN_REDIRECT_URL_FAILURE = '/'
 
-Somewhere in one of your templates, you'll need to create a link and a form with a single hidden input element, which you'll use to submit the BrowserID assertion to the server. If you want to use ``django_browserid.forms.BrowserIDForm``, you could use something like the following HTML snippet: ::
+Somewhere in one of your templates, you'll need to create a link and a form with a single hidden input element, which you'll use to submit the BrowserID assertion to the server. If you want to use ``django_browserid.forms.BrowserIDForm``, you could use something like the following template snippet: ::
 
+   {% if not user.is_authenticated %}
    <a id="browserid" href="{% url gracefully_degrade %}">Sign In</a>
    <form method="POST" action="{% url browserid_verify %}">
-      {{ form.as_p }}
+      {{ browserid_form.as_p }}
    </form>
+   {% endif %}
 
-Finally, you'll need some Javascript to handle the onclick event. If you use ``django_browserid.forms.BrowserID``, you can use the javascript in ``static/browserid.js``. Otherwise, you can use it as a basic example: ::
+If you do this, it is further recommended that you add ``django_browserid.context_processors.browserid_form`` to  ``TEMPLATE_CONTEXT_PROCESSORS``; this will create the ``browserid_form`` variable automatically in ``RequestContext`` instances when needed. That is, in ``settings.py``: ::
+
+   TEMPLATE_CONTEXT_PROCESSORS = (
+       # ...
+       'django_browserid.context_processors.browserid_form',
+       # ...
+   )
+
+Finally, you'll need some Javascript to handle the onclick event. If you use ``django_browserid.forms.BrowserIDForm``, you can use the javascript in ``static/browserid.js``. Otherwise, you can use it as a basic example: ::
 
    $('#browserid').bind('click', function(e) {
      e.preventDefault();
