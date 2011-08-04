@@ -33,7 +33,8 @@ class BrowserIDBackend(object):
     def _verify_http_request(self, url, qs):
         timeout = getattr(settings, 'BROWSERID_HTTP_TIMEOUT',
                           DEFAULT_HTTP_TIMEOUT)
-        client = httplib2.Http(timeout=timeout)
+        ca_certs = getattr(settings, 'BROWSERID_CACERT_FILE', None)
+        client = httplib2.Http(timeout=timeout, ca_certs=ca_certs)
         resp, content = client.request('%s?%s' % (url, qs), 'POST')
         return json.loads(content)
 

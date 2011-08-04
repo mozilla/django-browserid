@@ -40,6 +40,9 @@ You can also set the following optional in ``settings.py`` (they have sensible d
    # URL of a BrowserID verification service.
    BROWSERID_VERIFICATION_URL = 'https://browserid.org/verify'
 
+   # CA cert file for validating SSL certificate
+   BROWSERID_CACERT_FILE = ''
+
    # Create user accounts automatically if no user is found.
    BROWSERID_CREATE_USER = False
 
