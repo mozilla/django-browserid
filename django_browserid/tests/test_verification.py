@@ -85,12 +85,30 @@ def test_authenticate_create_user(fake):
     """Test that automatic user creation works when enabled."""
     with positive_assertion(fake):
         setattr(settings, 'BROWSERID_CREATE_USER', True)
+        delattr(settings, 'BROWSERID_USERNAME_ALGO')
         user = auth.authenticate(**authenticate_kwargs)
         # user should have been created
         assert user
         assert user.email == 'myemail@example.com'
         assert user.username == base64.urlsafe_b64encode(
             hashlib.sha1(user.email).digest()).rstrip('=')
+
+
+@fudge.patch('django_browserid.auth.BrowserIDBackend._verify_http_request')
+def test_authenticate_create_user_with_alternate_username_algo(fake):
+    """Test that automatic user creation with an alternate username algo
+    works."""
+
+    def username_algo(email):
+        return email.split('@')[0]
+
+    with positive_assertion(fake, email=u'myemail@example.org'):
+        setattr(settings, 'BROWSERID_CREATE_USER', True)
+        setattr(settings, 'BROWSERID_USERNAME_ALGO', username_algo)
+        user = auth.authenticate(**authenticate_kwargs)
+        assert user
+        assert user.email == 'myemail@example.org'
+        assert user.username == 'myemail'
 
 
 @fudge.patch('django_browserid.auth.BrowserIDBackend._verify_http_request')
