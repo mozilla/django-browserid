@@ -71,6 +71,14 @@ def get_audience(request):
 
     return site_url
 
+def default_username_algo(email):
+    # store the username as a base64 encoded sha1 of the email address
+    # this protects against data leakage because usernames are often
+    # treated as public identifiers (so we can't use the email address).
+    username = base64.urlsafe_b64encode(
+        hashlib.sha1(email).digest()).rstrip('=')
+    return username
+
 
 class BrowserIDBackend(object):
     supports_anonymous_user = False
@@ -150,12 +158,11 @@ class BrowserIDBackend(object):
         create_user = getattr(settings, 'BROWSERID_CREATE_USER', False)
         if not create_user:
             return None
-        # store the username as a base64 encoded sha1 of the email address
-        # this protects against data leakage because usernames are often
-        # treated as public identifiers (so we can't use the email address).
-        username = base64.urlsafe_b64encode(
-            hashlib.sha1(email).digest()).rstrip('=')
-        user = self.create_user(username, email)
+
+        username_algo = getattr(settings, 'BROWSERID_USERNAME_ALGO',
+                                default_username_algo)
+        user = User.objects.create_user(username_algo(email), email)
+
         user.is_active = True
         user.save()
         return user
