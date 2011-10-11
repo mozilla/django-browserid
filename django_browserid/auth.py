@@ -50,6 +50,14 @@ class BrowserIDBackend(object):
             return result
         return False
 
+    def filter_users_by_email(self, email):
+        """Return all users matching the specified email."""
+        return User.objects.filter(email=email)
+
+    def create_user(self, username, email):
+        """Return object for a newly created user account."""
+        return User.objects.create_user(username, email)
+
     def authenticate(self, assertion=None, host=None, port=None):
         result = self.verify(assertion, self.get_audience(host, port))
         if result is None:
@@ -57,7 +65,7 @@ class BrowserIDBackend(object):
         email = result['email']
         # in the rare case that two user accounts have the same email address,
         # log and bail. randomly selecting one seems really wrong.
-        users = User.objects.filter(email=email)
+        users = self.filter_users_by_email(email=email)
         if len(users) > 1:
             log.warn('%d users with email address %s.' % (len(users), email))
             return None
@@ -71,7 +79,7 @@ class BrowserIDBackend(object):
         # treated as public identifiers (so we can't use the email address).
         username = base64.urlsafe_b64encode(
             hashlib.sha1(email).digest()).rstrip('=')
-        user = User.objects.create_user(username, email)
+        user = self.create_user(username, email)
         user.is_active = True
         user.save()
         return user
