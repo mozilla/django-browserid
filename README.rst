@@ -111,11 +111,8 @@ If you do not wish to automatically create user accounts, you may manually verif
           if not form.is_valid():
               # do something
           host = request.get_host()
-          if ':' in host:
-              host, port = host.split(':')
-          else:
-              port = '80'
-          audience = get_audience(host, port)
+          https = request.is_secure()
+          audience = get_audience(host, https)
           result = verify(form.cleaned_data['assertion'], audience)
           # ...
 

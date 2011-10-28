@@ -16,7 +16,6 @@ from django.contrib.auth.models import User
 
 log = logging.getLogger(__name__)
 
-DEFAULT_HTTP_PORT = '80'
 DEFAULT_HTTP_TIMEOUT = 5
 DEFAULT_VERIFICATION_URL = 'https://browserid.org/verify'
 OKAY_RESPONSE = 'okay'
@@ -26,10 +25,19 @@ class BrowserIDBackend(object):
     supports_anonymous_user = False
     supports_object_permissions = False
 
-    def get_audience(self, host, port):
-        if port and port != DEFAULT_HTTP_PORT:
-            return u'%s:%s' % (host, port)
-        return host
+    def get_audience(self, host, https):
+        if https:
+            scheme = 'https'
+            default_port = 443
+        else:
+            scheme = 'http'
+            default_port = 80
+
+        audience = "%s://%s" % (scheme, host)
+        if ':' in host:
+            return audience
+        else:
+            return "%s:%s" % (audience, default_port)
 
     def _verify_http_request(self, url, qs):
         params = {'timeout': getattr(settings, 'BROWSERID_HTTP_TIMEOUT',
@@ -78,8 +86,8 @@ class BrowserIDBackend(object):
         """Return object for a newly created user account."""
         return User.objects.create_user(username, email)
 
-    def authenticate(self, assertion=None, host=None, port=None):
-        result = self.verify(assertion, self.get_audience(host, port))
+    def authenticate(self, assertion=None, host=None, https=None):
+        result = self.verify(assertion, self.get_audience(host, https))
         if result is None:
             return None
         email = result['email']

@@ -6,12 +6,6 @@ from django.views.decorators.http import require_POST
 from django_browserid.forms import BrowserIDForm
 
 
-def _get_host_and_port(request):
-    """Return host, port if port is nonstandard or host, '80' otherwise"""
-    host = request.get_host()
-    return ':' in host and host.split(':') or (host, '80')
-
-
 @require_POST
 def verify(request, redirect_field_name=auth.REDIRECT_FIELD_NAME):
     """Process browserid assertions."""
@@ -22,8 +16,8 @@ def verify(request, redirect_field_name=auth.REDIRECT_FIELD_NAME):
     form = BrowserIDForm(data=request.POST)
     if form.is_valid():
         assertion = form.cleaned_data['assertion']
-        host, port = _get_host_and_port(request)
-        user = auth.authenticate(assertion=assertion, host=host, port=port)
+        user = auth.authenticate(assertion=assertion, host=request.get_host(),
+                                 https=request.is_secure())
         if user is not None and user.is_active:
             auth.login(request, user)
             return HttpResponseRedirect(redirect_to)
