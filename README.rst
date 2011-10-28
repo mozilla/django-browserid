@@ -122,11 +122,11 @@ If you do not wish to automatically create user accounts, you may manually verif
 ``result`` will be False if the assertion failed, or a dictionary similar to the following: ::
 
    {
-      u'audience': u'mysite.com:443',
+      u'audience': u'https://mysite.com:443',
       u'email': u'myemail@example.com',
-      u'issuer': u'browserid.org:443',
+      u'issuer': u'browserid.org',
       u'status': u'okay',
-      u'valid-until': 1311377222765
+      u'expires': 1311377222765
    }
 
 You are of course then free to store the email in the session and prompt the user to sign up using a chosen identifier as their username, or whatever else makes sense for your site.
