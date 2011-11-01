@@ -31,10 +31,24 @@ class BrowserIDBackend(object):
         return host
 
     def _verify_http_request(self, url, qs):
-        timeout = getattr(settings, 'BROWSERID_HTTP_TIMEOUT',
-                          DEFAULT_HTTP_TIMEOUT)
+        params = {'timeout': getattr(settings, 'BROWSERID_HTTP_TIMEOUT',
+                                     DEFAULT_HTTP_TIMEOUT)}
+
+        proxy_info = getattr(settings, 'BROWSERID_PROXY_INFO', None)
+        if proxy_info:
+            params['proxy_info'] = proxy_info
+
         ca_certs = getattr(settings, 'BROWSERID_CACERT_FILE', None)
-        client = httplib2.Http(timeout=timeout, ca_certs=ca_certs)
+        if ca_certs:
+            params['ca_certs'] = ca_certs
+
+        disable_cert_check = getattr(settings,
+                                     'BROWSERID_DISABLE_CERT_CHECK',
+                                     False)
+        if disable_cert_check:
+            params['disable_ssl_certificate_validation'] = disable_cert_check
+
+        client = httplib2.Http(**params)
         resp, content = client.request('%s?%s' % (url, qs), 'POST')
         return json.loads(content)
 

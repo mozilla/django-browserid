@@ -40,11 +40,17 @@ You can also set the following optional in ``settings.py`` (they have sensible d
    # URL of a BrowserID verification service.
    BROWSERID_VERIFICATION_URL = 'https://browserid.org/verify'
 
+   # Proxy Info, see httplib2 documentation
+   BROWSERID_PROXY_INFO = None
+
    # CA cert file for validating SSL certificate
-   BROWSERID_CACERT_FILE = ''
+   BROWSERID_CACERT_FILE = None
+
+   # Disable SSL cert validation
+   BROWSERID_DISABLE_CERT_CHECK = False
 
    # Create user accounts automatically if no user is found.
-   BROWSERID_CREATE_USER = False
+   BROWSERID_CREATE_USER = True
 
    # Path to redirect to on successful login.
    LOGIN_REDIRECT_URL = '/'
