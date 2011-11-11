@@ -62,6 +62,8 @@ class BrowserIDBackend(object):
         }))
         if result['status'] == OKAY_RESPONSE:
             return result
+        log.error("BrowserID verification failure. Assertion: %r Audience: %r"
+                  " Response: %r" % (assertion, audience, result))
         return False
 
     def filter_users_by_email(self, email):
