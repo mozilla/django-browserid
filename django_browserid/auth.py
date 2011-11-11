@@ -1,3 +1,4 @@
+
 try:
     import json
 except ImportError:
@@ -49,7 +50,10 @@ class BrowserIDBackend(object):
             params['disable_ssl_certificate_validation'] = disable_cert_check
 
         client = httplib2.Http(**params)
-        resp, content = client.request('%s?%s' % (url, qs), 'POST')
+
+        headers = {'Content-type': 'application/x-www-form-urlencoded'}
+        resp, content = client.request(url, 'POST', body=qs, headers=headers)
+
         return json.loads(content)
 
     def verify(self, assertion, audience):
