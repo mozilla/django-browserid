@@ -1,6 +1,6 @@
 $('#browserid').bind('click', function(e) {
     e.preventDefault();
-    navigator.getVerifiedEmail(function(assertion) {
+    navigator.id.getVerifiedEmail(function(assertion) {
         if (assertion) {
             var $e = $('#id_assertion');
             $e.val(assertion.toString());
