@@ -4,6 +4,7 @@ from django.http import HttpResponseRedirect
 from django.views.decorators.http import require_POST
 
 from django_browserid.forms import BrowserIDForm
+from django_browserid.auth import get_audience
 
 
 @require_POST
@@ -16,8 +17,8 @@ def verify(request, redirect_field_name=auth.REDIRECT_FIELD_NAME):
     form = BrowserIDForm(data=request.POST)
     if form.is_valid():
         assertion = form.cleaned_data['assertion']
-        user = auth.authenticate(assertion=assertion, host=request.get_host(),
-                                 https=request.is_secure())
+        user = auth.authenticate(assertion=assertion,
+                                 audience=get_audience(request))
         if user is not None and user.is_active:
             auth.login(request, user)
             return HttpResponseRedirect(redirect_to)

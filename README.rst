@@ -35,7 +35,35 @@ Edit your ``urls.py`` file and add the following: ::
        # ...
    )
 
-You can also set the following optional in ``settings.py`` (they have sensible defaults): ::
+You can also set the following config in ``settings.py``: ::
+
+    # Note: No trailing slash
+    SITE_URL = 'https://example.com'
+
+BrowserID uses an assertion and an audience to verify a the user. This
+``SITE_URL`` is used to determine the audience. If you don't want to use
+SITE_URL or it is being used for another purpose, you can use PROTOCOL and
+DOMAIN, such as: ::
+
+    PROTOCOL = 'https://'
+    DOMAIN = 'example.com'
+    # Optional
+    PORT = 8001
+
+Either way, for security reasons, it is *very important* to set either SITE_URL
+or DOMAIN.
+
+You can also set the following optional config in ``settings.py`` 
+(they have sensible defaults): ::
+
+   # Path to redirect to on successful login.
+   LOGIN_REDIRECT_URL = '/'
+
+   # Path to redirect to on unsuccessful login attempt.
+   LOGIN_REDIRECT_URL_FAILURE = '/'
+
+Unless your really noodling around with BrowserID, you probably won't need these 
+optional config in ``settings.py`` (they have sensible defaults): ::
 
    # URL of a BrowserID verification service.
    BROWSERID_VERIFICATION_URL = 'https://browserid.org/verify'
@@ -51,12 +79,6 @@ You can also set the following optional in ``settings.py`` (they have sensible d
 
    # Create user accounts automatically if no user is found.
    BROWSERID_CREATE_USER = True
-
-   # Path to redirect to on successful login.
-   LOGIN_REDIRECT_URL = '/'
-
-   # Path to redirect to on unsuccessful login attempt.
-   LOGIN_REDIRECT_URL_FAILURE = '/'
 
 Somewhere in one of your templates, you'll need to create a link and a form with a single hidden input element, which you'll use to submit the BrowserID assertion to the server. If you want to use ``django_browserid.forms.BrowserIDForm``, you could use something like the following template snippet: ::
 
@@ -109,12 +131,10 @@ If you do not wish to automatically create user accounts, you may manually verif
       if request.method == 'POST':
           form = BrowserIDForm(data=request.POST)
           if not form.is_valid():
-              # do something
-          host = request.get_host()
-          https = request.is_secure()
-          audience = get_audience(host, https)
-          result = verify(form.cleaned_data['assertion'], audience)
-          # ...
+              result = verify(form.cleaned_data['assertion'], get_audience())
+              if result:
+                  # check for user account, create account for new users, etc
+                  user = my_get_or_create_user(result.email)
 
 ``result`` will be False if the assertion failed, or a dictionary similar to the following: ::
 
