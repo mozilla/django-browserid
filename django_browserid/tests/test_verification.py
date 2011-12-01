@@ -10,20 +10,18 @@ from django.contrib import auth
 from django_browserid import auth as browserid_auth
 
 assertion = 'foo.bar.baz'
-host = 'localhost'
-port = '8000'
+audience = 'http://localhost:8000'
 
 authenticate_kwargs = {
     'assertion': assertion,
-    'host': host,
-    'port': port
+    'audience': audience,
 }
 
 
 @contextmanager
 def positive_assertion(fake_http_request, **kwargs):
     assertion = {
-        u'audience': u'%s:%s' % (host, port),
+        u'audience': audience,
         u'email': u'myemail@example.com',
         u'issuer': u'browserid.org:443',
         u'status': u'okay',
@@ -57,7 +55,7 @@ def test_backend_authenticate(fake):
 def test_backend_verify(fake):
     """Test that authenticate() calls verify()."""
     (fake.expects_call()
-         .with_args(assertion, u'%s:%s' % (host, port))
+         .with_args(assertion, audience)
          .returns(False))
     auth.authenticate(**authenticate_kwargs)
 
@@ -75,7 +73,7 @@ def test_verify_correct_credentials(fake):
     """Test that verify() returns assertion details when assertion is valid."""
     with positive_assertion(fake):
         backend = browserid_auth.BrowserIDBackend()
-        verification = backend.verify(assertion, u'%s:%s' % (host, port))
+        verification = backend.verify(assertion, audience)
         assert verification['status'] == 'okay'
         assert verification['email'] == 'myemail@example.com'
 
