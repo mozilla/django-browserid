@@ -83,7 +83,8 @@ def test_authenticate_create_user(fake):
     """Test that automatic user creation works when enabled."""
     with positive_assertion(fake):
         setattr(settings, 'BROWSERID_CREATE_USER', True)
-        delattr(settings, 'BROWSERID_USERNAME_ALGO')
+        if getattr(settings, 'BROWSERID_USERNAME_ALGO', None):
+            delattr(settings, 'BROWSERID_USERNAME_ALGO')
         user = auth.authenticate(**authenticate_kwargs)
         # user should have been created
         assert user

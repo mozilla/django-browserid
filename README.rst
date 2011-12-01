@@ -62,21 +62,6 @@ You can also set the following optional config in ``settings.py``
    # Path to redirect to on unsuccessful login attempt.
    LOGIN_REDIRECT_URL_FAILURE = '/'
 
-Unless your really noodling around with BrowserID, you probably won't need these 
-optional config in ``settings.py`` (they have sensible defaults): ::
-
-   # URL of a BrowserID verification service.
-   BROWSERID_VERIFICATION_URL = 'https://browserid.org/verify'
-
-   # Proxy Info, see httplib2 documentation
-   BROWSERID_PROXY_INFO = None
-
-   # CA cert file for validating SSL certificate
-   BROWSERID_CACERT_FILE = None
-
-   # Disable SSL cert validation
-   BROWSERID_DISABLE_CERT_CHECK = False
-
    # Create user accounts automatically if no user is found.
    BROWSERID_CREATE_USER = True
 
@@ -115,12 +100,27 @@ Finally, you'll need some Javascript to handle the onclick event. If you use ``d
      });
    });
 
+Automatic Account Creation
+--------------------------
+
+``django-browserid`` will automatically create a user account for new users if the setting ``BROWSERID_CREATE_USER`` is set to ``True`` in ``settings.py``. The user account will be created with the verified email returned from the BrowserID verification service, and a URL safe base64 encoded SHA1 of the email with the padding removed as the username.
+
+To provide a customized username, you can provide a different algorytm via your settings.py. ::
+
+   # settings.py
+   BROWSERID_CREATE_USER = True
+   def username(email):
+       return email.split('@')[0]
+   BROWSERID_USERNAME_ALGO = username
+
+You can __disable account creation__, but continue to use the ``browserid_verify`` view to authenticate existing users with the following: ::
+
+    BROWSERID_CREATE_USER = False
+
 Creating User Accounts
 ----------------------
 
-``django-browserid`` will automatically create a user account for new users if the setting ``BROWSERID_CREATE_USER`` is set to ``True`` in ``settings.py``. The user account will be created with the verified email returned from the BrowserID verification service, and a URL safe base64 encoded SHA1 of the email with the padding removed as the username. 
-
-If you do not wish to automatically create user accounts, you may manually verify a BrowserID assertion with something like the following: ::
+If you want full control over account creation, don't use django-browserid's browserid_verify view. Create your own view and use ``verify`` to manually verify a BrowserID assertion with something like the following: ::
 
    from django_browserid.auth import get_audience, verify
    from django_browserid.forms import BrowserIDForm
@@ -131,12 +131,12 @@ If you do not wish to automatically create user accounts, you may manually verif
       if request.method == 'POST':
           form = BrowserIDForm(data=request.POST)
           if not form.is_valid():
-              result = verify(form.cleaned_data['assertion'], get_audience())
+              result = verify(form.cleaned_data['assertion'], get_audience(request))
               if result:
                   # check for user account, create account for new users, etc
                   user = my_get_or_create_user(result.email)
 
-``result`` will be False if the assertion failed, or a dictionary similar to the following: ::
+``result`` will be ``False`` if the assertion failed, or a dictionary similar to the following: ::
 
    {
       u'audience': u'https://mysite.com:443',
@@ -147,6 +147,24 @@ If you do not wish to automatically create user accounts, you may manually verif
    }
 
 You are of course then free to store the email in the session and prompt the user to sign up using a chosen identifier as their username, or whatever else makes sense for your site.
+
+Obscure Options
+-------
+
+Unless your really noodling around with BrowserID, you probably won't need these 
+optional config in ``settings.py`` (they have sensible defaults): ::
+
+   # URL of a BrowserID verification service.
+   BROWSERID_VERIFICATION_URL = 'https://browserid.org/verify'
+
+   # Proxy Info, see httplib2 documentation
+   BROWSERID_PROXY_INFO = None
+
+   # CA cert file for validating SSL ceprtificate
+   BROWSERID_CACERT_FILE = None
+
+   # Disable SSL cert validation
+   BROWSERID_DISABLE_CERT_CHECK = False
 
 License
 -------

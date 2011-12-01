@@ -47,29 +47,43 @@ def get_audience(request):
     """
     site_url = getattr(settings, 'SITE_URL', False)
 
+    # Note audience based on request for developer warnings
+    if request.is_secure():
+        req_proto = 'https://'
+    else:
+        req_proto = 'http://'
+    req_domain = request.get_host()
+
     # If we don't define it explicitly
     if not site_url:
-        if request.is_secure():
-            req_proto = 'https://'
-        else:
-            req_proto = 'http://'
         protocol = getattr(settings, 'PROTOCOL', req_proto)
-        req_domain = request.get_host()
         if not getattr(settings, 'DOMAIN'):
             log.warning('django-browserid WARNING you are missing '
                         'settings.SITE_URL. This is not a secure way '
                         'to verify assertions. Please fix me. '
                         'Setting domain to %s.' % req_domain)
 
-        domain = getattr(settings, 'DOMAIN', req_domain)
+        # DOMAIN is example.com req_domain is example.com:8001
+        domain = getattr(settings, 'DOMAIN', req_domain.split(':')[0])
+
         standards = {'https://': 443, 'http://': 80}
-        port = getattr(settings, 'PORT', standards[protocol])
+        if ':' in req_domain:
+            req_port = req_domain.split(':')[1]
+        else:
+            req_port = None
+        port = getattr(settings, 'PORT', req_port or standards[protocol])
         if port == standards[protocol]:
             site_url = ''.join(map(str, (protocol, domain)))
         else:
             site_url = ''.join(map(str, (protocol, domain, ':', port)))
 
+    req_url = "%s%s" % (req_proto, req_domain)
+    if site_url != "%s%s" % (req_proto, req_domain):
+        log.warning('Misconfigured SITE_URL? settings has [%s], but '
+                    'actual request was [%s] BrowserID may fail on '
+                    'audience' % (site_url, req_url))
     return site_url
+
 
 def default_username_algo(email):
     # store the username as a base64 encoded sha1 of the email address
