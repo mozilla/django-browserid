@@ -121,7 +121,14 @@ class BrowserIDBackend(object):
         headers = {'Content-type': 'application/x-www-form-urlencoded'}
         resp, content = client.request(url, 'POST', body=qs, headers=headers)
 
-        return json.loads(content)
+        try:
+            rv = json.loads(content)
+        except ValueError:
+            log.debug('Failed to decode JSON. Resp: %s, Content: %s' % (
+                resp, content))
+            return dict(status='failure')
+
+        return rv
 
     def verify(self, assertion, audience):
         """Verify assertion using an external verification service."""
