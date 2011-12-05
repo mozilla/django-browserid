@@ -19,18 +19,18 @@ To use ``django-browserid``, add it to ``INSTALLED_APPS`` in ``settings.py``: ::
        # ...
    )
 
-and add ``django_browserid.auth.BrowserIDBackend`` to ``AUTHENTICATION_BACKENDS`` in ``settings.py``: ::
+and add ``django_browserid.BrowserIDBackend`` to ``AUTHENTICATION_BACKENDS`` in ``settings.py``: ::
 
    AUTHENTICATION_BACKENDS = (
        # ...
-       'django_browserid.auth.BrowserIDBackend',
+       'django_browserid.BrowserIDBackend',
        # ...
    )
 
 Edit your ``urls.py`` file and add the following: ::
 
    urlpatterns = patterns('',
-       # ... 
+       # ...
        (r'^browserid/', include('django_browserid.urls')),
        # ...
    )
@@ -53,7 +53,7 @@ DOMAIN, such as: ::
 Either way, for security reasons, it is *very important* to set either SITE_URL
 or DOMAIN.
 
-You can also set the following optional config in ``settings.py`` 
+You can also set the following optional config in ``settings.py``
 (they have sensible defaults): ::
 
    # Path to redirect to on successful login.
@@ -122,7 +122,7 @@ Creating User Accounts
 
 If you want full control over account creation, don't use django-browserid's browserid_verify view. Create your own view and use ``verify`` to manually verify a BrowserID assertion with something like the following: ::
 
-   from django_browserid.auth import get_audience, verify
+   from django_browserid import get_audience, verify
    from django_browserid.forms import BrowserIDForm
 
 
@@ -151,7 +151,7 @@ You are of course then free to store the email in the session and prompt the use
 Obscure Options
 -------
 
-Unless your really noodling around with BrowserID, you probably won't need these 
+Unless your really noodling around with BrowserID, you probably won't need these
 optional config in ``settings.py`` (they have sensible defaults): ::
 
    # URL of a BrowserID verification service.

@@ -7,7 +7,7 @@ from contextlib import contextmanager
 from django.conf import settings
 from django.contrib import auth
 
-from django_browserid import auth as browserid_auth
+from django_browserid.base import verify
 
 assertion = 'foo.bar.baz'
 audience = 'http://localhost:8000'
@@ -51,7 +51,7 @@ def test_backend_authenticate(fake):
     auth.authenticate(**authenticate_kwargs)
 
 
-@fudge.patch('django_browserid.auth.BrowserIDBackend.verify')
+@fudge.patch('django_browserid.auth.verify')
 def test_backend_verify(fake):
     """Test that authenticate() calls verify()."""
     (fake.expects_call()
@@ -60,7 +60,7 @@ def test_backend_verify(fake):
     auth.authenticate(**authenticate_kwargs)
 
 
-@fudge.patch('django_browserid.auth.BrowserIDBackend._verify_http_request')
+@fudge.patch('django_browserid.base._verify_http_request')
 def test_backend_verify_invalid_assertion(fake):
     """Test that authenticate() returns None when credentials are bad."""
     with negative_assertion(fake):
@@ -68,17 +68,16 @@ def test_backend_verify_invalid_assertion(fake):
         assert user is None
 
 
-@fudge.patch('django_browserid.auth.BrowserIDBackend._verify_http_request')
+@fudge.patch('django_browserid.base._verify_http_request')
 def test_verify_correct_credentials(fake):
     """Test that verify() returns assertion details when assertion is valid."""
     with positive_assertion(fake):
-        backend = browserid_auth.BrowserIDBackend()
-        verification = backend.verify(assertion, audience)
+        verification = verify(assertion, audience)
         assert verification['status'] == 'okay'
         assert verification['email'] == 'myemail@example.com'
 
 
-@fudge.patch('django_browserid.auth.BrowserIDBackend._verify_http_request')
+@fudge.patch('django_browserid.base._verify_http_request')
 def test_authenticate_create_user(fake):
     """Test that automatic user creation works when enabled."""
     with positive_assertion(fake):
@@ -93,7 +92,7 @@ def test_authenticate_create_user(fake):
             hashlib.sha1(user.email).digest()).rstrip('=')
 
 
-@fudge.patch('django_browserid.auth.BrowserIDBackend._verify_http_request')
+@fudge.patch('django_browserid.base._verify_http_request')
 def test_authenticate_create_user_with_alternate_username_algo(fake):
     """Test that automatic user creation with an alternate username algo
     works."""
@@ -110,7 +109,7 @@ def test_authenticate_create_user_with_alternate_username_algo(fake):
         assert user.username == 'myemail'
 
 
-@fudge.patch('django_browserid.auth.BrowserIDBackend._verify_http_request')
+@fudge.patch('django_browserid.base._verify_http_request')
 def test_authenticate_missing_user(fake):
     """Test that authenticate() returns None when user creation disabled."""
     with positive_assertion(fake, email='someotheremail@example.com'):
