@@ -134,14 +134,18 @@ class BrowserIDBackend(object):
         """Verify assertion using an external verification service."""
         verify_url = getattr(settings, 'BROWSERID_VERIFICATION_URL',
                              DEFAULT_VERIFICATION_URL)
+
+        log.info("Verification URL: %s" % verify_url)
+
         result = self._verify_http_request(verify_url, urllib.urlencode({
             'assertion': assertion,
             'audience': audience
         }))
         if result['status'] == OKAY_RESPONSE:
             return result
-        log.error("BrowserID verification failure. Assertion: %r Audience: %r"
-                  " Response: %r" % (assertion, audience, result))
+        log.error("BrowserID verification failure. Response: %r"
+                  " Audience: %r" % (result, audience))
+        log.error("BID assert: %r" % assertion)
         return False
 
     def filter_users_by_email(self, email):
