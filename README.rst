@@ -10,7 +10,7 @@ This is ``django-browserid``, a drop-in `Django`_ application that adds support 
 Installation
 ------------
 
-To use ``django-browserid``, add it to ``INSTALLED_APPS`` in ``settings.py``: ::
+To use ``django-browserid``, add it to ``INSTALLED_APPS`` in ``settings.py``::
 
    INSTALLED_APPS = (
        # ...
@@ -19,7 +19,7 @@ To use ``django-browserid``, add it to ``INSTALLED_APPS`` in ``settings.py``: ::
        # ...
    )
 
-and add ``django_browserid.auth.BrowserIDBackend`` to ``AUTHENTICATION_BACKENDS`` in ``settings.py``: ::
+and add ``django_browserid.auth.BrowserIDBackend`` to ``AUTHENTICATION_BACKENDS`` in ``settings.py``::
 
    AUTHENTICATION_BACKENDS = (
        # ...
@@ -27,7 +27,7 @@ and add ``django_browserid.auth.BrowserIDBackend`` to ``AUTHENTICATION_BACKENDS`
        # ...
    )
 
-Edit your ``urls.py`` file and add the following: ::
+Edit your ``urls.py`` file and add the following::
 
    urlpatterns = patterns('',
        # ... 
@@ -35,15 +35,15 @@ Edit your ``urls.py`` file and add the following: ::
        # ...
    )
 
-You can also set the following config in ``settings.py``: ::
+You can also set the following config in ``settings.py``::
 
     # Note: No trailing slash
     SITE_URL = 'https://example.com'
 
-BrowserID uses an assertion and an audience to verify a the user. This
+BrowserID uses an assertion and an audience to verify the user. This
 ``SITE_URL`` is used to determine the audience. If you don't want to use
 SITE_URL or it is being used for another purpose, you can use PROTOCOL and
-DOMAIN, such as: ::
+DOMAIN, such as::
 
     PROTOCOL = 'https://'
     DOMAIN = 'example.com'
@@ -54,7 +54,7 @@ Either way, for security reasons, it is *very important* to set either SITE_URL
 or DOMAIN.
 
 You can also set the following optional config in ``settings.py`` 
-(they have sensible defaults): ::
+(they have sensible defaults)::
 
    # Path to redirect to on successful login.
    LOGIN_REDIRECT_URL = '/'
@@ -76,11 +76,11 @@ Somewhere in one of your templates, you'll need to create a link and a form with
    {% endif %}
 
 
-You'll want to include the BrowserID's library at the bottom of this template ::
+You'll want to include the BrowserID's library at the bottom of this template::
 
     <script src="https://browserid.org/include.js" type="text/javascript"></script>
 
-If you use browserid_form, it is further recommended that you add ``django_browserid.context_processors.browserid_form`` to  ``TEMPLATE_CONTEXT_PROCESSORS``; this will create the ``browserid_form`` variable automatically in ``RequestContext`` instances when needed. That is, in ``settings.py``: ::
+If you use browserid_form, it is further recommended that you add ``django_browserid.context_processors.browserid_form`` to  ``TEMPLATE_CONTEXT_PROCESSORS``; this will create the ``browserid_form`` variable automatically in ``RequestContext`` instances when needed. That is, in ``settings.py``::
 
    TEMPLATE_CONTEXT_PROCESSORS = (
        # ...
@@ -88,7 +88,7 @@ If you use browserid_form, it is further recommended that you add ``django_brows
        # ...
    )
 
-Finally, you'll need some Javascript to handle the onclick event. If you use ``django_browserid.forms.BrowserIDForm``, you can use the javascript in ``static/browserid.js``. Otherwise, you can use it as a basic example: ::
+Finally, you'll need some Javascript to handle the onclick event. If you use ``django_browserid.forms.BrowserIDForm``, you can use the javascript in ``static/browserid.js``. Otherwise, you can use it as a basic example::
 
    $('#browserid').bind('click', function(e) {
      e.preventDefault();
@@ -106,7 +106,7 @@ Automatic Account Creation
 
 ``django-browserid`` will automatically create a user account for new users if the setting ``BROWSERID_CREATE_USER`` is set to ``True`` in ``settings.py``. The user account will be created with the verified email returned from the BrowserID verification service, and a URL safe base64 encoded SHA1 of the email with the padding removed as the username.
 
-To provide a customized username, you can provide a different algorytm via your settings.py. ::
+To provide a customized username, you can provide a different algorithm via your settings.py::
 
    # settings.py
    BROWSERID_CREATE_USER = True
@@ -114,14 +114,14 @@ To provide a customized username, you can provide a different algorytm via your 
        return email.split('@')[0]
    BROWSERID_USERNAME_ALGO = username
 
-You can __disable account creation__, but continue to use the ``browserid_verify`` view to authenticate existing users with the following: ::
+You can disable account creation, but continue to use the ``browserid_verify`` view to authenticate existing users with the following::
 
     BROWSERID_CREATE_USER = False
 
 Creating User Accounts
 ----------------------
 
-If you want full control over account creation, don't use django-browserid's browserid_verify view. Create your own view and use ``verify`` to manually verify a BrowserID assertion with something like the following: ::
+If you want full control over account creation, don't use django-browserid's ``browserid_verify`` view. Create your own view and use ``verify`` to manually verify a BrowserID assertion with something like the following::
 
    from django_browserid.auth import get_audience, verify
    from django_browserid.forms import BrowserIDForm
@@ -137,7 +137,7 @@ If you want full control over account creation, don't use django-browserid's bro
                   # check for user account, create account for new users, etc
                   user = my_get_or_create_user(result.email)
 
-``result`` will be ``False`` if the assertion failed, or a dictionary similar to the following: ::
+``result`` will be ``False`` if the assertion failed, or a dictionary similar to the following::
 
    {
       u'audience': u'https://mysite.com:443',
@@ -150,10 +150,10 @@ If you want full control over account creation, don't use django-browserid's bro
 You are of course then free to store the email in the session and prompt the user to sign up using a chosen identifier as their username, or whatever else makes sense for your site.
 
 Obscure Options
--------
+---------------
 
 Unless your really noodling around with BrowserID, you probably won't need these 
-optional config in ``settings.py`` (they have sensible defaults): ::
+optional config in ``settings.py`` (they have sensible defaults)::
 
    # URL of a BrowserID verification service.
    BROWSERID_VERIFICATION_URL = 'https://browserid.org/verify'
