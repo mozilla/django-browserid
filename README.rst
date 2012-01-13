@@ -70,6 +70,7 @@ Somewhere in one of your templates, you'll need to create a link and a form with
    {% if not user.is_authenticated %}
    <a id="browserid" href="{% url gracefully_degrade %}">Sign In</a>
    <form method="POST" action="{% url browserid_verify %}">
+      {% csrf_token %}
       {{ browserid_form.as_p }}
    </form>
    {% endif %}
