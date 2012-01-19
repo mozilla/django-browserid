@@ -1,4 +1,4 @@
--e hg+https://code.google.com/p/httplib2/@6525cadfde53#egg=httplib2
+requests==0.9.1
 
 # Tests
 fudge==1.0.3

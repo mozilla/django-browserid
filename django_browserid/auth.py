@@ -8,7 +8,7 @@ import hashlib
 import logging
 import urllib
 
-import httplib2
+import requests
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -99,33 +99,22 @@ class BrowserIDBackend(object):
     supports_object_permissions = False
 
     def _verify_http_request(self, url, qs):
-        params = {'timeout': getattr(settings, 'BROWSERID_HTTP_TIMEOUT',
-                                     DEFAULT_HTTP_TIMEOUT)}
+        parameters = {'data': qs}
+        parameters['params'] = {'timeout': getattr(
+                settings, 'BROWSERID_HTTP_TIMEOUT', DEFAULT_HTTP_TIMEOUT)}
+        parameters['proxies'] = getattr(settings, 'BROWSERID_PROXY_INFO', None)
+        parameters['verify'] = getattr(settings, 'BROWSERID_DISABLE_CERT_CHECK', False)
+        if not parameters['verify']:
+            parameters['verify'] = getattr(settings, 'BROWSERID_CACERT_FILE', True)
 
-        proxy_info = getattr(settings, 'BROWSERID_PROXY_INFO', None)
-        if proxy_info:
-            params['proxy_info'] = proxy_info
-
-        ca_certs = getattr(settings, 'BROWSERID_CACERT_FILE', None)
-        if ca_certs:
-            params['ca_certs'] = ca_certs
-
-        disable_cert_check = getattr(settings,
-                                     'BROWSERID_DISABLE_CERT_CHECK',
-                                     False)
-        if disable_cert_check:
-            params['disable_ssl_certificate_validation'] = disable_cert_check
-
-        client = httplib2.Http(**params)
-
-        headers = {'Content-type': 'application/x-www-form-urlencoded'}
-        resp, content = client.request(url, 'POST', body=qs, headers=headers)
+        parameters['headers'] = {'Content-type': 'application/x-www-form-urlencoded'}
+        r = requests.post(url, **parameters)
 
         try:
-            rv = json.loads(content)
+            rv = json.loads(r.content)
         except ValueError:
             log.debug('Failed to decode JSON. Resp: %s, Content: %s' % (
-                resp, content))
+                r.status_code, r.content))
             return dict(status='failure')
 
         return rv

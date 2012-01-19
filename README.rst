@@ -30,7 +30,7 @@ and add ``django_browserid.auth.BrowserIDBackend`` to ``AUTHENTICATION_BACKENDS`
 Edit your ``urls.py`` file and add the following: ::
 
    urlpatterns = patterns('',
-       # ... 
+       # ...
        (r'^browserid/', include('django_browserid.urls')),
        # ...
    )
@@ -53,7 +53,7 @@ DOMAIN, such as: ::
 Either way, for security reasons, it is *very important* to set either SITE_URL
 or DOMAIN.
 
-You can also set the following optional config in ``settings.py`` 
+You can also set the following optional config in ``settings.py``
 (they have sensible defaults): ::
 
    # Path to redirect to on successful login.
@@ -152,14 +152,11 @@ You are of course then free to store the email in the session and prompt the use
 Obscure Options
 -------
 
-Unless your really noodling around with BrowserID, you probably won't need these 
+Unless your really noodling around with BrowserID, you probably won't need these
 optional config in ``settings.py`` (they have sensible defaults): ::
 
    # URL of a BrowserID verification service.
    BROWSERID_VERIFICATION_URL = 'https://browserid.org/verify'
-
-   # Proxy Info, see httplib2 documentation
-   BROWSERID_PROXY_INFO = None
 
    # CA cert file for validating SSL ceprtificate
    BROWSERID_CACERT_FILE = None
