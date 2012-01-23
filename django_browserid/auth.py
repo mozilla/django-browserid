@@ -23,28 +23,28 @@ OKAY_RESPONSE = 'okay'
 def get_audience(request):
     """Uses Django settings to format the audience.
 
-    To use this function, make sure there is either a SITE_URL in
-    your settings.py file or PROTOCOL and DOMAIN.
+To use this function, make sure there is either a SITE_URL in
+your settings.py file or PROTOCOL and DOMAIN.
 
-    Examples using SITE_URL:
-        SITE_URL = 'http://127.0.0.1:8001'
-        SITE_URL = 'https://example.com'
-        SITE_URL = 'http://example.com'
+Examples using SITE_URL:
+SITE_URL = 'http://127.0.0.1:8001'
+SITE_URL = 'https://example.com'
+SITE_URL = 'http://example.com'
 
-    If you don't have a SITE_URL you can also use these varables:
-    PROTOCOL, DOMAIN, and (optionally) PORT.
-    Example 1:
-        PROTOCOL = 'https://'
-        DOMAIN = 'example.com'
+If you don't have a SITE_URL you can also use these varables:
+PROTOCOL, DOMAIN, and (optionally) PORT.
+Example 1:
+PROTOCOL = 'https://'
+DOMAIN = 'example.com'
 
-    Example 2:
-        PROTOCOL = 'http://'
-        DOMAIN = '127.0.0.1'
-        PORT = '8001'
+Example 2:
+PROTOCOL = 'http://'
+DOMAIN = '127.0.0.1'
+PORT = '8001'
 
-    If none are set, we trust the request to populate the audience.
-    This is *not secure*!
-    """
+If none are set, we trust the request to populate the audience.
+This is *not secure*!
+"""
     site_url = getattr(settings, 'SITE_URL', False)
 
     # Note audience based on request for developer warnings
@@ -83,15 +83,6 @@ def get_audience(request):
                     'actual request was [%s] BrowserID may fail on '
                     'audience' % (site_url, req_url))
     return site_url
-
-
-def default_username_algo(email):
-    # store the username as a base64 encoded sha1 of the email address
-    # this protects against data leakage because usernames are often
-    # treated as public identifiers (so we can't use the email address).
-    username = base64.urlsafe_b64encode(
-        hashlib.sha1(email).digest()).rstrip('=')
-    return username
 
 
 class BrowserIDBackend(object):
@@ -141,22 +132,27 @@ class BrowserIDBackend(object):
         """Return all users matching the specified email."""
         return User.objects.filter(email=email)
 
-    def create_user(self, username, email):
+    def create_user(self, email):
         """Return object for a newly created user account."""
-        return User.objects.create_user(username, email)
+        username_algo = getattr(settings, 'BROWSERID_USERNAME_ALGO',
+                                self._username_algo)
+        user = User.objects.create_user(username_algo(email), email)
+        user.is_active = True
+        user.save()
+        return user
 
     def authenticate(self, assertion=None, audience=None):
         """``django.contrib.auth`` compatible authentication method.
 
-        Given a BrowserID assertion and an audience, it attempts to
-        verify them and then extract the email address for the authenticated
-        user.
+Given a BrowserID assertion and an audience, it attempts to
+verify them and then extract the email address for the authenticated
+user.
 
-        An audience should be in the form ``https://example.com`` or
-        ``http://localhost:8001``.
+An audience should be in the form ``https://example.com`` or
+``http://localhost:8001``.
 
-        See django_browserid.auth.get_audience()
-        """
+See django_browserid.auth.get_audience()
+"""
         result = self.verify(assertion, audience)
         if result is None:
             return None
@@ -169,20 +165,22 @@ class BrowserIDBackend(object):
             return None
         if len(users) == 1:
             return users[0]
-        create_user = getattr(settings, 'BROWSERID_CREATE_USER', False)
-        if not create_user:
+
+        if not getattr(settings, 'BROWSERID_CREATE_USER', False):
             return None
 
-        username_algo = getattr(settings, 'BROWSERID_USERNAME_ALGO',
-                                default_username_algo)
-        user = User.objects.create_user(username_algo(email), email)
-
-        user.is_active = True
-        user.save()
-        return user
+        return self.create_user(email)
 
     def get_user(self, user_id):
         try:
             return User.objects.get(pk=user_id)
         except User.DoesNotExist:
             return None
+
+    def _username_algo(self, email):
+        # store the username as a base64 encoded sha1 of the email address
+        # this protects against data leakage because usernames are often
+        # treated as public identifiers (so we can't use the email address).
+        username = base64.urlsafe_b64encode(
+            hashlib.sha1(email).digest()).rstrip('=')
+        return username
