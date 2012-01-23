@@ -23,28 +23,28 @@ OKAY_RESPONSE = 'okay'
 def get_audience(request):
     """Uses Django settings to format the audience.
 
-    To use this function, make sure there is either a SITE_URL in
-    your settings.py file or PROTOCOL and DOMAIN.
+To use this function, make sure there is either a SITE_URL in
+your settings.py file or PROTOCOL and DOMAIN.
 
-    Examples using SITE_URL:
-        SITE_URL = 'http://127.0.0.1:8001'
-        SITE_URL = 'https://example.com'
-        SITE_URL = 'http://example.com'
+Examples using SITE_URL:
+SITE_URL = 'http://127.0.0.1:8001'
+SITE_URL = 'https://example.com'
+SITE_URL = 'http://example.com'
 
-    If you don't have a SITE_URL you can also use these varables:
-    PROTOCOL, DOMAIN, and (optionally) PORT.
-    Example 1:
-        PROTOCOL = 'https://'
-        DOMAIN = 'example.com'
+If you don't have a SITE_URL you can also use these varables:
+PROTOCOL, DOMAIN, and (optionally) PORT.
+Example 1:
+PROTOCOL = 'https://'
+DOMAIN = 'example.com'
 
-    Example 2:
-        PROTOCOL = 'http://'
-        DOMAIN = '127.0.0.1'
-        PORT = '8001'
+Example 2:
+PROTOCOL = 'http://'
+DOMAIN = '127.0.0.1'
+PORT = '8001'
 
-    If none are set, we trust the request to populate the audience.
-    This is *not secure*!
-    """
+If none are set, we trust the request to populate the audience.
+This is *not secure*!
+"""
     site_url = getattr(settings, 'SITE_URL', False)
 
     # Note audience based on request for developer warnings
@@ -144,15 +144,15 @@ class BrowserIDBackend(object):
     def authenticate(self, assertion=None, audience=None):
         """``django.contrib.auth`` compatible authentication method.
 
-        Given a BrowserID assertion and an audience, it attempts to
-        verify them and then extract the email address for the authenticated
-        user.
+Given a BrowserID assertion and an audience, it attempts to
+verify them and then extract the email address for the authenticated
+user.
 
-        An audience should be in the form ``https://example.com`` or
-        ``http://localhost:8001``.
+An audience should be in the form ``https://example.com`` or
+``http://localhost:8001``.
 
-        See django_browserid.auth.get_audience()
-        """
+See django_browserid.auth.get_audience()
+"""
         result = self.verify(assertion, audience)
         if result is None:
             return None
