@@ -7,11 +7,14 @@ import base64
 import hashlib
 import logging
 import urllib
+import warnings
 
 import requests
 
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.exceptions import ImproperlyConfigured
+from django.utils.importlib import import_module
 
 log = logging.getLogger(__name__)
 
@@ -27,20 +30,20 @@ def get_audience(request):
     your settings.py file or PROTOCOL and DOMAIN.
 
     Examples using SITE_URL:
-        SITE_URL = 'http://127.0.0.1:8001'
-        SITE_URL = 'https://example.com'
-        SITE_URL = 'http://example.com'
+    SITE_URL = 'http://127.0.0.1:8001'
+    SITE_URL = 'https://example.com'
+    SITE_URL = 'http://example.com'
 
     If you don't have a SITE_URL you can also use these varables:
     PROTOCOL, DOMAIN, and (optionally) PORT.
     Example 1:
-        PROTOCOL = 'https://'
-        DOMAIN = 'example.com'
+    PROTOCOL = 'https://'
+    DOMAIN = 'example.com'
 
     Example 2:
-        PROTOCOL = 'http://'
-        DOMAIN = '127.0.0.1'
-        PORT = '8001'
+    PROTOCOL = 'http://'
+    DOMAIN = '127.0.0.1'
+    PORT = '8001'
 
     If none are set, we trust the request to populate the audience.
     This is *not secure*!
@@ -85,15 +88,6 @@ def get_audience(request):
     return site_url
 
 
-def default_username_algo(email):
-    # store the username as a base64 encoded sha1 of the email address
-    # this protects against data leakage because usernames are often
-    # treated as public identifiers (so we can't use the email address).
-    username = base64.urlsafe_b64encode(
-        hashlib.sha1(email).digest()).rstrip('=')
-    return username
-
-
 class BrowserIDBackend(object):
     supports_anonymous_user = False
     supports_object_permissions = False
@@ -124,8 +118,6 @@ class BrowserIDBackend(object):
         verify_url = getattr(settings, 'BROWSERID_VERIFICATION_URL',
                              DEFAULT_VERIFICATION_URL)
 
-        log.info("Verification URL: %s" % verify_url)
-
         result = self._verify_http_request(verify_url, urllib.urlencode({
             'assertion': assertion,
             'audience': audience
@@ -140,10 +132,6 @@ class BrowserIDBackend(object):
     def filter_users_by_email(self, email):
         """Return all users matching the specified email."""
         return User.objects.filter(email=email)
-
-    def create_user(self, username, email):
-        """Return object for a newly created user account."""
-        return User.objects.create_user(username, email)
 
     def authenticate(self, assertion=None, audience=None):
         """``django.contrib.auth`` compatible authentication method.
@@ -169,20 +157,60 @@ class BrowserIDBackend(object):
             return None
         if len(users) == 1:
             return users[0]
+
         create_user = getattr(settings, 'BROWSERID_CREATE_USER', False)
         if not create_user:
             return None
-
-        username_algo = getattr(settings, 'BROWSERID_USERNAME_ALGO',
-                                default_username_algo)
-        user = User.objects.create_user(username_algo(email), email)
-
-        user.is_active = True
-        user.save()
-        return user
+        elif create_user == True:
+            return self._create_user(email)
+        else:
+            # Find the function to call, call it and throw in the email.
+            return self._load_module(create_user)(email)
 
     def get_user(self, user_id):
         try:
             return User.objects.get(pk=user_id)
         except User.DoesNotExist:
             return None
+
+    def _create_user(self, email):
+        """Return object for a newly created user account."""
+        username_algo = getattr(settings, 'BROWSERID_USERNAME_ALGO',
+                                self._username_algo)
+
+        # TODO: Remove this once people have been given fair warning.
+        if getattr(settings, 'BROWSERID_USERNAME_ALGO', False):
+            warnings.warn("BROWSERID_USERNAME_ALGO has been deprecated."
+                          " Please use the BROWSERID_CREATE_USER option.",
+                          DeprecationWarning)
+
+        user = User.objects.create_user(username_algo(email), email)
+        user.is_active = True
+        user.save()
+        return user
+
+    def _username_algo(self, email):
+        # store the username as a base64 encoded sha1 of the email address
+        # this protects against data leakage because usernames are often
+        # treated as public identifiers (so we can't use the email address).
+        username = base64.urlsafe_b64encode(
+            hashlib.sha1(email).digest()).rstrip('=')
+        return username
+
+    def _load_module(self, path):
+        """Code to load create user module. Based off django's load_backend"""
+        i = path.rfind('.')
+        module, attr = path[:i], path[i + 1:]
+        try:
+            mod = import_module(module)
+        except ImportError, e:
+            raise ImproperlyConfigured('Error importing BROWSERID_CREATE_USER function.')
+        except ValueError, e:
+            raise ImproperlyConfigured('Error importing BROWSERID_CREATE_USER function. Is BROWSERID_CREATE_USER a string?')
+
+        try:
+            create_user = getattr(mod, attr)
+        except AttributeError:
+            raise ImproperlyConfigured('Module "%s" does not define a "%s" function.' % (module, attr))
+
+        return create_user
