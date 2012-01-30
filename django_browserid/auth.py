@@ -177,7 +177,8 @@ class BrowserIDBackend(object):
                                 default_username_algo)
         user = User.objects.create_user(username_algo(email), email)
 
-        user.is_active = True
+        if getattr(settings, 'BROWSERID_ACTIVATE_USER', True):
+            user.is_active = True
         user.save()
         return user
 

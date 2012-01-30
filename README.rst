@@ -118,6 +118,10 @@ You can disable account creation, but continue to use the ``browserid_verify`` v
 
     BROWSERID_CREATE_USER = False
 
+To have newly-created users be initially inactive, you can use::
+
+    BROWSERID_ACTIVATE_USER = False
+
 Creating User Accounts
 ----------------------
 
