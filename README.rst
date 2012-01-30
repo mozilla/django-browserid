@@ -123,7 +123,7 @@ Creating User Accounts
 
 If you want full control over account creation, don't use django-browserid's ``browserid_verify`` view. Create your own view and use ``verify`` to manually verify a BrowserID assertion with something like the following::
 
-   from django_browserid.auth import get_audience, verify
+   from django_browserid import get_audience, verify
    from django_browserid.forms import BrowserIDForm
 
 
