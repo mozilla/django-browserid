@@ -57,7 +57,7 @@ def get_audience(request):
     # If we don't define it explicitly
     if not site_url:
         protocol = getattr(settings, 'PROTOCOL', req_proto)
-        if not getattr(settings, 'DOMAIN'):
+        if not getattr(settings, 'DOMAIN', None):
             log.warning('django-browserid WARNING you are missing '
                         'settings.SITE_URL. This is not a secure way '
                         'to verify assertions. Please fix me. '
