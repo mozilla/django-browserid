@@ -19,7 +19,7 @@ def verify(request, redirect_field_name=auth.REDIRECT_FIELD_NAME):
         assertion = form.cleaned_data['assertion']
         user = auth.authenticate(assertion=assertion,
                                  audience=get_audience(request))
-        if user is not None and user.is_active:
+        if user is not None:
             auth.login(request, user)
             return HttpResponseRedirect(redirect_to)
     return HttpResponseRedirect(redirect_to_failure)
