@@ -13,6 +13,9 @@ import requests
 from django.conf import settings
 from django.contrib.auth.models import User
 
+from django_browserid.signals import browserid_signup
+from django_browserid.signals import browserid_login
+
 log = logging.getLogger(__name__)
 
 DEFAULT_HTTP_TIMEOUT = 5
@@ -168,7 +171,9 @@ class BrowserIDBackend(object):
             log.warn('%d users with email address %s.' % (len(users), email))
             return None
         if len(users) == 1:
-            return users[0]
+            user = users[0]
+            browserid_login.send(sender=user)
+            return user
         create_user = getattr(settings, 'BROWSERID_CREATE_USER', False)
         if not create_user:
             return None
@@ -180,6 +185,7 @@ class BrowserIDBackend(object):
         if getattr(settings, 'BROWSERID_ACTIVATE_USER', True):
             user.is_active = True
         user.save()
+        browserid_signup.send(sender=user)
         return user
 
     def get_user(self, user_id):
