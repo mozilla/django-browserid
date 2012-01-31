@@ -13,6 +13,9 @@ import requests
 from django.conf import settings
 from django.contrib.auth.models import User
 
+from django_browserid.signals import browserid_signup
+from django_browserid.signals import browserid_login
+
 log = logging.getLogger(__name__)
 
 DEFAULT_HTTP_TIMEOUT = 5
@@ -57,7 +60,7 @@ def get_audience(request):
     # If we don't define it explicitly
     if not site_url:
         protocol = getattr(settings, 'PROTOCOL', req_proto)
-        if not getattr(settings, 'DOMAIN'):
+        if not getattr(settings, 'DOMAIN', None):
             log.warning('django-browserid WARNING you are missing '
                         'settings.SITE_URL. This is not a secure way '
                         'to verify assertions. Please fix me. '
@@ -168,7 +171,9 @@ class BrowserIDBackend(object):
             log.warn('%d users with email address %s.' % (len(users), email))
             return None
         if len(users) == 1:
-            return users[0]
+            user = users[0]
+            browserid_login.send(sender=user)
+            return user
         create_user = getattr(settings, 'BROWSERID_CREATE_USER', False)
         if not create_user:
             return None
@@ -177,8 +182,10 @@ class BrowserIDBackend(object):
                                 default_username_algo)
         user = User.objects.create_user(username_algo(email), email)
 
-        user.is_active = True
+        if getattr(settings, 'BROWSERID_ACTIVATE_USER', True):
+            user.is_active = True
         user.save()
+        browserid_signup.send(sender=user)
         return user
 
     def get_user(self, user_id):
