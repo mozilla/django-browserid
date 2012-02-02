@@ -1,11 +1,8 @@
 from setuptools import setup
 
-import django_browserid
-
-
 setup(
     name='django-browserid',
-    version=django_browserid.__version__,
+    version='0.2',
     packages=['django_browserid'],
     author="Paul Osman",
     author_email="paul@mozillafoundation.org",
