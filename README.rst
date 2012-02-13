@@ -7,6 +7,11 @@ This is ``django-browserid``, a drop-in `Django`_ application that adds support 
 .. _Django: http://www.djangoproject.com/
 .. _BrowserID: https://browserid.org/
 
+Requirements
+------------
+
+   pip install requests
+
 Installation
 ------------
 
