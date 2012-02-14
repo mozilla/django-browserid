@@ -9,6 +9,7 @@ This is ``django-browserid``, a drop-in `Django`_ application that adds support 
 
 Requirements
 ------------
+Run this to add requirements::
 
    pip install requests
 
@@ -93,17 +94,19 @@ If you use browserid_form, it is further recommended that you add ``django_brows
        # ...
    )
 
-Finally, you'll need some Javascript to handle the onclick event. If you use ``django_browserid.forms.BrowserIDForm``, you can use the javascript in ``static/browserid.js``. Otherwise, you can use it as a basic example::
-
-   $('#browserid').bind('click', function(e) {
-     e.preventDefault();
-     navigator.id.getVerifiedEmail(function(assertion) {
-       if (assertion) {
-         var $e = $('#id_assertion');
-         $e.val(assertion.toString());
-         $e.parent().submit();
-       }
-     });
+Finally, you'll need some Javascript to handle the onclick event. If you use ``django_browserid.forms.BrowserIDForm``, you can use the javascript in ``static/browserid.js``. Otherwise, you can use it as a basic example (for this example you will need jQuery)::
+   
+   $(document).ready(function() {
+      $('#browserid').bind('click', function(e) {
+         e.preventDefault();
+            navigator.id.getVerifiedEmail(function(assertion) {
+               if (assertion) {
+                  var $e = $('#id_assertion');
+                  $e.val(assertion.toString());
+                  $e.parent().submit();
+               }
+            });
+      });
    });
 
 Automatic Account Creation
