@@ -5,6 +5,8 @@ from warnings import warn
 
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.exceptions import ImproperlyConfigured
+from django.utils.importlib import import_module
 
 from django_browserid.base import get_audience as base_get_audience, verify
 
@@ -40,8 +42,10 @@ class BrowserIDBackend(object):
         """Return all users matching the specified email."""
         return User.objects.filter(email=email)
 
-    def create_user(self, username, email):
+    def create_user(self, email):
         """Return object for a newly created user account."""
+        username = getattr(settings, 'BROWSERID_USERNAME_ALGO',
+                        default_username_algo)(email)
         return User.objects.create_user(username, email)
 
     def authenticate(self, assertion=None, audience=None):
@@ -70,18 +74,38 @@ class BrowserIDBackend(object):
             return users[0]
         create_user = getattr(settings, 'BROWSERID_CREATE_USER', False)
         if not create_user:
-            return None
-
-        username_algo = getattr(settings, 'BROWSERID_USERNAME_ALGO',
-                                default_username_algo)
-        user = User.objects.create_user(username_algo(email), email)
-
-        user.is_active = True
-        user.save()
-        return user
+             return None
+        elif create_user == True:
+           return self.create_user(email)
+        else:
+           # Find the function to call, call it and throw in the email.
+           return self._load_module(create_user)(email)
 
     def get_user(self, user_id):
         try:
             return User.objects.get(pk=user_id)
         except User.DoesNotExist:
             return None
+
+    def _load_module(self, path):
+        """Code to load create user module. Based off django's load_backend"""
+
+        i = path.rfind('.')
+        module, attr = path[:i], path[i + 1:]
+
+        try:
+            mod = import_module(module)
+        except ImportError, e:
+            raise ImproperlyConfigured('Error importing BROWSERID_CREATE_USER'
+                                       ' function.')
+        except ValueError, e:
+            raise ImproperlyConfigured('Error importing BROWSERID_CREATE_USER'
+                                       ' function. Is BROWSERID_CREATE_USER a'
+                                       ' string?')
+
+        try:
+            create_user = getattr(mod, attr)
+        except AttributeError:
+            raise ImproperlyConfigured('Module "%s" does not define a "%s" '
+                                       'function.' % (module, attr))
+        return create_user
