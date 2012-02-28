@@ -76,9 +76,9 @@ Somewhere in one of your templates, you'll need to create a link and a form with
    {% endif %}
 
 
-You'll want to include the BrowserID's library at the bottom of this template::
+You'll want to include the form's media.js at the bottom of this template::
 
-    <script src="https://browserid.org/include.js" type="text/javascript"></script>
+    {{ browserid_form.media.js }}
 
 If you use browserid_form, it is further recommended that you add ``django_browserid.context_processors.browserid_form`` to  ``TEMPLATE_CONTEXT_PROCESSORS``; this will create the ``browserid_form`` variable automatically in ``RequestContext`` instances when needed. That is, in ``settings.py``::
 
