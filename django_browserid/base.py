@@ -1,5 +1,6 @@
 import logging
 import urllib
+from warnings import warn
 try:
     import json
 except ImportError:
@@ -55,15 +56,13 @@ def get_audience(request):
 
     # If we don't define it explicitly
     if not site_url:
-        protocol = getattr(settings, 'PROTOCOL', req_proto)
-        if not getattr(settings, 'DOMAIN'):
-            log.warning('django-browserid WARNING you are missing '
-                        'settings.SITE_URL. This is not a secure way '
-                        'to verify assertions. Please fix me. '
-                        'Setting domain to %s.' % req_domain)
+        warn('Using DOMAIN and PROTOCOL to specify your BrowserID audience is '
+             'deprecated. Please use the SITE_URL setting instead.',
+             DeprecationWarning)
 
         # DOMAIN is example.com req_domain is example.com:8001
         domain = getattr(settings, 'DOMAIN', req_domain.split(':')[0])
+        protocol = getattr(settings, 'PROTOCOL', req_proto)
 
         standards = {'https://': 443, 'http://': 80}
         if ':' in req_domain:
