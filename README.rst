@@ -42,23 +42,14 @@ Edit your ``urls.py`` file and add the following::
        # ...
    )
 
-You can also set the following config in ``settings.py``::
+You should also add the following in ``settings.py``::
 
     # Note: No trailing slash
-    SITE_URL = 'https://example.com'
+    SITE_URL = 'https://example.com:8000'
 
 BrowserID uses an assertion and an audience to verify the user. This
-``SITE_URL`` is used to determine the audience. If you don't want to use
-SITE_URL or it is being used for another purpose, you can use PROTOCOL and
-DOMAIN, such as::
-
-    PROTOCOL = 'https://'
-    DOMAIN = 'example.com'
-    # Optional
-    PORT = 8001
-
-Either way, for security reasons, it is *very important* to set either SITE_URL
-or DOMAIN.
+``SITE_URL`` is used to determine the audience. For security reasons, it is
+*very important* that you set ``SITE_URL`` correctly.
 
 You can also set the following optional config in ``settings.py``
 (they have sensible defaults): ::
