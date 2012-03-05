@@ -88,7 +88,7 @@ def _verify_http_request(url, qs):
     parameters = {
         'data': qs,
         'proxies': getattr(settings, 'BROWSERID_PROXY_INFO', None),
-        'verify': getattr(settings, 'BROWSERID_DISABLE_CERT_CHECK', False),
+        'verify': not getattr(settings, 'BROWSERID_DISABLE_CERT_CHECK', False),
         'headers': {'Content-type': 'application/x-www-form-urlencoded'},
         'params': {
             'timeout': getattr(settings, 'BROWSERID_HTTP_TIMEOUT',
@@ -96,7 +96,7 @@ def _verify_http_request(url, qs):
         }
     }
 
-    if not parameters['verify']:
+    if parameters['verify']:
         parameters['verify'] = getattr(settings, 'BROWSERID_CACERT_FILE', True)
 
     r = requests.post(url, **parameters)
