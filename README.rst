@@ -63,7 +63,11 @@ You can also set the following optional config in ``settings.py``
    # Create user accounts automatically if no user is found.
    BROWSERID_CREATE_USER = True
 
-Somewhere in one of your templates, you'll need to create a link and a form with a single hidden input element, which you'll use to submit the BrowserID assertion to the server. If you want to use ``django_browserid.forms.BrowserIDForm``, you could use something like the following template snippet: ::
+Somewhere in one of your templates, you'll need to create a link and a
+form with a single hidden input element, which you'll use to submit
+the BrowserID assertion to the server. If you want to use
+``django_browserid.forms.BrowserIDForm``, you could use something like
+the following template snippet: ::
 
    {% if not user.is_authenticated %}
    <a id="browserid" href="{% url gracefully_degrade %}">Sign In</a>
@@ -73,12 +77,11 @@ Somewhere in one of your templates, you'll need to create a link and a form with
    </form>
    {% endif %}
 
-
-You'll want to include the form's media.js at the bottom of this template::
-
-    {{ browserid_form.media.js }}
-
-If you use browserid_form, it is further recommended that you add ``django_browserid.context_processors.browserid_form`` to  ``TEMPLATE_CONTEXT_PROCESSORS``; this will create the ``browserid_form`` variable automatically in ``RequestContext`` instances when needed. That is, in ``settings.py``::
+If you use browserid_form, it is further recommended that you add
+``django_browserid.context_processors.browserid_form`` to
+``TEMPLATE_CONTEXT_PROCESSORS``; this will create the
+``browserid_form`` variable automatically in ``RequestContext``
+instances when needed. That is, in ``settings.py``::
 
    TEMPLATE_CONTEXT_PROCESSORS = (
        # ...
@@ -86,14 +89,35 @@ If you use browserid_form, it is further recommended that you add ``django_brows
        # ...
    )
 
-Finally, you'll need some Javascript to handle the onclick event. ``static/browserid.js`` contains some example code that will work with ``django_browserid.forms.BrowserIDForm``.
+You will also need to include JavaScript to power the BrowserID popup
+and form. You can use django form media at the bottom of your page
+(see `Form Media`_ and `Managing static files`_ for more
+information)::
+
+   {{ browserid_form.media }}
+
+.. note:: If you don't want to use the static files framework, you'll need to
+   include the ``https://browserid.org/include.js`` file, as well as
+   JavaScript similar to ``django_browserid/static/browserid/browserid.js``::
+
+      <script src="https://browserid.org/include.js"></script>
+      <!-- Include JS for browserid_form here. -->
+
+.. _Form Media: https://docs.djangoproject.com/en/1.3/topics/forms/media/
+.. _Managing static files: https://docs.djangoproject.com/en/1.3/howto/static-files/
 
 Automatic Account Creation
 --------------------------
 
-``django-browserid`` will automatically create a user account for new users if the setting ``BROWSERID_CREATE_USER`` is set to ``True`` in ``settings.py``. The user account will be created with the verified email returned from the BrowserID verification service, and a URL safe base64 encoded SHA1 of the email with the padding removed as the username.
+``django-browserid`` will automatically create a user account for new
+users if the setting ``BROWSERID_CREATE_USER`` is set to ``True`` in
+``settings.py``. The user account will be created with the verified
+email returned from the BrowserID verification service, and a URL safe
+base64 encoded SHA1 of the email with the padding removed as the
+username.
 
-To provide a customized username, you can provide a different algorithm via your settings.py::
+To provide a customized username, you can provide a different
+algorithm via your settings.py::
 
    # settings.py
    BROWSERID_CREATE_USER = True
@@ -101,7 +125,8 @@ To provide a customized username, you can provide a different algorithm via your
        return email.split('@')[0]
    BROWSERID_USERNAME_ALGO = username
 
-You can can provide your own function to create users by setting ``BROWSERID_CREATE_USER`` to a string path pointing to a function::
+You can can provide your own function to create users by setting
+``BROWSERID_CREATE_USER`` to a string path pointing to a function::
 
    # module/util.py
    def create_user(email):
@@ -110,14 +135,19 @@ You can can provide your own function to create users by setting ``BROWSERID_CRE
    # settings.py
    BROWSERID_CREATE_USER = 'module.util.create_user'
 
-You can disable account creation, but continue to use the ``browserid_verify`` view to authenticate existing users with the following::
+You can disable account creation, but continue to use the
+``browserid_verify`` view to authenticate existing users with the
+following::
 
     BROWSERID_CREATE_USER = False
 
 Creating User Accounts
 ----------------------
 
-If you want full control over account verification, don't use django-browserid's ``browserid_verify`` view. Create your own view and use ``verify`` to manually verify a BrowserID assertion with something like the following::
+If you want full control over account verification, don't use
+django-browserid's ``browserid_verify`` view. Create your own view and
+use ``verify`` to manually verify a BrowserID assertion with something
+like the following::
 
    from django_browserid import get_audience, verify
    from django_browserid.forms import BrowserIDForm
@@ -133,7 +163,8 @@ If you want full control over account verification, don't use django-browserid's
                   # check for user account, create account for new users, etc
                   user = my_get_or_create_user(result.email)
 
-``result`` will be ``False`` if the assertion failed, or a dictionary similar to the following::
+``result`` will be ``False`` if the assertion failed, or a dictionary
+similar to the following::
 
    {
       u'audience': u'https://mysite.com:443',
@@ -143,7 +174,9 @@ If you want full control over account verification, don't use django-browserid's
       u'expires': 1311377222765
    }
 
-You are of course then free to store the email in the session and prompt the user to sign up using a chosen identifier as their username, or whatever else makes sense for your site.
+You are of course then free to store the email in the session and
+prompt the user to sign up using a chosen identifier as their
+username, or whatever else makes sense for your site.
 
 Obscure Options
 ---------------
@@ -163,13 +196,15 @@ optional config in ``settings.py`` (they have sensible defaults): ::
 License
 -------
 
-This software is licensed under the `New BSD License`_. For more information, read the file ``LICENSE``.
+This software is licensed under the `New BSD License`_. For more
+information, read the file ``LICENSE``.
 
 .. _New BSD License: http://creativecommons.org/licenses/BSD/
 
 Status
 ------
 
-``django-browserid`` is a work in progress. Contributions are welcome. Feel free to `fork`_ and contribute!
+``django-browserid`` is a work in progress. Contributions are
+welcome. Feel free to `fork`_ and contribute!
 
 .. _fork: https://github.com/mozilla/django-browserid
