@@ -53,14 +53,6 @@ def test_backend_authenticate(fake):
 
     auth.authenticate(**authenticate_kwargs)
 
-@fudge.patch('django_browserid.auth.BrowserIDBackend.authenticate')
-def test_backend_authenticate(fake):
-    """Test that the authentication backend is set up correctly."""
-    (fake.expects_call()
-         .with_args(**authenticate_kwargs)
-         .returns(None))
-    auth.authenticate(**authenticate_kwargs)
-
 
 @fudge.patch('django_browserid.auth.verify')
 def test_backend_verify(fake):
@@ -121,19 +113,20 @@ def test_authenticate_create_user_with_alternate_username_algo(fake):
 
 
 def fake_create_user(email):
-    return auth.models.User.objects.create_user('robot', 'robo@example.com')
+    pass
 
 
-@fudge.patch('django_browserid.base._verify_http_request')
-def test_authenticate_create_user_with_callable_create_user(fake):
+@fudge.patch('django_browserid.base._verify_http_request',
+             'django_browserid.tests.test_verification.fake_create_user')
+def test_authenticate_create_user_with_callable(fake_verify, fake_create):
     """Test that automatic user creation with a callable function name works"""
+    (fake_create.expects_call()
+     .with_args('does.not.exist@example.org')
+     .returns(None))
 
-    with positive_assertion(fake, email=u'myemail@example.org'):
+    with positive_assertion(fake_verify, email=u'does.not.exist@example.org'):
         setattr(settings, 'BROWSERID_CREATE_USER', 'django_browserid.tests.test_verification.fake_create_user')
-        user = auth.authenticate(**authenticate_kwargs)
-        assert user
-        assert user.email == 'robo@example.com'
-        assert user.username == 'robot'
+        auth.authenticate(**authenticate_kwargs)
 
 
 @fudge.patch('django_browserid.base._verify_http_request')

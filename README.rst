@@ -114,6 +114,15 @@ To provide a customized username, you can provide a different algorithm via your
        return email.split('@')[0]
    BROWSERID_USERNAME_ALGO = username
 
+You can can provide your own function to create users by setting ``BROWSERID_CREATE_USER`` to a string path pointing to a function::
+
+   # module/util.py
+   def create_user(email):
+       pass  # Create a user here
+
+   # settings.py
+   BROWSERID_CREATE_USER = 'module.util.create_user'
+
 You can disable account creation, but continue to use the ``browserid_verify`` view to authenticate existing users with the following::
 
     BROWSERID_CREATE_USER = False
@@ -121,7 +130,7 @@ You can disable account creation, but continue to use the ``browserid_verify`` v
 Creating User Accounts
 ----------------------
 
-If you want full control over account creation, don't use django-browserid's ``browserid_verify`` view. Create your own view and use ``verify`` to manually verify a BrowserID assertion with something like the following::
+If you want full control over account verification, don't use django-browserid's ``browserid_verify`` view. Create your own view and use ``verify`` to manually verify a BrowserID assertion with something like the following::
 
    from django_browserid import get_audience, verify
    from django_browserid.forms import BrowserIDForm
