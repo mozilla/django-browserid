@@ -1,6 +1,8 @@
 from django.conf.urls.defaults import patterns, url
 
+from views import BrowserID_Verify
 
 urlpatterns = patterns('',
-    url('^verify/', 'django_browserid.views.verify', name='browserid_verify')
+    url('^browserid/verify/', BrowserID_Verify.as_view(),
+        name='browserid_verify')
 )
