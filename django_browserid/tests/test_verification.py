@@ -1,13 +1,13 @@
-import base64
-import hashlib
-import fudge
-
 from contextlib import contextmanager
 
 from django.conf import settings
 from django.contrib import auth
+from django.contrib.auth.models import User
+
+from mock import patch
 
 from django_browserid.base import verify
+from django_browserid.tests import mock_browserid
 
 
 assertion = 'foo.bar.baz'
@@ -21,20 +21,6 @@ authenticate_kwargs = {
 
 
 @contextmanager
-def positive_assertion(fake_http_request, **kwargs):
-    assertion = {
-        u'audience': audience,
-        u'email': u'myemail@example.com',
-        u'issuer': u'browserid.org:443',
-        u'status': u'okay',
-        u'valid-until': 1311377222765
-    }
-    assertion.update(kwargs)
-    fake_http_request.expects_call().returns(assertion)
-    yield
-
-
-@contextmanager
 def negative_assertion(fake_http_request, **kwargs):
     assertion = {
         u'status': u'failure'
@@ -44,95 +30,76 @@ def negative_assertion(fake_http_request, **kwargs):
     yield
 
 
-@fudge.patch('django_browserid.auth.BrowserIDBackend.authenticate')
+@patch('django_browserid.auth.BrowserIDBackend.authenticate')
 def test_backend_authenticate(fake):
     """Test that the authentication backend is set up correctly."""
-    (fake.expects_call()
-         .with_args(**authenticate_kwargs)
-         .returns(None))
-
+    fake.return_value = None
     auth.authenticate(**authenticate_kwargs)
+    fake.assert_called_with(**authenticate_kwargs)
 
 
-@fudge.patch('django_browserid.auth.verify')
+@patch('django_browserid.auth.verify')
 def test_backend_verify(fake):
     """Test that authenticate() calls verify()."""
-    (fake.expects_call()
-         .with_args(assertion, audience)
-         .returns(False))
+    fake.return_value = False
     auth.authenticate(**authenticate_kwargs)
+    fake.assert_called_with(assertion, audience)
 
 
-@fudge.patch('django_browserid.base._verify_http_request')
-def test_backend_verify_invalid_assertion(fake):
+@mock_browserid(None)
+def test_backend_verify_invalid_assertion():
     """Test that authenticate() returns None when credentials are bad."""
-    with negative_assertion(fake):
-        user = auth.authenticate(**authenticate_kwargs)
-        assert user is None
+    user = auth.authenticate(**authenticate_kwargs)
+    assert user is None
 
 
-@fudge.patch('django_browserid.base._verify_http_request')
-def test_verify_correct_credentials(fake):
+@mock_browserid('myemail@example.com')
+def test_verify_correct_credentials():
     """Test that verify() returns assertion details when assertion is valid."""
-    with positive_assertion(fake):
-        verification = verify(assertion, audience)
-        assert verification['status'] == 'okay'
-        assert verification['email'] == 'myemail@example.com'
+    verification = verify(assertion, audience)
+    assert verification['status'] == 'okay'
+    assert verification['email'] == 'myemail@example.com'
 
 
-@fudge.patch('django_browserid.base._verify_http_request')
-def test_authenticate_create_user(fake):
+@patch.object(settings, 'BROWSERID_CREATE_USER', True, create=True)
+@patch.object(settings, 'BROWSERID_USERNAME_ALGO', None, create=True)
+@mock_browserid('bid_create@example.com')
+def test_authenticate_create_user():
     """Test that automatic user creation works when enabled."""
-    with positive_assertion(fake):
-        setattr(settings, 'BROWSERID_CREATE_USER', True)
-        if getattr(settings, 'BROWSERID_USERNAME_ALGO', None):
-            delattr(settings, 'BROWSERID_USERNAME_ALGO')
-        user = auth.authenticate(**authenticate_kwargs)
-        # user should have been created
-        assert user
-        assert user.email == 'myemail@example.com'
-        assert user.username == base64.urlsafe_b64encode(
-            hashlib.sha1(user.email).digest()).rstrip('=')
+    User.objects.filter(email='bid_create@example.com').delete()
+    assert User.objects.filter(email='bid_create@example.com').exists() == False
+    auth.authenticate(**authenticate_kwargs)
+    assert User.objects.filter(email='bid_create@example.com').exists() == True
 
 
-@fudge.patch('django_browserid.base._verify_http_request')
-def test_authenticate_create_user_with_alternate_username_algo(fake):
+def username_algo(email):
+    return email.split('@')[0]
+
+
+@patch.object(settings, 'BROWSERID_CREATE_USER', True, create=True)
+@patch.object(settings, 'BROWSERID_USERNAME_ALGO', username_algo, create=True)
+@mock_browserid('bid_alt_username@example.com')
+def test_authenticate_create_user_with_alternate_username_algo():
     """Test that automatic user creation with an alternate username algo
     works."""
-
-    def username_algo(email):
-        return email.split('@')[0]
-
-    with positive_assertion(fake, email=u'myemail@example.org'):
-        setattr(settings, 'BROWSERID_CREATE_USER', True)
-        setattr(settings, 'BROWSERID_USERNAME_ALGO', username_algo)
-        user = auth.authenticate(**authenticate_kwargs)
-        assert user
-        assert user.email == 'myemail@example.org'
-        assert user.username == 'myemail'
+    user = auth.authenticate(**authenticate_kwargs)
+    assert user.username == 'bid_alt_username'
 
 
-def fake_create_user(email):
-    pass
-
-
-@fudge.patch('django_browserid.base._verify_http_request',
-             'django_browserid.tests.test_verification.fake_create_user')
-def test_authenticate_create_user_with_callable(fake_verify, fake_create):
+@patch.object(settings, 'BROWSERID_CREATE_USER',
+              'django_browserid.tests.fake_create_user', create=True)
+@patch('django_browserid.tests.fake_create_user')
+@mock_browserid('does.not.exist@example.org')
+def test_authenticate_create_user_with_callable(fake):
     """Test that automatic user creation with a callable function name works"""
-    (fake_create.expects_call()
-     .with_args('does.not.exist@example.org')
-     .returns(None))
-
-    with positive_assertion(fake_verify, email=u'does.not.exist@example.org'):
-        setattr(settings, 'BROWSERID_CREATE_USER', 'django_browserid.tests.test_verification.fake_create_user')
-        auth.authenticate(**authenticate_kwargs)
+    fake.return_value = None
+    auth.authenticate(**authenticate_kwargs)
+    fake.assert_called_with('does.not.exist@example.org')
 
 
-@fudge.patch('django_browserid.base._verify_http_request')
-def test_authenticate_missing_user(fake):
+@patch.object(settings, 'BROWSERID_CREATE_USER', False, create=True)
+@mock_browserid('someotheremail@example.com')
+def test_authenticate_missing_user():
     """Test that authenticate() returns None when user creation disabled."""
-    with positive_assertion(fake, email='someotheremail@example.com'):
-        setattr(settings, 'BROWSERID_CREATE_USER', False)
-        user = auth.authenticate(**authenticate_kwargs)
-        assert user is None
+    user = auth.authenticate(**authenticate_kwargs)
+    assert user is None

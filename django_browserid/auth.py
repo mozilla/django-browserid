@@ -44,8 +44,12 @@ class BrowserIDBackend(object):
 
     def create_user(self, email):
         """Return object for a newly created user account."""
-        username = getattr(settings, 'BROWSERID_USERNAME_ALGO',
-                        default_username_algo)(email)
+        username_algo = getattr(settings, 'BROWSERID_USERNAME_ALGO', None)
+        if username_algo is not None:
+            username = username_algo(email)
+        else:
+            username = default_username_algo(email)
+
         return User.objects.create_user(username, email)
 
     def authenticate(self, assertion=None, audience=None):

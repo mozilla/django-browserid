@@ -1,6 +1,6 @@
 requests==0.9.1
 
 # Tests
-fudge==1.0.3
+mock==0.8.0
 -e git://github.com/jbalogh/django-nose.git@b130825#egg=django-nose
 Django==1.3
