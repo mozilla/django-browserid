@@ -13,17 +13,11 @@ class Verify(BaseFormView):
     failure_url = getattr(settings, 'LOGIN_REDIRECT_URL_FAILURE', '/')
     success_url = getattr(settings, 'LOGIN_REDIRECT_URL', '/')
 
-    def handle_user(self, request, user):
-        """This view takes an authenticated user and logs them in. This view
-        should be subclassed to accomplish more complicated behavior
-        """
-        auth.login(request, user)
-
     def login_success(self):
         """Handle a successful login. Use this to perform complex redirects
         post-login.
         """
-        redirect_to = None
+        auth.login(self.request, self.user)
         redirect_field_name = self.kwargs.get('redirect_field_name',
                                               auth.REDIRECT_FIELD_NAME)
         redirect_to = self.request.REQUEST.get(redirect_field_name, None)
@@ -32,6 +26,12 @@ class Verify(BaseFormView):
             return redirect(redirect_to)
         else:
             return redirect(self.get_success_url())
+
+    def login_failure(self):
+        """Handle a failed login. Use this to perform complex redirects
+        post-login.
+        """
+        return redirect(self.get_success_url())
 
     def form_valid(self, form):
         """Handles the return post request from the browserID form and puts
@@ -45,16 +45,12 @@ class Verify(BaseFormView):
                 audience=self.audience)
 
         if self.user and self.user.is_active:
-            self.handle_user(self.request, self.user)
             return self.login_success()
 
-        return redirect(self.get_failure_url())
-
-    def get(self, *args, **kwargs):
-        return redirect(self.get_failure_url())
+        return self.login_failure()
 
     def form_invalid(self, *args, **kwargs):
-        return redirect(self.get_failure_url())
+        return self.login_failure()
 
     def get_failure_url(self):
         """

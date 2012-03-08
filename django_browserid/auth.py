@@ -10,7 +10,6 @@ from django.utils.importlib import import_module
 
 from django_browserid.base import get_audience as base_get_audience, verify
 
-
 log = logging.getLogger(__name__)
 
 
@@ -81,12 +80,12 @@ class BrowserIDBackend(object):
 
         create_user = getattr(settings, 'BROWSERID_CREATE_USER', False)
         if not create_user:
-             return None
+            return None
         elif create_user == True:
-           return self.create_user(email)
+            return self.create_user(email)
         else:
-           # Find the function to call, call it and throw in the email.
-           return self._load_module(create_user)(email)
+            # Find the function to call, call it and throw in the email.
+            return self._load_module(create_user)(email)
 
     def get_user(self, user_id):
         try:
