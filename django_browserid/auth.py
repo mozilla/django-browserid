@@ -64,7 +64,7 @@ class BrowserIDBackend(object):
 
         See django_browserid.base.get_audience()
         """
-        result = verify(assertion, audience)
+        result = self.verify(assertion, audience)
         if result is None:
             return None
 
