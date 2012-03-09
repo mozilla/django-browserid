@@ -1,1 +1,4 @@
 *.pyc
+/build/
+/dist/
+/django_browserid.egg-info/
