@@ -8,7 +8,7 @@ from django_browserid.forms import BrowserIDForm
 from django_browserid.base import get_audience
 
 
-class Verify(BaseFormView):
+class VerifyView(BaseFormView):
     form_class = BrowserIDForm
     failure_url = getattr(settings, 'LOGIN_REDIRECT_URL_FAILURE', '/')
     success_url = getattr(settings, 'LOGIN_REDIRECT_URL', '/')
