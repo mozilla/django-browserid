@@ -1,2 +1,5 @@
 *.pyc
 test.db
+/build/
+/dist/
+/django_browserid.egg-info/
