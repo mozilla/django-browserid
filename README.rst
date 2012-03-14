@@ -193,6 +193,12 @@ optional config in ``settings.py`` (they have sensible defaults): ::
    # Disable SSL cert validation
    BROWSERID_DISABLE_CERT_CHECK = False
 
+Testing
+-------
+0. (Recommended) Create a virtualenv for django-browserid testing.
+1. Install test requirements with ``pip install -r requirements.txt``
+2. Run test suite with ``fab test``
+
 License
 -------
 
