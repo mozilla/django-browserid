@@ -45,6 +45,7 @@ def verify(request_type, redirect_field_name=None, success_url=None,
     # Fake requests don't have sessions, so we're subclassing the view to
     # avoid login issues.
     reload(views)
+
     class MyVerify(views.Verify):
         def handle_user(self, request, user):
             pass
