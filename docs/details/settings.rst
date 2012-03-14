@@ -43,6 +43,6 @@ Settings
     **Default:** ``None``
 
     CA cert file used during validation. If none is provided, the default file
-    included with requests_ (which originates from Mozilla) is used.
+    included with requests_ is used.
 
 .. _requests: http://docs.python-requests.org/

@@ -7,6 +7,11 @@ Django_.
 .. _Django: http://www.djangoproject.com/
 .. _BrowserID: https://browserid.org/
 
+Documentation
+-------------
+
+http://django-browserid.rtfd.org
+
 Testing
 -------
 0. (Recommended) Create a virtualenv for django-browserid testing.
