@@ -31,7 +31,7 @@ class Verify(BaseFormView):
         """Handle a failed login. Use this to perform complex redirects
         post-login.
         """
-        return redirect(self.get_success_url())
+        return redirect(self.get_failure_url())
 
     def form_valid(self, form):
         """Handles the return post request from the browserID form and puts
@@ -51,6 +51,9 @@ class Verify(BaseFormView):
 
     def form_invalid(self, *args, **kwargs):
         return self.login_failure()
+
+    def get(self, *args, **kwargs):
+        return redirect(self.get_failure_url())
 
     def get_failure_url(self):
         """

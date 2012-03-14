@@ -42,16 +42,10 @@ def verify(request_type, redirect_field_name=None, success_url=None,
         p.start()
 
     # We need to reload verify for the setting changes to take effect.
-    # Fake requests don't have sessions, so we're subclassing the view to
-    # avoid login issues.
     reload(views)
-
-    class MyVerify(views.Verify):
-        def handle_user(self, request, user):
-            pass
-
-    verify_view = MyVerify.as_view()
-    response = verify_view(request, **verify_kwargs)
+    verify_view = views.Verify.as_view()
+    with patch.object(auth, 'login'):
+        response = verify_view(request, **verify_kwargs)
 
     for p in patches:
         p.stop()
