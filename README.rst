@@ -1,7 +1,10 @@
 django-browserid
 ================
 
-.. image:: https://secure.travis-ci.org/mozilla/django-browserid.png?branch=master
+|TravisCI|_
+
+.. |TravisCI| image:: https://secure.travis-ci.org/mozilla/django-browserid.png?branch=master
+.. _TravisCI: https://secure.travis-ci.org/mozilla/django-browserid
 
 django-browserid is a library that integrates BrowserID_ authentication into
 Django_.
