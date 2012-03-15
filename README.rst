@@ -1,6 +1,8 @@
 django-browserid
 ================
 
+.. image:: https://secure.travis-ci.org/mozilla/django-browserid.png?branch=master
+
 django-browserid is a library that integrates BrowserID_ authentication into
 Django_.
 
