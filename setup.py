@@ -1,4 +1,4 @@
-from setuptools import setup
+from distutils.core import setup
 
 setup(
     name='django-browserid',
@@ -7,5 +7,5 @@ setup(
     author="Paul Osman",
     author_email="paul@mozillafoundation.org",
     install_requires="requests==0.9.1",
-    include_package_data=True
+    package_data={"django_browserid": ["static/browserid/*.js"]},
 )
