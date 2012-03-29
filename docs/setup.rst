@@ -1,15 +1,16 @@
 Setup
 =====
 
-Requirements
-------------
-
-You can use pip to install required libraries:
-
-   pip install -r requirements.txt
-
 Installation
 ------------
+
+You can use pip to install django-browserid and requirements:
+
+   pip install django-browserid
+
+
+Configuration
+-------------
 
 To use ``django-browserid``, add it to ``INSTALLED_APPS`` in ``settings.py``::
 
