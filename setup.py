@@ -2,7 +2,7 @@ from distutils.core import setup
 
 setup(
     name='django-browserid',
-    version='0.2',
+    version='0.5',
     packages=['django_browserid'],
     author='Paul Osman, Michael Kelly',
     author_email='mkelly@mozilla.com',
