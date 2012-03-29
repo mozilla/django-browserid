@@ -1,4 +1,4 @@
-requests==0.9.1
+requests==0.10.8
 
 # Tests
 mock==0.8.0
