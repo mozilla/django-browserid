@@ -5,9 +5,12 @@ django-browserid is a library that integrates BrowserID_ authentication into
 Django_.
 
 django-browserid provides an authentication backend, ``BrowserIDBackend``, that
-verifies BrowserID assertions using the browserid.org verification service and
-authenticates users. It also provides ``verify``, which lets you build more
-complex authentication systems based on BrowserID.
+verifies BrowserID assertions using different methods and authenticate users.
+The verification can be done using the browserid.org verification service or
+locally.
+
+It also provides a ``verify`` function which lets you build more complex
+authentication systems based on BrowserID.
 
 django-browserid is a work in progress. Contributions are welcome. Feel free
 to fork_ and contribute!

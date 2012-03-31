@@ -25,18 +25,32 @@ Settings
     If set to a string, it is treated as an import path pointing to a custom
     user creation function. See :ref:`auto-user` for more information.
 
+.. data:: BROWSERID_VERIFIER
+
+    **Default:** ``remote``
+
+    Defines the PyBrowserID verifier to use. It could be one of "local",
+    "remote" or "custom".
+
+    - "local" will do the verification locally, using M2Crypto.
+    - "remote" will use the verfication url (described via
+      BROWSERID_VERIFICATION_URL) to check the validity of the assertion
+    - "custom" let's you define a valid PyBrowserID verifier.
+
+
 .. data:: BROWSERID_VERIFICATION_URL
 
     **Default:** ``'https://browserid.org/verify``
 
-    Defines the URL for the BrowserID verification service to use.
+    Defines the URL for the BrowserID verification service to use. This is only
+    useful if you are using the "remote" verifier.
 
 .. data:: BROWSERID_DISABLE_CERT_CHECK
 
     **Default:** ``False``
 
     Disables SSL certificate verification during BrowserID verification.
-    *Never disable this in production!*
+    *This is for testing purposes, never disable this in production!*
 
 .. data:: BROWSERID_CACERT_FILE
 
