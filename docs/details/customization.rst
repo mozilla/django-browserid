@@ -19,7 +19,7 @@ algorithm via your settings.py::
    # settings.py
    BROWSERID_CREATE_USER = True
    def username(email):
-       return email.split('@')[0]
+       return email.rsplit('@', 1)[0]
    BROWSERID_USERNAME_ALGO = username
 
 You can can provide your own function to create users by setting
