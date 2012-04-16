@@ -22,7 +22,7 @@ class Verify(BaseFormView):
                                               auth.REDIRECT_FIELD_NAME)
         redirect_to = self.request.REQUEST.get(redirect_field_name, None)
 
-        if redirect_to is not None:
+        if redirect_to:
             return redirect(redirect_to)
         else:
             return redirect(self.get_success_url())
