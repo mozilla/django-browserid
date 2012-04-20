@@ -78,7 +78,7 @@ class BrowserIDBackend(object):
         if len(users) == 1:
             return users[0]
 
-        create_user = getattr(settings, 'BROWSERID_CREATE_USER', False)
+        create_user = getattr(settings, 'BROWSERID_CREATE_USER', True)
         if not create_user:
             return None
         elif create_user == True:
