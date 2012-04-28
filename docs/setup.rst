@@ -55,9 +55,6 @@ You can also set the following optional config in ``settings.py``
    # Path to redirect to on unsuccessful login attempt.
    LOGIN_REDIRECT_URL_FAILURE = '/'
 
-   # Create user accounts automatically if no user is found.
-   BROWSERID_CREATE_USER = True
-
 Somewhere in one of your templates, you'll need to create a link and a
 form with a single hidden input element, which you'll use to submit
 the BrowserID assertion to the server. If you want to use
@@ -65,7 +62,7 @@ the BrowserID assertion to the server. If you want to use
 the following template snippet: ::
 
    {% if not user.is_authenticated %}
-   <a id="browserid" href="{% url gracefully_degrade %}">Sign In</a>
+   <a id="browserid" href="#">Sign In</a>
    <form method="POST" action="{% url browserid_verify %}">
       {% csrf_token %}
       {{ browserid_form.as_p }}
@@ -90,6 +87,8 @@ and form. You can use django form media at the bottom of your page
 information)::
 
    {{ browserid_form.media }}
+
+This JavaScript file requires jQuery.
 
 .. note:: If you don't want to use the static files framework, you'll need to
    include the ``https://browserid.org/include.js`` file, as well as

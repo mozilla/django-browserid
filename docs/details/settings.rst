@@ -5,9 +5,10 @@ Settings
 
 .. data:: LOGIN_REDIRECT_URL
 
-    **Default:** ``'/'``
+    **Default:** ``'/accounts/profile'``
 
-    Path to redirect to on successful login.
+    Path to redirect to on successful login. If you don't specify this, the
+    default_ Django value will be used.
 
 .. data:: LOGIN_REDIRECT_URL_FAILURE
 
@@ -46,3 +47,5 @@ Settings
     included with requests_ is used.
 
 .. _requests: http://docs.python-requests.org/
+
+.. _default: https://docs.djangoproject.com/en/dev/ref/settings/#login-redirect-url

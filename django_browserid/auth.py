@@ -64,8 +64,8 @@ class BrowserIDBackend(object):
         See django_browserid.base.get_audience()
         """
         result = verify(assertion, audience)
-        if result is None:
-            return None
+        if not result:
+            return
 
         email = result['email']
 
@@ -74,13 +74,13 @@ class BrowserIDBackend(object):
         users = self.filter_users_by_email(email=email)
         if len(users) > 1:
             log.warn('%d users with email address %s.' % (len(users), email))
-            return None
+            return
         if len(users) == 1:
             return users[0]
 
         create_user = getattr(settings, 'BROWSERID_CREATE_USER', True)
         if not create_user:
-            return None
+            return
         elif create_user == True:
             return self.create_user(email)
         else:
