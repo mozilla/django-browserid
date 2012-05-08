@@ -65,7 +65,7 @@ class BrowserIDBackend(object):
         """
         result = verify(assertion, audience)
         if not result:
-            return
+            return None
 
         email = result['email']
 
@@ -74,13 +74,13 @@ class BrowserIDBackend(object):
         users = self.filter_users_by_email(email=email)
         if len(users) > 1:
             log.warn('%d users with email address %s.' % (len(users), email))
-            return
+            return None
         if len(users) == 1:
             return users[0]
 
         create_user = getattr(settings, 'BROWSERID_CREATE_USER', True)
         if not create_user:
-            return
+            return None
         elif create_user == True:
             return self.create_user(email)
         else:
@@ -101,10 +101,10 @@ class BrowserIDBackend(object):
 
         try:
             mod = import_module(module)
-        except ImportError, e:
+        except ImportError:
             raise ImproperlyConfigured('Error importing BROWSERID_CREATE_USER'
                                        ' function.')
-        except ValueError, e:
+        except ValueError:
             raise ImproperlyConfigured('Error importing BROWSERID_CREATE_USER'
                                        ' function. Is BROWSERID_CREATE_USER a'
                                        ' string?')

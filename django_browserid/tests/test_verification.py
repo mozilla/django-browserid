@@ -57,7 +57,7 @@ def test_backend_verify_invalid_assertion():
 def test_auth_copes_with_false(verify):
     """Test that authenticate copes with False."""
     verify.return_value = False
-    assert BrowserIDBackend().authenticate(**authenticate_kwargs) == None
+    assert BrowserIDBackend().authenticate(**authenticate_kwargs) is None
 
 @mock_browserid('myemail@example.com')
 def test_verify_correct_credentials():
