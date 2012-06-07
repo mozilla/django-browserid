@@ -97,5 +97,16 @@ This JavaScript file requires jQuery.
       <script src="https://browserid.org/include.js"></script>
       <!-- Include JS for browserid_form here. -->
 
+.. note:: If your site uses `Content Security Policy`_, you will have to add
+   directives to allow the external browserid.org JavaScript, as well as an
+   iframe used as part of the login process.
+
+   If you're using `django-csp`_, the following settings will work::
+
+      CSP_SCRIPT_SRC = ("'self'", 'https://browserid.org',)
+      CSP_FRAME_SRC = ("'self'", 'https://browserid.org',)
+
 .. _Form Media: https://docs.djangoproject.com/en/1.3/topics/forms/media/
 .. _Managing static files: https://docs.djangoproject.com/en/1.3/howto/static-files/
+.. _Content Security Policy: https://developer.mozilla.org/en/Security/CSP
+.. _django-csp: https://github.com/mozilla/django-csp
