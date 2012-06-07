@@ -22,3 +22,4 @@ to fork_ and contribute!
    setup
    details/customization
    details/settings
+   details/troubleshooting
