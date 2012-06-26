@@ -30,6 +30,7 @@ def default_username_algo(email):
 
 class BrowserIDBackend(object):
     supports_anonymous_user = False
+    supports_inactive_user = True
     supports_object_permissions = False
 
     def verify(self, *args):
