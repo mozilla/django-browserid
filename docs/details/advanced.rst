@@ -1,7 +1,5 @@
-Customization
-=============
-
-.. _auto-user:
+Advanced Usage
+==============
 
 Automatic Account Creation
 --------------------------
@@ -37,6 +35,7 @@ You can disable account creation, but continue to use the
 following::
 
     BROWSERID_CREATE_USER = False
+
 
 Custom Verification
 -------------------
@@ -74,3 +73,19 @@ similar to the following::
 You are of course then free to store the email in the session and
 prompt the user to sign up using a chosen identifier as their
 username, or whatever else makes sense for your site.
+
+
+Javascript Fallback
+-------------------
+
+It is a good idea to provide an alternative method of authenticating with your
+site for users that do not have JavaScript available. An easy way of doing this
+is to modify the ``href`` of the link that you bind to BrowserID login to point
+to a traditional login and registration page::
+
+   <a id="browserid" href="{% url 'login.view.name' %}">Sign In</a>
+
+If a user has JavaScript enabled, when they click the link the JavaScript will
+take over and show a BrowserID popup. If a user has JavaScript disabled, they
+will be directed to your login view (which should not require JavaScript, of
+course).
