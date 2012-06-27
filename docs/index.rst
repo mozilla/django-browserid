@@ -20,6 +20,6 @@ to fork_ and contribute!
    :maxdepth: 2
 
    setup
-   details/customization
+   details/advanced
    details/settings
    details/troubleshooting
