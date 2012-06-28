@@ -26,10 +26,10 @@ Testing
 License
 -------
 
-This software is licensed under the `New BSD License`_. For more
+This software is licensed under the `Mozilla Public License v. 2.0`_. For more
 information, read the file ``LICENSE``.
 
-.. _New BSD License: http://creativecommons.org/licenses/BSD/
+.. _Mozilla Public License v. 2.0: http://mozilla.org/MPL/2.0/
 
 Status
 ------
