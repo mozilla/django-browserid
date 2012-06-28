@@ -89,3 +89,16 @@ If a user has JavaScript enabled, when they click the link the JavaScript will
 take over and show a BrowserID popup. If a user has JavaScript disabled, they
 will be directed to your login view (which should not require JavaScript, of
 course).
+
+
+Signals
+-------
+
+.. module:: django_browserid.signals
+
+.. data:: user_created
+
+    Signal triggered when a user is automatically created during authentication.
+
+    * **sender**: The function that created the user instance.
+    * **user**: The user instance that was created.
