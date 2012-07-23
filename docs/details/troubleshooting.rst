@@ -11,8 +11,8 @@ external JavaScript include.
 To fix this, include https://browserid.org in your script-src directive. If
 you're using the `django-csp`_ library, the following settings will work::
 
-    CSP_SCRIPT_SRC = ("'self'", 'https://browserid.org',)
-    CSP_FRAME_SRC = ("'self'", 'https://browserid.org',)
+    CSP_SCRIPT_SRC = ("'self'", 'https://browserid.org','https://login.persona.org')
+    CSP_FRAME_SRC = ("'self'", 'https://browserid.org','https://login.persona.org')
 
 .. note:: The example above also includes the frame-src directive. There is an
    iframe used during BrowserID login, but some people report that login will
