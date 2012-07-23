@@ -103,8 +103,8 @@ This JavaScript file requires jQuery.
 
    If you're using `django-csp`_, the following settings will work::
 
-      CSP_SCRIPT_SRC = ("'self'", 'https://browserid.org',)
-      CSP_FRAME_SRC = ("'self'", 'https://browserid.org',)
+      CSP_SCRIPT_SRC = ("'self'", 'https://browserid.org','https://login.persona.org')
+      CSP_FRAME_SRC = ("'self'", 'https://browserid.org','https://login.persona.org')
 
 .. _Form Media: https://docs.djangoproject.com/en/1.3/topics/forms/media/
 .. _Managing static files: https://docs.djangoproject.com/en/1.3/howto/static-files/
