@@ -5,8 +5,7 @@ Automatic Account Creation
 --------------------------
 
 ``django-browserid`` will automatically create a user account for new
-users if the setting ``BROWSERID_CREATE_USER`` is set to ``True`` in
-``settings.py``. The user account will be created with the verified
+users. The user account will be created with the verified
 email returned from the BrowserID verification service, and a URL safe
 base64 encoded SHA1 of the email with the padding removed as the
 username.
