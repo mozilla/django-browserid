@@ -1,6 +1,24 @@
 Advanced Usage
 ==============
 
+navigator.id.request Arguments
+------------------------------
+
+The ``navigator.id.request`` function accepts several optional arguments that
+customize the BrowserID login dialog. The default JavaScript provided by
+``django-browserid`` checks for data attributes on the login link and passes
+them to ``navigator.id.request``. For example, the following customizes the
+website name shown in the BrowserID dialog::
+
+    <a href="#" data-site-name="Site Name">Login</a>
+
+.. note:: ``navigator.id.request`` arguments are in camelCase, but data
+   attributes must use dashes in place of capitalization changes.
+
+See the `navigator.id.request documentation`_ for a list of accepted parameters.
+
+.. _navigator.id.request documentation: https://developer.mozilla.org/docs/DOM/navigator.id.request
+
 Automatic Account Creation
 --------------------------
 
@@ -88,6 +106,15 @@ If a user has JavaScript enabled, when they click the link the JavaScript will
 take over and show a BrowserID popup. If a user has JavaScript disabled, they
 will be directed to your login view (which should not require JavaScript, of
 course).
+
+
+Multiple Login Buttons
+----------------------
+
+If you are using the default JavaScript provided by ``django-browserid``, you
+can have multiple login buttons on a single page by marking them with the class
+``browserid-login``. Be sure to only include the hidden login form on the page
+once to avoid errors from using the same id multiple times.
 
 
 Signals
