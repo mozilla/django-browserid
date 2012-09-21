@@ -5,3 +5,4 @@ test.db
 /django_browserid.egg-info/
 docs/_build
 MANIFEST
+.DS_Store

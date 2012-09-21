@@ -5,7 +5,7 @@
 (function($) {
     'use strict';
 
-    $(document).ready(function() {
+    $(function() {
         var requestOptions = [
             'siteName',
             'siteLogo',
@@ -15,7 +15,7 @@
             'termsOfService'
         ];
 
-        $('.browserid-login, #browserid').bind('click', function(e) {
+        $(document).delegate('.browserid-login, #browserid', 'click', function(e) {
             e.preventDefault();
 
             // Arguments to navigator.id.request can be specified by data-attributes
