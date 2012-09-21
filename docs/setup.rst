@@ -62,12 +62,17 @@ the BrowserID assertion to the server. If you want to use
 the following template snippet: ::
 
    {% if not user.is_authenticated %}
-   <a id="browserid" href="#">Sign In</a>
+   <a class="browserid-login" href="#">Sign In</a>
    <form method="POST" action="{% url browserid_verify %}">
       {% csrf_token %}
       {{ browserid_form.as_p }}
    </form>
    {% endif %}
+
+.. note:: If you're using the default JavaScript mentioned below, you can use as
+   many login links as you like as long as they all have the class
+   ``browserid-login``. However, you must only include the form on the page
+   once.
 
 If you use browserid_form, it is further recommended that you add
 ``django_browserid.context_processors.browserid_form`` to
@@ -88,7 +93,7 @@ information)::
 
    {{ browserid_form.media }}
 
-This JavaScript file requires jQuery.
+This JavaScript file requires jQuery 1.6 or higher.
 
 .. note:: If you don't want to use the static files framework, you'll need to
    include the ``https://browserid.org/include.js`` file, as well as
