@@ -9,7 +9,7 @@ from warnings import warn
 try:
     import json
 except ImportError:
-    import simplejson as json
+    import simplejson as json  # NOQA
 
 
 from django.conf import settings
