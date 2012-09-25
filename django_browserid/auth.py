@@ -90,7 +90,7 @@ class BrowserIDBackend(object):
         if not create_user:
             return None
         else:
-            if create_user == True:
+            if create_user is True:
                 create_function = self.create_user
             else:
                 # Find the function to call.
