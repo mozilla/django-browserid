@@ -59,14 +59,14 @@ def verify(request_type, redirect_field_name=None, success_url=None,
 
 
 def test_get_redirect_failure():
-    """Issuing a GET to the verify view redirects to the failure URL."""
+    # Issuing a GET to the verify view redirects to the failure URL.
     response = verify('get', failure_url='/fail')
     assert response.status_code == 302
     assert response['Location'].endswith('/fail')
 
 
 def test_invalid_redirect_failure():
-    """Invalid form arguments redirect to the failure URL."""
+    # Invalid form arguments redirect to the failure URL.
     response = verify('post', failure_url='/fail', blah='asdf')
     assert response.status_code == 302
     assert response['Location'].endswith('/fail')
@@ -74,7 +74,7 @@ def test_invalid_redirect_failure():
 
 @mock_browserid(None)
 def test_auth_fail_redirect_failure():
-    """If authentication fails, redirect to the failure URL."""
+    # If authentication fails, redirect to the failure URL.
     response = verify('post', failure_url='/fail', assertion='asdf')
     assert response.status_code == 302
     assert response['Location'].endswith('/fail')
@@ -82,7 +82,7 @@ def test_auth_fail_redirect_failure():
 
 @mock_browserid('test@example.com')
 def test_auth_success_redirect_success():
-    """If authentication succeeds, redirect to the success URL."""
+    # If authentication succeeds, redirect to the success URL.
     response = verify('post', success_url='/success', assertion='asdf')
     assert response.status_code == 302
     assert response['Location'].endswith('/success')
@@ -90,9 +90,8 @@ def test_auth_success_redirect_success():
 
 @mock_browserid('test@example.com')
 def test_default_redirect_field():
-    """If a redirect is passed as an argument to the request, redirect to that
-    instead of the success URL.
-    """
+    # If a redirect is passed as an argument to the request, redirect to that
+    # instead of the success URL.
     kwargs = {auth.REDIRECT_FIELD_NAME: '/field_success', 'assertion': 'asdf'}
     response = verify('post', success_url='/success', **kwargs)
     assert response.status_code == 302
@@ -101,9 +100,8 @@ def test_default_redirect_field():
 
 @mock_browserid('test@example.com')
 def test_redirect_field_name():
-    """If a redirect field name is specified, use the request argument matching
-    that name as the path to redirect to.
-    """
+    # If a redirect field name is specified, use the request argument matching
+    # that name as the path to redirect to.
     kwargs = {'my_redirect': '/field_success', 'assertion': 'asdf'}
     response = verify('post', success_url='/success',
                       redirect_field_name='my_redirect', **kwargs)
