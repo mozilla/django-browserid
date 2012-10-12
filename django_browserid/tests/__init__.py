@@ -31,7 +31,7 @@ class mock_browserid(object):
         self.return_value = {
             u'audience': audience,
             u'email': email,
-            u'issuer': u'browserid.org:443',
+            u'issuer': u'login.persona.org:443',
             u'status': u'okay' if email is not None else u'failure',
             u'valid-until': 1311377222765
         }

@@ -21,7 +21,7 @@ log = logging.getLogger(__name__)
 
 
 DEFAULT_HTTP_TIMEOUT = 5
-DEFAULT_VERIFICATION_URL = 'https://browserid.org/verify'
+DEFAULT_VERIFICATION_URL = 'https://verifier.login.persona.org/verify'
 OKAY_RESPONSE = 'okay'
 
 
