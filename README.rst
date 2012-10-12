@@ -10,7 +10,7 @@ django-browserid is a library that integrates BrowserID_ authentication into
 Django_.
 
 .. _Django: http://www.djangoproject.com/
-.. _BrowserID: https://browserid.org/
+.. _BrowserID: https://login.persona.org/
 
 Documentation
 -------------

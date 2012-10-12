@@ -96,10 +96,10 @@ information)::
 This JavaScript file requires jQuery 1.6 or higher.
 
 .. note:: If you don't want to use the static files framework, you'll need to
-   include the ``https://browserid.org/include.js`` file, as well as
+   include the ``https://login.persona.org/include.js`` file, as well as
    JavaScript similar to ``django_browserid/static/browserid/browserid.js``::
 
-      <script src="https://browserid.org/include.js"></script>
+      <script src="https://login.persona.org/include.js"></script>
       <!-- Include JS for browserid_form here. -->
 
 .. note:: If your site uses `Content Security Policy`_, you will have to add
@@ -108,8 +108,8 @@ This JavaScript file requires jQuery 1.6 or higher.
 
    If you're using `django-csp`_, the following settings will work::
 
-      CSP_SCRIPT_SRC = ("'self'", 'https://browserid.org','https://login.persona.org')
-      CSP_FRAME_SRC = ("'self'", 'https://browserid.org','https://login.persona.org')
+      CSP_SCRIPT_SRC = ("'self'", 'https://login.persona.org')
+      CSP_FRAME_SRC = ("'self'", 'https://login.persona.org')
 
 .. _Form Media: https://docs.djangoproject.com/en/1.3/topics/forms/media/
 .. _Managing static files: https://docs.djangoproject.com/en/1.3/howto/static-files/
