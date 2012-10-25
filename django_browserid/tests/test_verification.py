@@ -9,7 +9,7 @@ from django.conf import settings
 from django.contrib import auth
 from django.contrib.auth.models import User
 
-from mock import patch
+from mock import ANY, patch
 
 from django_browserid.base import verify
 from django_browserid.tests import mock_browserid
@@ -119,3 +119,18 @@ def test_authenticate_missing_user():
      # Test that authenticate() returns None when user creation disabled.
     user = auth.authenticate(**authenticate_kwargs)
     assert user is None
+
+
+@patch.object(settings, 'BROWSERID_HTTP_TIMEOUT', 1, create=True)
+@patch.object(settings, 'BROWSERID_VERIFICATION_URL',
+              'https://custom.org/verify', create=True)
+@patch('django_browserid.base.requests.post')
+def test_verify_post_uses_custom_settings(post):
+    post.return_value.content = '{"status": "okay"}'
+    verify(assertion, audience)
+    post.assert_called_with('https://custom.org/verify',
+                            verify=True,
+                            proxies=ANY,
+                            data=ANY,
+                            timeout=1,
+                            headers=ANY)

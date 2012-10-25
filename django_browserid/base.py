@@ -94,10 +94,8 @@ def _verify_http_request(url, qs):
         'proxies': getattr(settings, 'BROWSERID_PROXY_INFO', None),
         'verify': not getattr(settings, 'BROWSERID_DISABLE_CERT_CHECK', False),
         'headers': {'Content-type': 'application/x-www-form-urlencoded'},
-        'params': {
-            'timeout': getattr(settings, 'BROWSERID_HTTP_TIMEOUT',
-                               DEFAULT_HTTP_TIMEOUT)
-        }
+        'timeout': getattr(settings, 'BROWSERID_HTTP_TIMEOUT',
+                           DEFAULT_HTTP_TIMEOUT),
     }
 
     if parameters['verify']:
