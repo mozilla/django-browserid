@@ -41,7 +41,7 @@ class Verify(BaseFormView):
     def form_valid(self, form):
         """Handles the return post request from the browserID form and puts
         interesting variables into the class. If everything checks out, then
-        we call handle_user to decide how to handle a valid user
+        we call login_success to decide how to handle a valid user
         """
         self.assertion = form.cleaned_data['assertion']
         self.audience = get_audience(self.request)
