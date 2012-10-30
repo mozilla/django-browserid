@@ -82,9 +82,9 @@ def get_audience(request):
 
     req_url = "%s%s" % (req_proto, req_domain)
     if site_url != "%s%s" % (req_proto, req_domain):
-        log.warning('Misconfigured SITE_URL? settings has [%s], but '
-                    'actual request was [%s] BrowserID may fail on '
-                    'audience' % (site_url, req_url))
+        log.warning('Misconfigured SITE_URL? settings has {0}, but '
+                    'actual request was {1} BrowserID may fail on '
+                    'audience'.format(site_url, req_url))
     return site_url
 
 
@@ -108,8 +108,7 @@ def _verify_http_request(url, qs):
     try:
         rv = json.loads(r.content)
     except ValueError:
-        log.debug('Failed to decode JSON. Resp: %s, Content: %s' %
-                  (r.status_code, r.content))
+        log.debug('Failed to decode JSON. Resp: {0}, Content: {1}'.format(r.status_code, r.content))
         return dict(status='failure')
 
     return rv
@@ -120,7 +119,7 @@ def verify(assertion, audience):
     verify_url = getattr(settings, 'BROWSERID_VERIFICATION_URL',
                          DEFAULT_VERIFICATION_URL)
 
-    log.info("Verification URL: %s" % verify_url)
+    log.info("Verification URL: {0}".format(verify_url))
 
     result = _verify_http_request(verify_url, urllib.urlencode({
         'assertion': assertion,
@@ -130,7 +129,7 @@ def verify(assertion, audience):
     if result['status'] == OKAY_RESPONSE:
         return result
 
-    log.error('BrowserID verification failure. Response: %r '
-              'Audience: %r' % (result, audience))
-    log.error("BID assert: %r" % assertion)
+    log.error('BrowserID verification failure. Response: {0} '
+              'Audience: {1}'.format(result, audience))
+    log.error("BID assert: {0}".format(assertion))
     return False
