@@ -55,7 +55,7 @@
             onready: function() {
                 // The click event is now bound to the login button and now we
                 // we are ready for some action - hence make the login button visible
-                $("#browserid, .browserid-login").addClass("display");
+                $("#browserid, .browserid-login").addClass("visible");
             }
         });
     });

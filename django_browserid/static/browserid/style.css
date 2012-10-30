@@ -2,6 +2,6 @@
 	visibility: hidden;
 }
 
-.display {
+.browserid-login.visible, #browserid.visible {
 	visibility: visible;
 }
