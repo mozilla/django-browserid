@@ -1,0 +1,7 @@
+.browserid-login, #browserid {
+	visibility: hidden;
+}
+
+.browserid-login.visible, #browserid.visible {
+	visibility: visible;
+}
