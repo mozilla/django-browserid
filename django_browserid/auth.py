@@ -81,7 +81,7 @@ class BrowserIDBackend(object):
         # log and bail. randomly selecting one seems really wrong.
         users = self.filter_users_by_email(email=email)
         if len(users) > 1:
-            log.warn('%d users with email address %s.' % (len(users), email))
+            log.warn('{0} users with email address {1}.'.format(len(users), email))
             return None
         if len(users) == 1:
             return users[0]
@@ -125,6 +125,6 @@ class BrowserIDBackend(object):
         try:
             create_user = getattr(mod, attr)
         except AttributeError:
-            raise ImproperlyConfigured('Module "%s" does not define a "%s" '
-                                       'function.' % (module, attr))
+            raise ImproperlyConfigured('Module {0} does not define a {1} '
+                                       'function.'.format(module, attr))
         return create_user
