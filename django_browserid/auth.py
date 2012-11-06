@@ -9,12 +9,17 @@ import logging
 from warnings import warn
 
 from django.conf import settings
-from django.contrib.auth.models import User
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.importlib import import_module
 
 from django_browserid.base import get_audience as base_get_audience, verify
 from django_browserid.signals import user_created
+
+try:
+    from django.contrib.auth import get_user_model
+    User = get_user_model()
+except ImportError:
+    from django.contrib.auth.models import User
 
 
 log = logging.getLogger(__name__)
