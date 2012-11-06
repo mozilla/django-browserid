@@ -11,3 +11,6 @@ class BrowserIDForm(forms.Form):
 
     class Media:
         js = ('browserid/browserid.js', 'https://login.persona.org/include.js')
+        css = {
+        	'all': ('browserid/style.css',)
+        }
