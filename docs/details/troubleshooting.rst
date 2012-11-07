@@ -22,6 +22,27 @@ you're using the `django-csp`_ library, the following settings will work::
 .. _django-csp: https://github.com/mozilla/django-csp
 
 
+Site keeps redirecting to the same page repeatedly
+--------------------------------------------------
+
+Sometimes, after attempting to login, you might notice that the page keeps
+reloading itself over and over. This usually means that something has gone wrong
+in your login process, and you should check the log output as well as the
+solutions below to see if they can point you in the right direction.
+
+The reason for the repeating redirects has to do with Persona, the default
+BrowserID server that ``django-browserid`` uses. If you have attempted to log in
+to a site via Persona, and the site fails to accept your login, Persona will
+continue to attempt to log you in if the JavaScript shim that it provides is
+included on the page.
+
+The easiest way to get around this is to simply not include the login form on
+any pages when the user is logged in. ``django-browserid`` attempts to avoid
+these infinite loops in certain cases, but they may still come up if, for
+example, ``SESSION_COOKIE_SECURE`` is True on a development instance without
+SSL.
+
+
 Login fails silently due to SESSION_COOKIE_SECURE
 -------------------------------------------------
 
