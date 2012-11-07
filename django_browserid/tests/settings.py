@@ -5,6 +5,8 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 """
 TEST_RUNNER = 'django_nose.runner.NoseTestSuiteRunner'
 
+SECRET_KEY = 'asdf'
+
 DATABASES = {
     'default': {
         'NAME': 'test.db',
@@ -15,6 +17,7 @@ DATABASES = {
 INSTALLED_APPS = (
     'django_nose',
     'django_browserid',
+    'django_browserid.tests',
 
     'django.contrib.auth',
     'django.contrib.contenttypes',
