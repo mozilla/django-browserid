@@ -40,7 +40,10 @@
 
         navigator.id.watch({
             onlogin: function(assertion) {
-                if (assertion) {
+                // Don't bother if login just failed.
+                if (location.search.indexOf('bid_login_failed=1') !== -1) {
+                    navigator.id.logout();
+                } else if (assertion) {
                     var $e = $('#id_assertion');
                     $e.val(assertion.toString());
                     $e.parent().submit();

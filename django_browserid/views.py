@@ -36,7 +36,15 @@ class Verify(BaseFormView):
         """Handle a failed login. Use this to perform complex redirects
         post-login.
         """
-        return redirect(self.get_failure_url())
+        # Append "?bid_login_failed=1" to the URL to notify the JavaScript that
+        # login failed.
+        failure_url = self.get_failure_url()
+
+        if not failure_url.endswith('?'):
+            failure_url += '?' if not '?' in failure_url else '&'
+        failure_url += 'bid_login_failed=1'
+
+        return redirect(failure_url)
 
     def form_valid(self, form):
         """Handles the return post request from the browserID form and puts
@@ -58,7 +66,7 @@ class Verify(BaseFormView):
         return self.login_failure()
 
     def get(self, *args, **kwargs):
-        return redirect(self.get_failure_url())
+        return self.login_failure()
 
     def get_failure_url(self):
         """
