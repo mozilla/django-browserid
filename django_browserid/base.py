@@ -115,17 +115,21 @@ def _verify_http_request(url, qs):
     return rv
 
 
-def verify(assertion, audience):
-    """Verify assertion using an external verification service."""
+def verify(assertion, audience, extra_params=None):
+    """Verify assertion using an external verification service.
+       extra_params is a dict of additional parameters to send to the
+        verification service.
+    """
     verify_url = getattr(settings, 'BROWSERID_VERIFICATION_URL',
                          DEFAULT_VERIFICATION_URL)
 
     log.info("Verification URL: %s" % verify_url)
 
-    result = _verify_http_request(verify_url, urllib.urlencode({
-        'assertion': assertion,
-        'audience': audience
-    }))
+    args = {'assertion': assertion,
+            'audience': audience}
+    if extra_params:
+        args.update(extra_params)
+    result = _verify_http_request(verify_url, urllib.urlencode(args))
 
     if result['status'] == OKAY_RESPONSE:
         return result
