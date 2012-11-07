@@ -128,3 +128,13 @@ Signals
 
     * **sender**: The function that created the user instance.
     * **user**: The user instance that was created.
+
+
+Custom User Model
+-----------------
+
+Django 1.5 allows you to specify a custom model to use in place of the built-in
+User model with the ``AUTH_USER_MODEL`` setting. ``django-browserid`` supports
+custom User models, however you will most likely need to subclass
+``django-browserid.BrowserIDBackend`` and override the ``create_user``,
+``get_user``, and ``filter_users_by_email`` functions to work with your class.

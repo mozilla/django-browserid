@@ -12,6 +12,12 @@ from mock import patch
 from django_browserid.auth import BrowserIDBackend, default_username_algo
 from django_browserid.tests import mock_browserid
 
+try:
+    from django.contrib.auth import get_user_model
+    from django_browserid.tests.models import CustomUser
+except ImportError:
+    get_user_model = False
+
 
 def new_user(email, username=None):
         """Creates a user with the specified email for testing."""
@@ -87,3 +93,36 @@ class BrowserIDBackendTests(TestCase):
         # created.
         user = self.auth('a@b.com')
         assert user_created.call.called_with(user=user)
+
+
+# Only run custom user model tests if we're using a version of Django that
+# supports it.
+if get_user_model:
+    @patch.object(settings, 'AUTH_USER_MODEL', 'tests.CustomUser')
+    class CustomUserModelTests(TestCase):
+        def _auth(self, backend=None, verified_email=None):
+            if backend is None:
+                backend = BrowserIDBackend()
+
+            with mock_browserid(verified_email):
+                return backend.authenticate(assertion='asdf', audience='asdf')
+
+        def test_existing_user(self):
+            """If a custom user exists with the given email, return them."""
+            user = CustomUser.objects.create(email='a@test.com')
+            authed_user = self._auth(verified_email='a@test.com')
+            assert user == authed_user
+
+        @patch.object(settings, 'BROWSERID_CREATE_USER', True)
+        def test_create_new_user(self):
+            """
+            If a custom user does not exist with the given email, create a new
+            user and return them.
+            """
+            class CustomUserBrowserIDBackend(BrowserIDBackend):
+                def create_user(self, email):
+                    return CustomUser.objects.create(email=email)
+            user = self._auth(backend=CustomUserBrowserIDBackend(),
+                              verified_email='b@test.com')
+            assert isinstance(user, CustomUser)
+            assert user.email == 'b@test.com'
