@@ -6,6 +6,8 @@
     'use strict';
 
     $(function() {
+        // State? Ewwwwww.
+        var logoutButton = null;
         var requestOptions = [
             'siteName',
             'siteLogo',
@@ -35,6 +37,7 @@
 
         $('.browserid-logout').bind('click', function(e) {
             e.preventDefault();
+            logoutButton = e.target;
             navigator.id.logout(); // Clears User Agent BrowserID state.
         });
 
@@ -51,8 +54,13 @@
             },
 
             onlogout: function() {
-                // TODO: Detect if logout button was a link and follow its href
-                // if possible.
+                var currentButton = logoutButton;
+                if (currentButton !== null) {
+                    logoutButton = null;
+                    if (currentButton.href) {
+                        window.location = currentButton.href;
+                    }
+                }
             }
         });
     });
