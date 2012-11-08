@@ -1,8 +1,13 @@
 from distutils.core import setup
 
+
+with open('README.rst') as file:
+    long_description = file.read()
+
 setup(
     name='django-browserid',
     description='Django application for adding BrowserID support.',
+    long_description=long_description,
     version='0.7',
     packages=['django_browserid', 'django_browserid.tests'],
     author='Paul Osman, Michael Kelly',

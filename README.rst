@@ -36,11 +36,10 @@ Need Help?
 First, check out the `troubleshooting`_ section of the documentation, which
 covers solutions to several common problems.
 
-If that doesn't help, questions can be sent to the `#webdev`_ channel on
+If that doesn't help, questions can be sent to the #webdev channel on
 irc.mozilla.org, or by email to the `current maintainer`_.
 
 .. _troubleshooting: http://django-browserid.readthedocs.org/en/latest/details/troubleshooting.html
-.. _#webdev: irc://irc.mozilla.org/#webdev
 .. _current maintainer: mailto:mkelly@mozilla.org
 
 Testing
