@@ -115,3 +115,16 @@ This JavaScript file requires jQuery 1.6 or higher.
 .. _Managing static files: https://docs.djangoproject.com/en/1.3/howto/static-files/
 .. _Content Security Policy: https://developer.mozilla.org/en/Security/CSP
 .. _django-csp: https://github.com/mozilla/django-csp
+
+Logging Out
+-----------
+
+To log users out, create a view that calls `django.contrib.auth.logout`, or use
+the standard logout view `django.contrib.auth.views.logout`. Then, add a link
+to your page with the `browserid-logout` class::
+
+    <a href="{% url logout %}" class="browserid-logout">Log Out</a>
+
+.. note:: Ensure that you include the form media on the same page, as it handles
+   calling ``navigator.id.logout`` when the logout link is clicked.
+
