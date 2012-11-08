@@ -37,3 +37,4 @@ Patches and Suggestions
 - Greg Koberger
 - Niran Babalola
 - callmekatootie
+- Paul Mclanahan

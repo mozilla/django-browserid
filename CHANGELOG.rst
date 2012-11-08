@@ -3,6 +3,14 @@
 History
 -------
 
+0.7.1 (2012-11-08)
+++++++++++++++++++
+
+- Add support for a working logout button. Switching to the Observer API in 0.7
+  made the issue that we weren't calling ``navigator.id.logout`` more
+  pronounced, so it makes sense to make a small new release to make it easier
+  to add a logout button.
+
 0.7 (2012-11-07)
 ++++++++++++++++
 

@@ -8,7 +8,7 @@ setup(
     name='django-browserid',
     description='Django application for adding BrowserID support.',
     long_description=long_description,
-    version='0.7',
+    version='0.7.1',
     packages=['django_browserid', 'django_browserid.tests'],
     author='Paul Osman, Michael Kelly',
     author_email='mkelly@mozilla.com',
