@@ -12,10 +12,36 @@ Django_.
 .. _Django: http://www.djangoproject.com/
 .. _BrowserID: https://login.persona.org/
 
+Tested Under
+------------
+* Python
+
+  * 2.6
+  * 2.7
+
+* Django
+
+  * 1.3.4
+  * 1.4.2
+  * 1.5a1
+
 Documentation
 -------------
 
 http://django-browserid.rtfd.org
+
+Need Help?
+----------
+
+First, check out the `troubleshooting`_ section of the documentation, which
+covers solutions to several common problems.
+
+If that doesn't help, questions can be sent to the `#webdev`_ channel on
+irc.mozilla.org, or by email to the `current maintainer`_.
+
+.. _troubleshooting: http://django-browserid.readthedocs.org/en/latest/details/troubleshooting.html
+.. _#webdev: irc://irc.mozilla.org/#webdev
+.. _current maintainer: mailto:mkelly@mozilla.org
 
 Testing
 -------
@@ -30,9 +56,3 @@ This software is licensed under the `Mozilla Public License v. 2.0`_. For more
 information, read the file ``LICENSE``.
 
 .. _Mozilla Public License v. 2.0: http://mozilla.org/MPL/2.0/
-
-Status
-------
-
-django-browserid is a work in progress. Contributions are welcome. Feel free
-to fork and contribute!

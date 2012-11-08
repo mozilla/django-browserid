@@ -23,3 +23,11 @@ to fork_ and contribute!
    details/advanced
    details/settings
    details/troubleshooting
+
+Developer Guide
+---------------
+
+.. toctree::
+   :maxdepth: 1
+
+   dev/authors

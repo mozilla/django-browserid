@@ -36,17 +36,6 @@ def get_audience(request):
         SITE_URL = 'https://example.com'
         SITE_URL = 'http://example.com'
 
-    If you don't have a SITE_URL you can also use these varables:
-    PROTOCOL, DOMAIN, and (optionally) PORT.
-    Example 1:
-        PROTOCOL = 'https://'
-        DOMAIN = 'example.com'
-
-    Example 2:
-        PROTOCOL = 'http://'
-        DOMAIN = '127.0.0.1'
-        PORT = '8001'
-
     If none are set, we trust the request to populate the audience.
     This is *not secure*!
     """
@@ -58,27 +47,6 @@ def get_audience(request):
     else:
         req_proto = 'http://'
     req_domain = request.get_host()
-
-    # If we don't define it explicitly
-    if not site_url:
-        warn('Using DOMAIN and PROTOCOL to specify your BrowserID audience is '
-             'deprecated. Please use the SITE_URL setting instead.',
-             DeprecationWarning)
-
-        # DOMAIN is example.com req_domain is example.com:8001
-        domain = getattr(settings, 'DOMAIN', req_domain.split(':')[0])
-        protocol = getattr(settings, 'PROTOCOL', req_proto)
-
-        standards = {'https://': 443, 'http://': 80}
-        if ':' in req_domain:
-            req_port = req_domain.split(':')[1]
-        else:
-            req_port = None
-        port = getattr(settings, 'PORT', req_port or standards[protocol])
-        if port == standards[protocol]:
-            site_url = ''.join(map(str, (protocol, domain)))
-        else:
-            site_url = ''.join(map(str, (protocol, domain, ':', port)))
 
     req_url = "%s%s" % (req_proto, req_domain)
     if site_url != "%s%s" % (req_proto, req_domain):

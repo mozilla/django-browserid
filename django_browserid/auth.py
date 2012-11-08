@@ -6,13 +6,12 @@ file, You can obtain one at http://mozilla.org/MPL/2.0/.
 import base64
 import hashlib
 import logging
-from warnings import warn
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.importlib import import_module
 
-from django_browserid.base import get_audience as base_get_audience, verify
+from django_browserid.base import verify
 from django_browserid.signals import user_created
 
 try:
@@ -25,12 +24,6 @@ except ImportError:
 
 
 log = logging.getLogger(__name__)
-
-
-def get_audience(*args):
-    warn('Deprecated, please use the standalone function '
-         'django_browserid.get_audience instead.', DeprecationWarning)
-    return base_get_audience(*args)
 
 
 def default_username_algo(email):
@@ -54,11 +47,6 @@ class BrowserIDBackend(object):
         tests.
         """
         self.User = get_user_model()
-
-    def verify(self, *args):
-        warn('Deprecated, please use the standalone function '
-             'django_browserid.verify instead.', DeprecationWarning)
-        return verify(*args)
 
     def filter_users_by_email(self, email):
         """Return all users matching the specified email."""
