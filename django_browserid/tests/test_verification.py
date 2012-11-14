@@ -49,7 +49,7 @@ def test_backend_verify(fake):
     # Test that authenticate() calls verify().
     fake.return_value = False
     auth.authenticate(**authenticate_kwargs)
-    fake.assert_called_with(assertion, audience)
+    fake.assert_called_with(assertion, audience, extra_params={})
 
 
 @mock_browserid(None)
@@ -134,3 +134,20 @@ def test_verify_post_uses_custom_settings(post):
                             data=ANY,
                             timeout=1,
                             headers=ANY)
+
+
+@patch.object(settings, 'BROWSERID_ALLOW_UNVERIFIED', True, create=True)
+@patch.object(settings, 'BROWSERID_VERIFICATION_URL', 'https://unverifier.persona.org/verify', create=True)
+@mock_browserid(return_patcher=True)
+def test_authenticate_unverified_user(patch=None, **kw):
+    """ Test that an unverified email assertion resolves """
+    # in real life, BROWSERID_VERIFICATION_URL would point to the
+    # BID Unverified Email verifier. (Yes, that makes my head hurt too.)
+    args = dict(authenticate_kwargs)
+    patch = patch.__enter__()
+    args['extra_params']={'issuer': 'a.b.c', 'allow_unverified': True}
+
+    user = verify(**args)
+    patch.assert_called_once_with('https://unverifier.persona.org/verify',
+            ANY)
+    assert 'allow_unverified=True' in patch.call_args[0][1]
