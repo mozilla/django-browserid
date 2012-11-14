@@ -27,8 +27,8 @@ class mock_browserid(object):
         django_browserid.verify('random-token')  # = False
     """
     def __init__(self, email=None, audience=None, unverified_email=None,
-            return_patcher=False):
-        self.return_patcher = return_patcher
+                 pass_mock=False):
+        self.pass_mock = pass_mock
         self.patcher = patch('django_browserid.base._verify_http_request')
         self.return_value = {
             u'audience': audience,
@@ -42,7 +42,9 @@ class mock_browserid(object):
             del self.return_value['email']
 
     def __enter__(self):
-        self.patcher.start().return_value = self.return_value
+        mock = self.patcher.start()
+        mock.return_value = self.return_value
+        return mock
 
     def __exit__(self, exc_type, exc_value, traceback):
         self.patcher.stop()
@@ -50,8 +52,8 @@ class mock_browserid(object):
     def __call__(self, func):
         @wraps(func)
         def inner(*args, **kwargs):
-            with self:
-                if self.return_patcher:
-                    args += tuple([self.patcher])
+            with self as mock:
+                if self.pass_mock:
+                    args += (mock,)
                 return func(*args, **kwargs)
         return inner

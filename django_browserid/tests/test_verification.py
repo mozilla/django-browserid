@@ -138,16 +138,18 @@ def test_verify_post_uses_custom_settings(post):
 
 @patch.object(settings, 'BROWSERID_ALLOW_UNVERIFIED', True, create=True)
 @patch.object(settings, 'BROWSERID_VERIFICATION_URL', 'https://unverifier.persona.org/verify', create=True)
-@mock_browserid(return_patcher=True)
-def test_authenticate_unverified_user(patch=None, **kw):
-    """ Test that an unverified email assertion resolves """
-    # in real life, BROWSERID_VERIFICATION_URL would point to the
+@mock_browserid(pass_mock=True)
+def test_authenticate_unverified_user(_verify_http_request):
+    """
+    Test that extra parameters are passed through to _verify_http_request
+    correctly.
+    """
+    # In real life, BROWSERID_VERIFICATION_URL would point to the
     # BID Unverified Email verifier. (Yes, that makes my head hurt too.)
     args = dict(authenticate_kwargs)
-    patch = patch.__enter__()
-    args['extra_params']={'issuer': 'a.b.c', 'allow_unverified': True}
+    args['extra_params'] = {'issuer': 'a.b.c', 'allow_unverified': True}
 
-    user = verify(**args)
-    patch.assert_called_once_with('https://unverifier.persona.org/verify',
-            ANY)
-    assert 'allow_unverified=True' in patch.call_args[0][1]
+    verify(**args)
+    _verify_http_request.assert_called_once_with(
+        'https://unverifier.persona.org/verify', ANY)
+    assert 'allow_unverified=True' in _verify_http_request.call_args[0][1]
