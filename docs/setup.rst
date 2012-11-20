@@ -33,7 +33,7 @@ Edit your ``urls.py`` file and add the following::
 
    urlpatterns = patterns('',
        # ...
-       (r'^browserid/', include('django_browserid.urls')),
+       (r'', include('django_browserid.urls')),
        # ...
    )
 
