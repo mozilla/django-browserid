@@ -11,3 +11,10 @@ class BrowserIDForm(forms.Form):
 
     class Media:
         js = ('browserid/browserid.js', 'https://login.persona.org/include.js')
+
+    def clean_assertion(self):
+        try:
+            return str(self.cleaned_data['assertion'])
+        except UnicodeEncodeError:
+            # not ascii :(
+            raise forms.ValidationError('non-ascii string')
