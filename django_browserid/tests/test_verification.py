@@ -136,6 +136,19 @@ def test_verify_post_uses_custom_settings(post):
                             headers=ANY)
 
 
+@patch('django_browserid.base.requests.post')
+def test_verify_with_custom_url(post):
+    post.return_value.content = '{"status": "okay"}'
+    url = 'https://custom-service.org/verify'
+    verify(assertion, audience, url=url)
+    post.assert_called_with(url,
+                            verify=ANY,
+                            proxies=ANY,
+                            data=ANY,
+                            timeout=ANY,
+                            headers=ANY)
+
+
 @patch.object(settings, 'BROWSERID_ALLOW_UNVERIFIED', True, create=True)
 @patch.object(settings, 'BROWSERID_VERIFICATION_URL', 'https://unverifier.persona.org/verify', create=True)
 @mock_browserid(pass_mock=True)

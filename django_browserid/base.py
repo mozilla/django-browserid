@@ -31,7 +31,8 @@ def get_audience(request):
     To use this function, make sure there is either a SITE_URL in
     your settings.py file or PROTOCOL and DOMAIN.
 
-    Examples using SITE_URL:
+    Examples using SITE_URL::
+
         SITE_URL = 'http://127.0.0.1:8001'
         SITE_URL = 'https://example.com'
         SITE_URL = 'http://example.com'
@@ -80,21 +81,38 @@ def _verify_http_request(url, qs):
     return rv
 
 
-def verify(assertion, audience, extra_params=None):
-    """Verify assertion using an external verification service.
-       extra_params is a dict of additional parameters to send to the
-        verification service.
+def verify(assertion, audience, extra_params=None, url=None):
     """
-    verify_url = getattr(settings, 'BROWSERID_VERIFICATION_URL',
-                         DEFAULT_VERIFICATION_URL)
+    Verify assertion using an external verification service.
 
-    log.info("Verification URL: {0}".format(verify_url))
+    :param assertion:
+        The string assertion received in the client from
+        ``navigator.id.request()``.
+    :param audience:
+        This is domain of your website and it must match what
+        was in the URL bar when the client asked for an assertion.
+        You probably want to use
+        :func:`django_browserid.get_audience` which sets it
+        based on ``SITE_URL``.
+    :param extra_params:
+        A dict of additional parameters to send to the
+        verification service as part of the POST request.
+    :param url:
+        A custom verification URL for the service.
+        The service URL can also be set using the
+        ``BROWSERID_VERIFICATION_URL`` setting.
+    """
+    if not url:
+        url = getattr(settings, 'BROWSERID_VERIFICATION_URL',
+                      DEFAULT_VERIFICATION_URL)
+
+    log.info("Verification URL: {0}".format(url))
 
     args = {'assertion': assertion,
             'audience': audience}
     if extra_params:
         args.update(extra_params)
-    result = _verify_http_request(verify_url, urllib.urlencode(args))
+    result = _verify_http_request(url, urllib.urlencode(args))
 
     if result['status'] == OKAY_RESPONSE:
         return result

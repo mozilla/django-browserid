@@ -18,6 +18,12 @@ import sys, os
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #sys.path.insert(0, os.path.abspath('.'))
 
+# Add project root where setup.py lives:
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+
+# Set up Django so we can import django_browserid.
+os.environ['DJANGO_SETTINGS_MODULE'] = 'django_browserid.tests.settings'
+
 # -- General configuration -----------------------------------------------------
 
 # If your documentation needs a minimal Sphinx version, state it here.

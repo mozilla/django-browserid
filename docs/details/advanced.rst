@@ -59,8 +59,8 @@ Custom Verification
 
 If you want full control over account verification, don't use
 django-browserid's ``browserid_verify`` view. Create your own view and
-use ``verify`` to manually verify a BrowserID assertion with something
-like the following::
+use :func:`django_browserid.verify` to manually verify a
+BrowserID assertion with something like the following::
 
    from django_browserid import get_audience, verify
    from django_browserid.forms import BrowserIDForm
@@ -128,6 +128,13 @@ Signals
 
     * **sender**: The function that created the user instance.
     * **user**: The user instance that was created.
+
+API
+----------
+
+.. autofunction:: django_browserid.verify
+
+.. autofunction:: django_browserid.get_audience
 
 
 Custom User Model
