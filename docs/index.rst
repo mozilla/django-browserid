@@ -30,5 +30,6 @@ Developer Guide
 .. toctree::
    :maxdepth: 1
 
+   dev/devsetup
    dev/changelog
    dev/authors
