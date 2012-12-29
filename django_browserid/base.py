@@ -26,10 +26,10 @@ OKAY_RESPONSE = 'okay'
 
 
 def get_audience(request):
-    """Uses Django settings to format the audience.
+    """
+    Uses Django settings to format the audience.
 
-    To use this function, make sure there is either a SITE_URL in
-    your settings.py file or PROTOCOL and DOMAIN.
+    To use this function, make sure SITE_URL is set in your settings.py file.
 
     Examples using SITE_URL::
 
