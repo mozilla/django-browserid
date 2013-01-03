@@ -7,58 +7,56 @@
 
     $(function() {
         // State? Ewwwwww.
-        var logoutButton = null;
-        var requestOptions = [
-            'siteName',
-            'siteLogo',
-            'oncancel',
-            'privacyPolicy',
-            'returnTo',
-            'termsOfService'
-        ];
+        var logoutUrl = null;
+        var $loginButton = null;
+        var loginFailed = location.search.indexOf('bid_login_failed=1') !== -1;
 
-        $(document).delegate('.browserid-login, #browserid', 'click', function(e) {
+        $(document).on('click', '.browserid-login', function(e) {
             e.preventDefault();
 
-            // Arguments to navigator.id.request can be specified by data-attributes
-            // on the BrowserID link: <a href="#" data-site-name="Site Name">
-            var options = {};
-            var $link = $(this);
-            for (var k = 0; k < requestOptions.length; k++) {
-                var name = requestOptions[k];
-                var value = $link.data(name);
-                if (value !== undefined) {
-                    options[name] = value;
-                }
-            }
-
-            navigator.id.request(options); // Triggers BrowserID login dialog.
+            // Pull request arguments from the data-request-args attribute.
+            $loginButton = $(this);
+            navigator.id.request($loginButton.data('requestArgs'));
         });
 
-        $('.browserid-logout').bind('click', function(e) {
+        $(document).on('click', '.browserid-logout', function(e) {
             e.preventDefault();
-            logoutButton = this;
-            navigator.id.logout(); // Clears User Agent BrowserID state.
+            logoutUrl = $(this).attr('href');
+            navigator.id.logout();
         });
 
         navigator.id.watch({
+            loggedInUser: $('#browserid-info').data('userEmail') || null,
             onlogin: function(assertion) {
-                // Don't bother if login just failed.
-                if (location.search.indexOf('bid_login_failed=1') !== -1) {
-                    navigator.id.logout();
-                } else if (assertion) {
-                    var $e = $('#id_assertion');
-                    $e.val(assertion.toString());
-                    $e.parent().submit();
+                // Avoid auto-login on failure.
+                if (loginFailed) {
+                    loginFailed = false;
+                    return;
+                }
+
+                if (assertion) {
+                    var $form = $loginButton.prev('.browserid-form');
+                    assertion = assertion.toString();
+                    $form.find('input[name="assertion"]').val(assertion);
+                    $form.submit();
                 }
             },
-
             onlogout: function() {
-                var currentButton = logoutButton;
-                if (currentButton !== null) {
-                    logoutButton = null;
-                    if (currentButton.href) {
-                        window.location = currentButton.href;
+                // Follow the logout link's href once logout is complete.
+                var currentLogoutUrl = logoutUrl;
+                if (currentLogoutUrl !== null) {
+                    logoutUrl = null;
+                    window.location = currentLogoutUrl;
+                } else {
+                    // Sometimes you can get caught in a loop where BrowserID
+                    // keeps trying to log you out as soon as watch is called,
+                    // and fails since the logout URL hasn't been set yet.
+                    // Here we just find the first logout button and use that
+                    // URL; if this breaks your site, you'll just need custom
+                    // JavaScript instead, sorry. :(
+                    currentLogoutUrl = $('.browserid-logout').attr('href');
+                    if (currentLogoutUrl) {
+                        window.location = currentLogoutUrl;
                     }
                 }
             }
