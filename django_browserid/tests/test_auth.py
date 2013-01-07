@@ -7,7 +7,7 @@ from django.test import TestCase
 
 from mock import ANY, patch
 
-from django_browserid.auth import BrowserIDBackend, default_username_algo
+from django_browserid.auth import BrowserIDBackend, default_username_algo, verify
 from django_browserid.tests import mock_browserid
 
 # Support Python 2.6 by using unittest2
@@ -31,7 +31,7 @@ def new_user(email, username=None):
 
 
 class BrowserIDBackendTests(TestCase):
-    def auth(self, verified_email=None):
+    def auth(self, verified_email=None, browserid_extra=None):
         """
         Attempt to authenticate a user with BrowserIDBackend.
 
@@ -40,7 +40,7 @@ class BrowserIDBackendTests(TestCase):
         """
         with mock_browserid(verified_email):
             backend = BrowserIDBackend()
-            return backend.authenticate(assertion='asdf', audience='asdf')
+            return backend.authenticate(assertion='asdf', audience='asdf', browserid_extra=browserid_extra)
 
     def test_failed_verification(self):
         # If verification fails, return None.
@@ -97,6 +97,12 @@ class BrowserIDBackendTests(TestCase):
         # created.
         user = self.auth('a@b.com')
         user_created.send.assert_called_with(ANY, user=user)
+
+    @patch('django_browserid.auth.verify', wraps=verify)
+    def test_verify_called_with_browserid_extra(self, user_verify):
+        dic = {'a': 'AlphaA'}
+        self.auth('a@b.com', browserid_extra=dic)
+        user_verify.assert_called_with('asdf', 'asdf', extra_params=dic)
 
 
 # Only run custom user model tests if we're using a version of Django that
