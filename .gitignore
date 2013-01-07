@@ -6,3 +6,4 @@ test.db
 docs/_build
 MANIFEST
 .DS_Store
+virtualenv/

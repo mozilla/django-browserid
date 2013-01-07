@@ -74,7 +74,7 @@ class BrowserIDBackend(object):
 
         See django_browserid.base.get_audience()
         """
-        result = verify(assertion, audience, extra_params=kw)
+        result = verify(assertion, audience, **kw)
         if not result:
             return None
 

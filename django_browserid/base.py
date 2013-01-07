@@ -81,7 +81,7 @@ def _verify_http_request(url, qs):
     return rv
 
 
-def verify(assertion, audience, extra_params=None, url=None):
+def verify(assertion, audience, url=None, **browserid_extra):
     """
     Verify assertion using an external verification service.
 
@@ -110,8 +110,8 @@ def verify(assertion, audience, extra_params=None, url=None):
 
     args = {'assertion': assertion,
             'audience': audience}
-    if extra_params:
-        args.update(extra_params)
+    if browserid_extra:
+        args.update(browserid_extra)
     result = _verify_http_request(url, urllib.urlencode(args))
 
     if result['status'] == OKAY_RESPONSE:
