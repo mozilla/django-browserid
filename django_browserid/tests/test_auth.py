@@ -33,7 +33,7 @@ def new_user(email, username=None):
 
 
 class BrowserIDBackendTests(TestCase):
-    def auth(self, verified_email=None):
+    def auth(self, verified_email=None, browserid_extra=None):
         """
         Attempt to authenticate a user with BrowserIDBackend.
 
@@ -42,7 +42,7 @@ class BrowserIDBackendTests(TestCase):
         """
         with mock_browserid(verified_email):
             backend = BrowserIDBackend()
-            return backend.authenticate(assertion='asdf', audience='asdf')
+            return backend.authenticate(assertion='asdf', audience='asdf', browserid_extra=browserid_extra)
 
     def test_failed_verification(self):
         # If verification fails, return None.

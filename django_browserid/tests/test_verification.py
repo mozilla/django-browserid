@@ -49,7 +49,7 @@ def test_backend_verify(fake):
     # Test that authenticate() calls verify().
     fake.return_value = False
     auth.authenticate(**authenticate_kwargs)
-    fake.assert_called_with(assertion, audience, extra_params={})
+    fake.assert_called_with(assertion, audience, extra_params=None)
 
 
 @mock_browserid(None)
