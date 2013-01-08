@@ -62,7 +62,7 @@ class BrowserIDBackend(object):
 
         return self.User.objects.create_user(username, email)
 
-    def authenticate(self, assertion=None, audience=None, **kw):
+    def authenticate(self, assertion=None, audience=None, browserid_extra=None, **kw):
         """``django.contrib.auth`` compatible authentication method.
 
         Given a BrowserID assertion and an audience, it attempts to
@@ -74,7 +74,7 @@ class BrowserIDBackend(object):
 
         See django_browserid.base.get_audience()
         """
-        result = verify(assertion, audience, **kw)
+        result = verify(assertion, audience, extra_params=browserid_extra)
         if not result:
             return None
 
