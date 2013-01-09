@@ -5,14 +5,14 @@ CSP WARN: Directive "..." violated by https://browserid.org/include.js
 ----------------------------------------------------------------------
 
 This warning appears in the Error Console when your site uses
-`Content Security Policy`_ without making an exception for the browserid.org
+`Content Security Policy`_ without making an exception for the persona.org
 external JavaScript include.
 
-To fix this, include https://browserid.org in your script-src directive. If
+To fix this, include https://persona.org in your script-src directive. If
 you're using the `django-csp`_ library, the following settings will work::
 
-    CSP_SCRIPT_SRC = ("'self'", 'https://browserid.org','https://login.persona.org')
-    CSP_FRAME_SRC = ("'self'", 'https://browserid.org','https://login.persona.org')
+    CSP_SCRIPT_SRC = ("'self'", https://login.persona.org')
+    CSP_FRAME_SRC = ("'self'", 'https://login.persona.org')
 
 .. note:: The example above also includes the frame-src directive. There is an
    iframe used during BrowserID login, but some people report that login will
@@ -29,12 +29,6 @@ Sometimes, after attempting to login, you might notice that the page keeps
 reloading itself over and over. This usually means that something has gone wrong
 in your login process, and you should check the log output as well as the
 solutions below to see if they can point you in the right direction.
-
-The reason for the repeating redirects has to do with Persona, the default
-BrowserID server that ``django-browserid`` uses. If you have attempted to log in
-to a site via Persona, and the site fails to accept your login, Persona will
-continue to attempt to log you in if the JavaScript shim that it provides is
-included on the page.
 
 The easiest way to get around this is to simply not include the login form on
 any pages when the user is logged in. ``django-browserid`` attempts to avoid
