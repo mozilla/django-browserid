@@ -6,6 +6,7 @@ from functools import partial
 
 from django.template import RequestContext
 from django.template.loader import render_to_string
+from django.utils.html import escape
 from django.utils.safestring import mark_safe
 
 from django_browserid.forms import (BrowserIDForm, FORM_JAVASCRIPT,
@@ -28,19 +29,26 @@ def browserid_button(request, sign_in='Sign In', sign_out='Sign Out',
         **IGNORE:** Automatically filled in by context processor.
 
     :param sign_in:
-        String used for the sign-in button.
+        String used for the sign-in button text.
 
     :param sign_out:
-        String used for the sign-out button.
+        String used for the sign-out button text.
 
     :param login_fallback:
         Fallback URL to use for login with users who have JavaScript disabled.
 
     :param request_args:
         Dictionary of arguments to be passed to navigator.id.request for
-        customizing the BrowserID login popup.
+        customizing the BrowserID login popup. Can also be a string of JSON.
+
+        A list of valid options is available at
+        https://developer.mozilla.org/en-US/docs/DOM/navigator.id.request
     """
-    request_args = json.dumps(request_args)
+    if isinstance(request_args, dict):
+        request_args = json.dumps(request_args)
+    elif isinstance(request_args, basestring):
+        request_args = escape(request_args)
+
     return render_to_string('browserid/button.html', {
         'form': BrowserIDForm(),
         'request_args': request_args,

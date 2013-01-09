@@ -1,8 +1,9 @@
 from django.test import TestCase
+from django.test.client import RequestFactory
 
 from mock import Mock, patch
 
-from django_browserid.context_processors import browserid_js
+from django_browserid.context_processors import browserid_button, browserid_js
 
 
 class DummyForm(object):
@@ -34,3 +35,30 @@ class BrowserIDJSTests(TestCase):
         mock_form.media.absolute_path.assert_any_call('test1.js')
         mock_form.media.absolute_path.assert_any_call('test2.js')
         mock_form.media.absolute_path.assert_any_call('test3.js')
+
+
+class BrowserIDButtonTests(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+
+    @patch('django_browserid.context_processors.render_to_string')
+    def test_request_args_dict(self, render_to_template):
+        """
+        If request_args is a dict, it must be passed to the template as a JSON
+        string.
+        """
+        request = self.factory.get('/')
+        browserid_button(request, request_args={'siteName': 'test'})
+        self.assertEqual(render_to_template.call_args[0][1]['request_args'],
+                         '{"siteName": "test"}')
+
+    @patch('django_browserid.context_processors.render_to_string')
+    def test_request_args_string(self, render_to_template):
+        """
+        If request_args is a string, it must be escaped and passed to the
+        template.
+        """
+        request = self.factory.get('/')
+        browserid_button(request, request_args='{"siteName": "test"}')
+        self.assertEqual(render_to_template.call_args[0][1]['request_args'],
+                         '{&quot;siteName&quot;: &quot;test&quot;}')

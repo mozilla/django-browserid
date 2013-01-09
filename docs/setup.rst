@@ -69,14 +69,34 @@ things you will need to add to your templates:
 1. ``{{ browserid_info }}``: Invisible element that stores info about the
    current user. Must be within the ``<body>`` tag and appear only **once**.
 
-2. ``{{ browserid_js() }}``: Outputs the ``<script>`` tags for the button
+2. ``{% browserid_js %}``: Outputs the ``<script>`` tags for the button
    JavaScript. Must be somewhere on the page, typically at the bottom right
    before the ``</body>`` tag to allow the page to visibly load before
    executing.
 
-3. ``{{ browserid_button() }}``: Outputs the HTML for the login button itself.
+3. ``{% browserid_button %}``: Outputs the HTML for the login button itself.
 
 A complete example::
+
+    {% load browserid %}
+    <html>
+      <body>
+        {{ browserid_info }}
+        <header>
+          <h1>My Site</h1>
+          <div class="authentication">
+            {% browserid_button sign_in='Login' %}
+          </div>
+        </header>
+        <article>
+          <p>Welcome to my site!</p>
+        </article>
+        {% browserid_js %}
+      </body>
+    </html>
+
+If you're using `Jinja2`_ as your templating system, you can use the functions
+passed to your template by the context processor::
 
     <html>
       <body>
@@ -84,7 +104,7 @@ A complete example::
         <header>
           <h1>My Site</h1>
           <div class="authentication">
-            {{ browserid_button() }}
+            {{ browserid_button(sign_in='Login') }}
           </div>
         </header>
         <article>
@@ -93,7 +113,6 @@ A complete example::
         {{ browserid_js() }}
       </body>
     </html>
-
 
 .. note:: The JavaScript assumes you have `jQuery`_ 1.7 or higher on your site.
 
@@ -105,7 +124,7 @@ a logout button if the user is logged in.
 .. autofunction:: django_browserid.context_processors.browserid_js
 
 .. _jQuery: http://jquery.com/
-
+.. _Jinja2: http://jinja.pocoo.org/
 
 Static Files
 ------------
