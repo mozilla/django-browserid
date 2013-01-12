@@ -16,6 +16,12 @@ Settings
 
     Path to redirect to on an unsuccessful login attempt.
 
+.. data:: LOGOUT_REDIRECT_URL
+
+   **Default:** ``'/'``
+
+   Path to redirect to on logout.
+
 .. data:: BROWSERID_CREATE_USER
 
     **Default:** ``True``
@@ -31,6 +37,12 @@ Settings
     **Default:** ``'https://browserid.org/verify``
 
     Defines the URL for the BrowserID verification service to use.
+
+.. data:: BROWSERID_SHIM
+
+   **Default:** 'https://login.persona.org/include.js'
+
+   The URL to use for the BrowserID JavaScript shim.
 
 .. data:: BROWSERID_DISABLE_CERT_CHECK
 

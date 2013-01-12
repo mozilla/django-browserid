@@ -12,119 +12,147 @@ You can use pip to install django-browserid and requirements:
 Configuration
 -------------
 
-To use ``django-browserid``, add it to ``INSTALLED_APPS`` in ``settings.py``::
+To use ``django-browserid``, you'll need to make a few changes to your
+``settings.py`` file::
 
-   INSTALLED_APPS = (
-       # ...
-       'django.contrib.auth',
-       'django_browserid',  # Load after auth to monkey-patch it.
-       # ...
-   )
+    # Add 'django_browserid' to INSTALLED_APPS.
+    INSTALLED_APPS = (
+        # ...
+        'django.contrib.auth',
+        'django_browserid',  # Load after auth
+        # ...
+    )
 
-and add ``django_browserid.auth.BrowserIDBackend`` to ``AUTHENTICATION_BACKENDS`` in ``settings.py``::
+    # Add the domain and protocol you expect to use in SITE_URL.
+    SITE_URL = 'https://example.com:8000'  # Note: No trailing slash
 
-   AUTHENTICATION_BACKENDS = (
+    # Add the django_browserid authentication backend.
+    AUTHENTICATION_BACKENDS = (
        # ...
        'django_browserid.auth.BrowserIDBackend',
        # ...
-   )
+    )
 
-Edit your ``urls.py`` file and add the following::
-
-   urlpatterns = patterns('',
+    # Add the django_browserid context processor.
+    TEMPLATE_CONTEXT_PROCESSORS = (
        # ...
-       (r'', include('django_browserid.urls')),
+       'django_browserid.context_processors.browserid',
        # ...
-   )
+    )
 
-You should also add the following in ``settings.py``::
+.. note:: BrowserID uses an assertion and an audience to verify the user. This
+   ``SITE_URL`` is used to determine the audience. For security reasons, it is
+   *very important* that you set ``SITE_URL`` correctly.
 
-    # Note: No trailing slash
-    SITE_URL = 'https://example.com:8000'
+Next, edit your ``urls.py`` file and add the following::
 
-BrowserID uses an assertion and an audience to verify the user. This
-``SITE_URL`` is used to determine the audience. For security reasons, it is
-*very important* that you set ``SITE_URL`` correctly.
+    urlpatterns = patterns('',
+        # ...
+        (r'^browserid/', include('django_browserid.urls')),
+        # ...
+    )
 
-You can also set the following optional config in ``settings.py``
-(they have sensible defaults): ::
+You can also set the following optional settings in ``settings.py``::
 
-   # Path to redirect to on successful login.
-   LOGIN_REDIRECT_URL = '/'
+    # Path to redirect to on successful login.
+    LOGIN_REDIRECT_URL = '/'
 
-   # Path to redirect to on unsuccessful login attempt.
-   LOGIN_REDIRECT_URL_FAILURE = '/'
+    # Path to redirect to on unsuccessful login attempt.
+    LOGIN_REDIRECT_URL_FAILURE = '/'
 
-Somewhere in one of your templates, you'll need to create a link and a
-form with a single hidden input element, which you'll use to submit
-the BrowserID assertion to the server. If you want to use
-``django_browserid.forms.BrowserIDForm``, you could use something like
-the following template snippet: ::
+    # Path to redirect to on logout.
+    LOGOUT_REDIRECT_URL = '/'
 
-   {% if not user.is_authenticated %}
-   <a class="browserid-login" href="#">Sign In</a>
-   <form method="POST" action="{% url browserid_verify %}">
-      {% csrf_token %}
-      {{ browserid_form.as_p }}
-   </form>
-   {% endif %}
+Finally, you'll need to add the login button to your templates. There are three
+things you will need to add to your templates:
 
-.. note:: If you're using the default JavaScript mentioned below, you can use as
-   many login links as you like as long as they all have the class
-   ``browserid-login``. However, you must only include the form on the page
-   once.
+1. ``{{ browserid_info }}``: Invisible element that stores info about the
+   current user. Must be within the ``<body>`` tag and appear only **once**.
 
-If you use browserid_form, it is further recommended that you add
-``django_browserid.context_processors.browserid_form`` to
-``TEMPLATE_CONTEXT_PROCESSORS``; this will create the
-``browserid_form`` variable automatically in ``RequestContext``
-instances when needed. That is, in ``settings.py``::
+2. ``{% browserid_js %}``: Outputs the ``<script>`` tags for the button
+   JavaScript. Must be somewhere on the page, typically at the bottom right
+   before the ``</body>`` tag to allow the page to visibly load before
+   executing.
 
-   TEMPLATE_CONTEXT_PROCESSORS = (
-       # ...
-       'django_browserid.context_processors.browserid_form',
-       # ...
-   )
+3. ``{% browserid_button %}``: Outputs the HTML for the login button itself.
 
-You will also need to include JavaScript to power the BrowserID popup
-and form. You can use django form media at the bottom of your page
-(see `Form Media`_ and `Managing static files`_ for more
-information)::
+A complete example::
 
-   {{ browserid_form.media }}
+    {% load browserid %}
+    <html>
+      <body>
+        {{ browserid_info }}
+        <header>
+          <h1>My Site</h1>
+          <div class="authentication">
+            {% browserid_button sign_in='Login' %}
+          </div>
+        </header>
+        <article>
+          <p>Welcome to my site!</p>
+        </article>
+        {% browserid_js %}
+      </body>
+    </html>
 
-This JavaScript file requires jQuery 1.6 or higher.
+If you're using `Jinja2`_ as your templating system, you can use the functions
+passed to your template by the context processor::
 
-.. note:: If you don't want to use the static files framework, you'll need to
-   include the ``https://login.persona.org/include.js`` file, as well as
-   JavaScript similar to ``django_browserid/static/browserid/browserid.js``::
+    <html>
+      <body>
+        {{ browserid_info }}
+        <header>
+          <h1>My Site</h1>
+          <div class="authentication">
+            {{ browserid_button(sign_in='Login') }}
+          </div>
+        </header>
+        <article>
+          <p>Welcome to my site!</p>
+        </article>
+        {{ browserid_js() }}
+      </body>
+    </html>
 
-      <script src="https://login.persona.org/include.js"></script>
-      <!-- Include JS for browserid_form here. -->
+.. note:: The JavaScript assumes you have `jQuery`_ 1.7 or higher on your site.
 
-.. note:: If your site uses `Content Security Policy`_, you will have to add
-   directives to allow the external browserid.org JavaScript, as well as an
-   iframe used as part of the login process.
+``browserid_button`` will display a login button if the user is logged out, and
+a logout button if the user is logged in.
 
-   If you're using `django-csp`_, the following settings will work::
+.. autofunction:: django_browserid.context_processors.browserid_button
 
-      CSP_SCRIPT_SRC = ("'self'", 'https://login.persona.org')
-      CSP_FRAME_SRC = ("'self'", 'https://login.persona.org')
+.. autofunction:: django_browserid.context_processors.browserid_js
 
-.. _Form Media: https://docs.djangoproject.com/en/1.3/topics/forms/media/
-.. _Managing static files: https://docs.djangoproject.com/en/1.3/howto/static-files/
+.. _jQuery: http://jquery.com/
+.. _Jinja2: http://jinja.pocoo.org/
+
+Static Files
+------------
+
+``browserid_js`` uses `Form Media`_ and the Django `staticfiles`_ app to serve
+the JavaScript for the buttons. If you don't want to use the static files
+framework, you'll need to include the JavaScript manually on any page you use
+the ``browserid_button`` function.
+
+The files needed are the Persona JavaScript shim, which should be loaded from
+``https://login.persona.org/include.js`` in a script tag, and
+``django_browserid/static/browserid/browserid.js``, which is part of the
+django-browserid library.
+
+.. _Form Media: https://docs.djangoproject.com/en/dev/topics/forms/media/
+.. _staticfiles: https://docs.djangoproject.com/en/dev/howto/static-files/
+
+
+Content Security Policy
+-----------------------
+If your site uses `Content Security Policy`_, you will have to add directives
+to allow the external persona.org JavaScript, as well as an iframe used as part
+of the login process.
+
+If you're using `django-csp`_, the following settings will work::
+
+    CSP_SCRIPT_SRC = ("'self'", 'https://login.persona.org')
+    CSP_FRAME_SRC = ("'self'", 'https://login.persona.org')
+
 .. _Content Security Policy: https://developer.mozilla.org/en/Security/CSP
 .. _django-csp: https://github.com/mozilla/django-csp
-
-Logging Out
------------
-
-To log users out, create a view that calls `django.contrib.auth.logout`, or use
-the standard logout view `django.contrib.auth.views.logout`. Then, add a link
-to your page with the `browserid-logout` class::
-
-    <a href="{% url logout %}" class="browserid-logout">Log Out</a>
-
-.. note:: Ensure that you include the form media on the same page, as it handles
-   calling ``navigator.id.logout`` when the logout link is clicked.
-

@@ -1,24 +1,6 @@
 Advanced Usage
 ==============
 
-navigator.id.request Arguments
-------------------------------
-
-The ``navigator.id.request`` function accepts several optional arguments that
-customize the BrowserID login dialog. The default JavaScript provided by
-``django-browserid`` checks for data attributes on the login link and passes
-them to ``navigator.id.request``. For example, the following customizes the
-website name shown in the BrowserID dialog::
-
-    <a href="#" data-site-name="Site Name">Login</a>
-
-.. note:: ``navigator.id.request`` arguments are in camelCase, but data
-   attributes must use dashes in place of capitalization changes.
-
-See the `navigator.id.request documentation`_ for a list of accepted parameters.
-
-.. _navigator.id.request documentation: https://developer.mozilla.org/docs/DOM/navigator.id.request
-
 Automatic Account Creation
 --------------------------
 
@@ -91,50 +73,16 @@ You are of course then free to store the email in the session and
 prompt the user to sign up using a chosen identifier as their
 username, or whatever else makes sense for your site.
 
+.. autofunction:: django_browserid.verify
 
-Javascript Fallback
--------------------
-
-It is a good idea to provide an alternative method of authenticating with your
-site for users that do not have JavaScript available. An easy way of doing this
-is to modify the ``href`` of the link that you bind to BrowserID login to point
-to a traditional login and registration page::
-
-   <a id="browserid" href="{% url 'login.view.name' %}">Sign In</a>
-
-If a user has JavaScript enabled, when they click the link the JavaScript will
-take over and show a BrowserID popup. If a user has JavaScript disabled, they
-will be directed to your login view (which should not require JavaScript, of
-course).
-
-
-Multiple Login Buttons
-----------------------
-
-If you are using the default JavaScript provided by ``django-browserid``, you
-can have multiple login buttons on a single page by marking them with the class
-``browserid-login``. Be sure to only include the hidden login form on the page
-once to avoid errors from using the same id multiple times.
+.. autofunction:: django_browserid.get_audience
 
 
 Signals
 -------
 
-.. module:: django_browserid.signals
-
-.. data:: user_created
-
-    Signal triggered when a user is automatically created during authentication.
-
-    * **sender**: The function that created the user instance.
-    * **user**: The user instance that was created.
-
-API
-----------
-
-.. autofunction:: django_browserid.verify
-
-.. autofunction:: django_browserid.get_audience
+.. automodule:: django_browserid.signals
+   :members:
 
 
 Custom User Model
@@ -142,6 +90,17 @@ Custom User Model
 
 Django 1.5 allows you to specify a custom model to use in place of the built-in
 User model with the ``AUTH_USER_MODEL`` setting. ``django-browserid`` supports
-custom User models, however you will most likely need to subclass
-``django-browserid.BrowserIDBackend`` and override the ``create_user``,
-``get_user``, and ``filter_users_by_email`` functions to work with your class.
+custom User models, but you will most likely need to add a few extra
+customizations to make things work properly:
+
+* ``django_browserid.BrowserIDBackend`` has three methods that deal with User
+  objects: ``create_user``, ``get_user``, and ``filter_users_by_email``. You may
+  have to subclass ``BrowserIDBackend`` and override these methods to work with
+  your custom User class.
+
+* ``browserid_button`` assumes that your custom User class has an attribute
+  called ``email`` that contains the user's email address. You can either add
+  an email field to your model, or add a `property`_ to the model that returns
+  the user's email address.
+
+.. _property: http://docs.python.org/2/library/functions.html#property

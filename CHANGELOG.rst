@@ -3,6 +3,27 @@
 History
 -------
 
+Latest
+++++++
+
+- #101, #102: Update the default JavaScript to pass the current user's email
+  address into ``navigator.id.watch`` to avoid unnecessary auto-login attempts.
+- Add template functions/tags to use for embedding login/logout buttons instead
+  of using your own custom HTML.
+- Add a ``url`` kwarg to ``verify`` that lets you specify a custom verification
+  service to use.
+- Add documentation for setting up the library for development.
+- #103: ``BrowserIDForm`` now fails validation if the assertion given is
+  non-ASCII.
+- Fix an error in the sample urlconf in the documentation.
+- #98: Fix a bug where login or logout buttons might not be detected by the
+  default JavaScript correctly if ``<a>`` element contained extra HTML.
+- Add ``pass_mock`` kwarg to ``mock_browserid``, which adds a new argument to
+  the front of the decorated method that is filled with the Mock object used
+  in place of ``_verify_http_request``.
+- Any extra kwargs to ``BrowserIDBackend.authenticate`` are passed in the verify
+  request as POST arguments (this will soon be removed, don't rely on it).
+
 0.7.1 (2012-11-08)
 ++++++++++++++++++
 
