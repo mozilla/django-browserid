@@ -98,6 +98,11 @@ class BrowserIDBackendTests(TestCase):
         user = self.auth('a@b.com')
         user_created.send.assert_called_with(ANY, user=user)
 
+    @patch('django_browserid.base.verify')
+    def test_verify_called_with_browserid_extra(self, user_verify):
+        dic ={'a':'AlphaA'}
+        self.auth('a@b.com', browserid_extra=dic)
+        user_verify.assert_called_with(audience='asdf', assertion='asdf', extra_params=dic)
 
 # Only run custom user model tests if we're using a version of Django that
 # supports it.
