@@ -2,6 +2,7 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 
 from mock import Mock, patch
+from pyquery import PyQuery as pq
 
 from django_browserid.context_processors import browserid_button, browserid_js
 
@@ -62,3 +63,11 @@ class BrowserIDButtonTests(TestCase):
         browserid_button(request, request_args='{"siteName": "test"}')
         self.assertEqual(render_to_template.call_args[0][1]['request_args'],
                          '{&quot;siteName&quot;: &quot;test&quot;}')
+
+    def test_form_extras(self):
+        """form_extras should be rendered as hidden inputs in the button."""
+        request = self.factory.get('/')
+        button = browserid_button(request, form_extras={'test': 'blah'})
+        d = pq(button)
+        hidden_input = d('form.browserid-form input[name="test"]')
+        self.assertEqual(hidden_input.val(), 'blah')

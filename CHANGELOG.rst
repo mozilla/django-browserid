@@ -6,6 +6,7 @@ History
 Latest
 ++++++
 
+- Add ``form_extras`` parameter to ``browserid_button``.
 - #101, #102: Update the default JavaScript to pass the current user's email
   address into ``navigator.id.watch`` to avoid unnecessary auto-login attempts.
 - Add template functions/tags to use for embedding login/logout buttons instead

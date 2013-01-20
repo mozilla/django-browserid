@@ -21,7 +21,7 @@ except ImportError:
 
 
 def browserid_button(request, sign_in='Sign In', sign_out='Sign Out',
-                     login_fallback='#', request_args={}):
+                     login_fallback='#', request_args={}, form_extras={}):
     """
     Output the HTML for a BrowserID login button.
 
@@ -43,6 +43,10 @@ def browserid_button(request, sign_in='Sign In', sign_out='Sign Out',
 
         A list of valid options is available at
         https://developer.mozilla.org/en-US/docs/DOM/navigator.id.request
+
+    :param form_extras:
+        Dictionary of extra form fields to include as hidden inputs. Useful for
+        including things like a post-login redirect.
     """
     if isinstance(request_args, dict):
         request_args = json.dumps(request_args)
@@ -52,6 +56,7 @@ def browserid_button(request, sign_in='Sign In', sign_out='Sign Out',
     return render_to_string('browserid/button.html', {
         'form': BrowserIDForm(),
         'request_args': request_args,
+        'form_extras': form_extras,
         'sign_in': sign_in,
         'sign_out': sign_out,
         'login_url': reverse('browserid_login'),
