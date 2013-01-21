@@ -6,6 +6,9 @@ History
 Latest
 ++++++
 
+- #110: Fix bug where kwargs to ``authenticate`` get passed as ``extra_params``
+  to verify. Instead, you can pass any extra parameters in ``browserid_extra``.
+  But please don't, it's undocumented for a reason. <3
 - Add ``form_extras`` parameter to ``browserid_button``.
 - #101, #102: Update the default JavaScript to pass the current user's email
   address into ``navigator.id.watch`` to avoid unnecessary auto-login attempts.
