@@ -3,6 +3,17 @@ Settings
 
 .. module:: django.conf.settings
 
+.. data:: SITE_URL
+
+   **Default:** No default
+
+   Domain and protocol used to access your site. BrowserID uses this value to
+   determine if an assertion was meant for your site.
+
+   Note that this does not have to be a publicly accessible URL, so local URLs
+   like ``localhost:8000`` or ``127.0.0.1`` are acceptable as long as they match
+   what you are using to access your site.
+
 .. data:: LOGIN_REDIRECT_URL
 
     **Default:** ``'/accounts/profile'``

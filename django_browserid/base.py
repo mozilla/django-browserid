@@ -1,16 +1,12 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
+import json
 import logging
 import urllib
-from warnings import warn
-try:
-    import json
-except ImportError:
-    import simplejson as json  # NOQA
-
 
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 
 import requests
 
@@ -48,10 +44,10 @@ def get_audience(request):
     req_domain = request.get_host()
 
     req_url = "%s%s" % (req_proto, req_domain)
-    if site_url != "%s%s" % (req_proto, req_domain):
-        log.warning('Misconfigured SITE_URL? settings has {0}, but '
-                    'actual request was {1} BrowserID may fail on '
-                    'audience'.format(site_url, req_url))
+    if settings.DEBUG and site_url != req_url:
+        raise ImproperlyConfigured('SITE_URL incorrect. Settting is `{0}`, but '
+                                   'request was `{1}`'
+                                   .format(site_url, req_url))
     return site_url
 
 
@@ -73,7 +69,8 @@ def _verify_http_request(url, qs):
     try:
         rv = json.loads(r.content)
     except ValueError:
-        log.debug('Failed to decode JSON. Resp: {0}, Content: {1}'.format(r.status_code, r.content))
+        log.warn('Failed to decode JSON. Resp: {0}, Content: {1}'
+                 .format(r.status_code, r.content))
         return dict(status='failure')
 
     return rv
@@ -115,7 +112,7 @@ def verify(assertion, audience, extra_params=None, url=None):
     if result['status'] == OKAY_RESPONSE:
         return result
 
-    log.error('BrowserID verification failure. Response: {0} '
+    log.warn('BrowserID verification failure. Response: {0} '
               'Audience: {1}'.format(result, audience))
-    log.error("BID assert: {0}".format(assertion))
+    log.warn("BID assert: {0}".format(assertion))
     return False

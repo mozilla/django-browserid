@@ -44,6 +44,10 @@ To use ``django-browserid``, you'll need to make a few changes to your
    ``SITE_URL`` is used to determine the audience. For security reasons, it is
    *very important* that you set ``SITE_URL`` correctly.
 
+   ``SITE_URL`` should be set to the domain and protocol you use to access your
+   site. This does not have to be publicly available, however, so local URLs
+   like ``localhost:8000`` or ``127.0.0.1`` will work fine.
+
 Next, edit your ``urls.py`` file and add the following::
 
     urlpatterns = patterns('',
@@ -156,3 +160,51 @@ If you're using `django-csp`_, the following settings will work::
 
 .. _Content Security Policy: https://developer.mozilla.org/en/Security/CSP
 .. _django-csp: https://github.com/mozilla/django-csp
+
+
+Alternate Template Languages (Jingo/Jinja)
+------------------------------------------
+If you are using a library like `Jingo`_ in order to use a template language
+besides the Django template language, you may need to configure the library to
+use the Django template language for django-browserid templates. With Jingo,
+you can do this using the ``JINGO_EXCLUDE_APPS`` setting::
+
+    JINGO_EXCLUDE_APPS = ('browserid',)
+
+.. _Jingo: https://github.com/jbalogh/jingo
+
+
+Troubleshooting Issues
+----------------------
+If you run into any issues while setting up django-browserid, try the following
+steps:
+
+1. Check for any warnings in the server log. You may have to edit your
+   development server's logging settings to output ``django_browserid`` log
+   entries. Here's an example ``LOGGING`` setup to start with::
+
+       LOGGING = {
+           'version': 1,
+           'handlers': {
+               'console':{
+                   'level': 'DEBUG',
+                   'class': 'logging.StreamHandler'
+               },
+           },
+           'loggers': {
+               'django_browserid': {
+                   'handlers': ['console'],
+                   'level': 'DEBUG',
+               }
+           },
+        }
+
+2. Check the :doc:`details/troubleshooting` document for commonly-reported
+   issues.
+
+3. Ask for help in the `#webdev`_ channel on irc.mozilla.org.
+
+4. Post an issue on the `django-browserid Issue Tracker`_.
+
+.. _#webdev: http://chat.mibbit.com/?channel=%23chat&server=irc.mozilla.org
+.. _django-browserid Issue Tracker: https://github.com/mozilla/django-browserid/issues
