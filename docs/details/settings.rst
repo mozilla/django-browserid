@@ -3,6 +3,17 @@ Settings
 
 .. module:: django.conf.settings
 
+.. data:: SITE_URL
+
+   **Default:** No default
+
+   Domain and protocol used to access your site. BrowserID uses this value to
+   determine if an assertion was meant for your site.
+
+   Note that this does not have to be a publicly accessible URL, so local URLs
+   like ``localhost:8000`` or ``127.0.0.1`` are acceptable as long as they match
+   what you are using to access your site.
+
 .. data:: LOGIN_REDIRECT_URL
 
     **Default:** ``'/accounts/profile'``
@@ -31,6 +42,14 @@ Settings
 
     If set to a string, it is treated as an import path pointing to a custom
     user creation function. See :ref:`auto-user` for more information.
+
+.. data:: BROWSERID_ENABLE_SANITY_CHECKS
+
+    **Default:** True
+
+    Controls whether the ``Verify`` view performs some helpful checks for common
+    mistakes. Useful if you're getting warnings for things you know aren't
+    errors.
 
 .. data:: BROWSERID_VERIFICATION_URL
 

@@ -78,8 +78,8 @@ class BrowserIDBackend(object):
 
         email = result['email']
 
-        # in the rare case that two user accounts have the same email address,
-        # log and bail. randomly selecting one seems really wrong.
+        # In the rare case that two user accounts have the same email address,
+        # log and bail. Randomly selecting one seems really wrong.
         users = self.filter_users_by_email(email=email)
         if len(users) > 1:
             log.warn('{0} users with email address {1}.'.format(len(users),
@@ -90,6 +90,8 @@ class BrowserIDBackend(object):
 
         create_user = getattr(settings, 'BROWSERID_CREATE_USER', True)
         if not create_user:
+            log.debug('Login failed: No user with email {0} found, and '
+                      'BROWSERID_CREATE_USER is False'.format(email))
             return None
         else:
             if create_user is True:

@@ -1,21 +1,17 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
+import json
 import logging
 import urllib
-from warnings import warn
-try:
-    import json
-except ImportError:
-    import simplejson as json  # NOQA
-
 
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 
 import requests
 
 
-log = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 DEFAULT_HTTP_TIMEOUT = 5
@@ -27,7 +23,9 @@ def get_audience(request):
     """
     Uses Django settings to format the audience.
 
-    To use this function, make sure SITE_URL is set in your settings.py file.
+    If settings.DEBUG is True, the domain on the request will be used. If it is
+    False, the SITE_URL setting will be used and compared to the request domain,
+    raising an ImproperlyConfigured error if they do not match.
 
     Examples using SITE_URL::
 
@@ -38,20 +36,18 @@ def get_audience(request):
     If none are set, we trust the request to populate the audience.
     This is *not secure*!
     """
-    site_url = getattr(settings, 'SITE_URL', False)
-
-    # Note audience based on request for developer warnings
-    if request.is_secure():
-        req_proto = 'https://'
-    else:
-        req_proto = 'http://'
+    req_proto = 'https://' if request.is_secure() else 'http://'
     req_domain = request.get_host()
-
     req_url = "%s%s" % (req_proto, req_domain)
-    if site_url != "%s%s" % (req_proto, req_domain):
-        log.warning('Misconfigured SITE_URL? settings has {0}, but '
-                    'actual request was {1} BrowserID may fail on '
-                    'audience'.format(site_url, req_url))
+
+    site_url = getattr(settings, 'SITE_URL', False)
+    if settings.DEBUG and not site_url:
+        site_url = req_url
+
+    if site_url != req_url:
+        raise ImproperlyConfigured('SITE_URL incorrect. Settting is `{0}`, but '
+                                   'request was `{1}`'
+                                   .format(site_url, req_url))
     return site_url
 
 
@@ -73,7 +69,8 @@ def _verify_http_request(url, data):
     try:
         rv = json.loads(r.content)
     except ValueError:
-        log.debug('Failed to decode JSON. Resp: {0}, Content: {1}'.format(r.status_code, r.content))
+        logger.warning('Failed to decode JSON. Resp: {0}, Content: {1}'
+                       .format(r.status_code, r.content))
         return dict(status='failure')
 
     return rv
@@ -104,7 +101,7 @@ def verify(assertion, audience, extra_params=None, url=None):
         url = getattr(settings, 'BROWSERID_VERIFICATION_URL',
                       DEFAULT_VERIFICATION_URL)
 
-    log.info("Verification URL: {0}".format(url))
+    logger.info("Verification URL: {0}".format(url))
 
     args = {'assertion': assertion,
             'audience': audience}
@@ -115,7 +112,7 @@ def verify(assertion, audience, extra_params=None, url=None):
     if result['status'] == OKAY_RESPONSE:
         return result
 
-    log.error('BrowserID verification failure. Response: {0} '
-              'Audience: {1}'.format(result, audience))
-    log.error("BID assert: {0}".format(assertion))
+    logger.warning('BrowserID verification failure. Response: {0} '
+                   'Audience: {1}'.format(result, audience))
+    logger.warning("BID assert: {0}".format(assertion))
     return False
