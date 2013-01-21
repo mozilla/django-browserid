@@ -1,6 +1,8 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
+import logging
+
 from django.conf import settings
 from django.contrib import auth
 from django.core.exceptions import ImproperlyConfigured
@@ -9,6 +11,9 @@ from django.views.generic.edit import BaseFormView
 
 from django_browserid.forms import BrowserIDForm
 from django_browserid.base import get_audience
+
+
+log = logging.getLogger(__name__)
 
 
 class Verify(BaseFormView):
@@ -77,3 +82,31 @@ class Verify(BaseFormView):
             raise ImproperlyConfigured(
                 "No URL to redirect to. Provide a failure_url.")
         return url
+
+    def dispatch(self, request, *args, **kwargs):
+        self.sanity_checks(request)
+        return super(Verify, self).dispatch(request, *args, **kwargs)
+
+    def sanity_checks(self, request):
+        """Small checks for common errors."""
+        if not settings.DEBUG:
+            return
+
+        # SESSION_COOKIE_SECURE should be False in development.
+        if settings.SESSION_COOKIE_SECURE:
+            log.debug('SESSION_COOKIE_SECURE is currently set to True, which '
+                      'may cause issues with django_browserid login during '
+                      'local development. Consider setting it to False.')
+
+        # If you're using django-csp, you should include persona.
+        if 'csp.middleware.CSPMiddleware' in settings.MIDDLEWARE_CLASSES:
+            persona = 'https://login.persona.org'
+            in_default = persona in getattr(settings, 'CSP_DEFAULT_SRC', None)
+            in_script = persona in getattr(settings, 'CSP_SCRIPT_SRC', None)
+            in_frame = persona in getattr(settings, 'CSP_FRAME_SRC', None)
+
+            if (not in_script or not in_frame) and not in_default:
+                log.debug('django-csp detected, but https://login.persona.org '
+                          'is not found in your CSP policies. Consider adding '
+                          'it to CSP_SCRIPT_SRC and CSP_FRAME_SRC')
+

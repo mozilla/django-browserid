@@ -6,6 +6,7 @@ History
 Latest
 ++++++
 
+- #105: General documentation fixes, add more debug logging for common issues.
 - Add ``form_extras`` parameter to ``browserid_button``.
 - #101, #102: Update the default JavaScript to pass the current user's email
   address into ``navigator.id.watch`` to avoid unnecessary auto-login attempts.
