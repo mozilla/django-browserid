@@ -8,33 +8,15 @@ This warning appears in the Error Console when your site uses
 `Content Security Policy`_ without making an exception for the persona.org
 external JavaScript include.
 
-To fix this, include https://persona.org in your script-src directive. If
-you're using the `django-csp`_ library, the following settings will work::
+To fix this, include https://persona.org in your script-src and frame-src
+directive. If you're using the `django-csp`_ library, the following settings
+will work::
 
     CSP_SCRIPT_SRC = ("'self'", https://login.persona.org')
     CSP_FRAME_SRC = ("'self'", 'https://login.persona.org')
 
-.. note:: The example above also includes the frame-src directive. There is an
-   iframe used during BrowserID login, but some people report that login will
-   work without the directive. In general, you should probably include it.
-
 .. _Content Security Policy: https://developer.mozilla.org/en/Security/CSP
 .. _django-csp: https://github.com/mozilla/django-csp
-
-
-Site keeps redirecting to the same page repeatedly
---------------------------------------------------
-
-Sometimes, after attempting to login, you might notice that the page keeps
-reloading itself over and over. This usually means that something has gone wrong
-in your login process, and you should check the log output as well as the
-solutions below to see if they can point you in the right direction.
-
-The easiest way to get around this is to simply not include the login form on
-any pages when the user is logged in. ``django-browserid`` attempts to avoid
-these infinite loops in certain cases, but they may still come up if, for
-example, ``SESSION_COOKIE_SECURE`` is True on a development instance without
-SSL.
 
 
 Login fails silently due to SESSION_COOKIE_SECURE
