@@ -6,6 +6,8 @@ History
 Latest
 ++++++
 
+- #109: Fix issue with unicode strings in the ``extra_params`` kwarg for
+  ``verify``.
 - #110: Fix bug where kwargs to ``authenticate`` get passed as ``extra_params``
   to verify. Instead, you can pass any extra parameters in ``browserid_extra``.
   But please don't, it's undocumented for a reason. <3
