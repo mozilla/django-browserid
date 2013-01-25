@@ -158,9 +158,13 @@ def test_authenticate_unverified_user(_verify_http_request):
     # In real life, BROWSERID_VERIFICATION_URL would point to the
     # BID Unverified Email verifier. (Yes, that makes my head hurt too.)
     args = dict(authenticate_kwargs)
-    args['extra_params'] = {'issuer': 'a.b.c', 'allow_unverified': True}
+    args['extra_params'] = {
+        'issuer': 'a.b.c',
+        'allow_unverified': True,
+        'first_name': u'P\xe3ter'
+    }
 
     verify(**args)
     _verify_http_request.assert_called_once_with(
         'https://unverifier.persona.org/verify', ANY)
-    assert 'allow_unverified=True' in _verify_http_request.call_args[0][1]
+    assert _verify_http_request.call_args[0][1]['allow_unverified']

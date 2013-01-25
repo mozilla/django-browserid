@@ -55,9 +55,9 @@ def get_audience(request):
     return site_url
 
 
-def _verify_http_request(url, qs):
+def _verify_http_request(url, data):
     parameters = {
-        'data': qs,
+        'data': data,
         'proxies': getattr(settings, 'BROWSERID_PROXY_INFO', None),
         'verify': not getattr(settings, 'BROWSERID_DISABLE_CERT_CHECK', False),
         'headers': {'Content-type': 'application/x-www-form-urlencoded'},
@@ -110,7 +110,7 @@ def verify(assertion, audience, extra_params=None, url=None):
             'audience': audience}
     if extra_params:
         args.update(extra_params)
-    result = _verify_http_request(url, urllib.urlencode(args))
+    result = _verify_http_request(url, args)
 
     if result['status'] == OKAY_RESPONSE:
         return result
