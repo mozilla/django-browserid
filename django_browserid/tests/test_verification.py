@@ -167,4 +167,4 @@ def test_authenticate_unverified_user(_verify_http_request):
     verify(**args)
     _verify_http_request.assert_called_once_with(
         'https://unverifier.persona.org/verify', ANY)
-    assert 'allow_unverified=True' in _verify_http_request.call_args[0][1]
+    assert _verify_http_request.call_args[0][1]['allow_unverified']
