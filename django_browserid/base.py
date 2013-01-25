@@ -110,6 +110,10 @@ def verify(assertion, audience, extra_params=None, url=None):
             'audience': audience}
     if extra_params:
         args.update(extra_params)
+    # we can't urlencode(args) if any of the values is a unicode string
+    for key, value in args.items():
+        if isinstance(value, unicode):
+            args[key] = value.encode('utf-8')
     result = _verify_http_request(url, urllib.urlencode(args))
 
     if result['status'] == OKAY_RESPONSE:
