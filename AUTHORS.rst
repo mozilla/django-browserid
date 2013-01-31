@@ -40,3 +40,4 @@ Patches and Suggestions
 - Paul Mclanahan
 - JR Conlin
 - Prasoon Shukla
+- Peter Bengtsson
