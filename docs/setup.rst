@@ -44,6 +44,9 @@ To use ``django-browserid``, you'll need to make a few changes to your
    ``SITE_URL`` is used to determine the audience. For security reasons, it is
    *very important* that you set ``SITE_URL`` correctly.
 
+.. note:: ``TEMPLATE_CONTEXT_PROCESSORS`` is not in the settings file by
+   default. You can find the default value in the `Django docs`_
+
 Next, edit your ``urls.py`` file and add the following::
 
     urlpatterns = patterns('',
@@ -125,6 +128,7 @@ a logout button if the user is logged in.
 
 .. _jQuery: http://jquery.com/
 .. _Jinja2: http://jinja.pocoo.org/
+.. _`Django docs`: https://docs.djangoproject.com/en/dev/ref/settings/#template-context-processors
 
 Static Files
 ------------
