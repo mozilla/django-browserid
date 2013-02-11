@@ -23,26 +23,35 @@ def get_audience(request):
     """
     Uses Django settings to format the audience.
 
-    If settings.DEBUG is True, the domain on the request will be used. If it is
-    False, the SITE_URL setting will be used and compared to the request domain,
-    raising an ImproperlyConfigured error if they do not match.
+    To figure out the audience to use, it does this:
 
-    Examples using SITE_URL::
+    1. If settings.DEBUG is True and settings.SITE_URL is not set or
+       empty, then the domain on the request will be used.
+
+       This is *not* secure!
+
+    2. Otherwise, settings.SITE_URL is compared with the request
+       domain and will raise an ImproperlyConfigured error if they
+       don't match.
+
+    Examples of settings.SITE_URL::
 
         SITE_URL = 'http://127.0.0.1:8001'
         SITE_URL = 'https://example.com'
         SITE_URL = 'http://example.com'
 
-    If none are set, we trust the request to populate the audience.
-    This is *not secure*!
     """
     req_proto = 'https://' if request.is_secure() else 'http://'
     req_domain = request.get_host()
-    req_url = "%s%s" % (req_proto, req_domain)
+    req_url = '%s%s' % (req_proto, req_domain)
 
     site_url = getattr(settings, 'SITE_URL', False)
-    if settings.DEBUG and not site_url:
-        site_url = req_url
+    if not site_url:
+        if settings.DEBUG:
+            site_url = req_url
+        else:
+            raise ImproperlyConfigured('`SITE_URL` must be set. See '
+                                       'documentation for django-browserid')
 
     if site_url != req_url:
         raise ImproperlyConfigured('SITE_URL incorrect. Settting is `{0}`, but '
@@ -69,8 +78,8 @@ def _verify_http_request(url, data):
     try:
         rv = json.loads(r.content)
     except ValueError:
-        logger.warning('Failed to decode JSON. Resp: {0}, Content: {1}'
-                       .format(r.status_code, r.content))
+        logger.warning('Failed to decode JSON. Resp: %s, Content: %s',
+                       r.status_code, r.content)
         return dict(status='failure')
 
     return rv
@@ -101,7 +110,7 @@ def verify(assertion, audience, extra_params=None, url=None):
         url = getattr(settings, 'BROWSERID_VERIFICATION_URL',
                       DEFAULT_VERIFICATION_URL)
 
-    logger.info("Verification URL: {0}".format(url))
+    logger.info('Verification URL: %s', url)
 
     args = {'assertion': assertion,
             'audience': audience}
@@ -112,7 +121,34 @@ def verify(assertion, audience, extra_params=None, url=None):
     if result['status'] == OKAY_RESPONSE:
         return result
 
-    logger.warning('BrowserID verification failure. Response: {0} '
-                   'Audience: {1}'.format(result, audience))
-    logger.warning("BID assert: {0}".format(assertion))
+    logger.warning('BrowserID verification failure. Response: %s '
+                   'Audience: %s', result, audience)
+    logger.warning('BID assert: %s', assertion)
     return False
+
+
+def sanity_checks(request):
+    """Small checks for common errors."""
+    if not getattr(settings, 'BROWSERID_DISABLE_SANITY_CHECKS', False):
+        return
+
+    # SESSION_COOKIE_SECURE should be False in development unless you can
+    # use https.
+    if settings.SESSION_COOKIE_SECURE and not request.is_secure():
+        logger.warning('SESSION_COOKIE_SECURE is currently set to True, '
+                       'which may cause issues with django_browserid '
+                       'login during local development. Consider setting '
+                       'it to False.')
+
+    # If you're using django-csp, you should include persona.
+    if 'csp.middleware.CSPMiddleware' in settings.MIDDLEWARE_CLASSES:
+        persona = 'https://login.persona.org'
+        in_default = persona in getattr(settings, 'CSP_DEFAULT_SRC', None)
+        in_script = persona in getattr(settings, 'CSP_SCRIPT_SRC', None)
+        in_frame = persona in getattr(settings, 'CSP_FRAME_SRC', None)
+
+        if (not in_script or not in_frame) and not in_default:
+            logger.warning('django-csp detected, but %s was not found in '
+                           'your CSP policies. Consider adding it to '
+                           'CSP_SCRIPT_SRC and CSP_FRAME_SRC',
+                           persona)

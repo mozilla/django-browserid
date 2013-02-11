@@ -43,9 +43,9 @@ Settings
     If set to a string, it is treated as an import path pointing to a custom
     user creation function. See :ref:`auto-user` for more information.
 
-.. data:: BROWSERID_ENABLE_SANITY_CHECKS
+.. data:: BROWSERID_DISABLE_SANITY_CHECKS
 
-    **Default:** True
+    **Default:** False
 
     Controls whether the ``Verify`` view performs some helpful checks for common
     mistakes. Useful if you're getting warnings for things you know aren't

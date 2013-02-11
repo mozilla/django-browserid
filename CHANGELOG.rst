@@ -14,7 +14,7 @@ Latest
   But please don't, it's undocumented for a reason. <3
 
 - #105: General documentation fixes, add more debug logging for common issues.
-  Add ``BROWSERID_ENABLE_SANITY_CHECKS`` setting and remove the need to set
+  Add ``BROWSERID_DISABLE_SANITY_CHECKS`` setting and remove the need to set
   ``SITE_URL`` in development.
 
 - Add ``form_extras`` parameter to ``browserid_button``.
