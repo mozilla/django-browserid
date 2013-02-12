@@ -21,7 +21,7 @@ except ImportError:
         return User
 
 
-log = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 def default_username_algo(email):
@@ -78,18 +78,19 @@ class BrowserIDBackend(object):
 
         email = result['email']
 
-        # in the rare case that two user accounts have the same email address,
-        # log and bail. randomly selecting one seems really wrong.
+        # In the rare case that two user accounts have the same email address,
+        # log and bail. Randomly selecting one seems really wrong.
         users = self.filter_users_by_email(email=email)
         if len(users) > 1:
-            log.warn('{0} users with email address {1}.'.format(len(users),
-                                                                email))
+            logger.warn('%s users with email address %s.', len(users), email)
             return None
         if len(users) == 1:
             return users[0]
 
         create_user = getattr(settings, 'BROWSERID_CREATE_USER', True)
         if not create_user:
+            logger.debug('Login failed: No user with email %s found, and '
+                         'BROWSERID_CREATE_USER is False', email)
             return None
         else:
             if create_user is True:

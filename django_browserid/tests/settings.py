@@ -27,7 +27,5 @@ AUTHENTICATION_BACKENDS = (
     'django_browserid.auth.BrowserIDBackend',
 )
 
-SITE_URL = 'http://testserver'
-
 BROWSERID_CREATE_USER = True
 BROWSERID_USERNAME_ALGO = None

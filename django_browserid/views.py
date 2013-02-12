@@ -1,14 +1,19 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
+import logging
+
 from django.conf import settings
 from django.contrib import auth
 from django.core.exceptions import ImproperlyConfigured
 from django.shortcuts import redirect
 from django.views.generic.edit import BaseFormView
 
+from django_browserid.base import get_audience, sanity_checks
 from django_browserid.forms import BrowserIDForm
-from django_browserid.base import get_audience
+
+
+logger = logging.getLogger(__name__)
 
 
 class Verify(BaseFormView):
@@ -77,3 +82,7 @@ class Verify(BaseFormView):
             raise ImproperlyConfigured(
                 "No URL to redirect to. Provide a failure_url.")
         return url
+
+    def dispatch(self, request, *args, **kwargs):
+        sanity_checks(request)
+        return super(Verify, self).dispatch(request, *args, **kwargs)

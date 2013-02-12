@@ -1,21 +1,17 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
+import json
 import logging
 import urllib
-from warnings import warn
-try:
-    import json
-except ImportError:
-    import simplejson as json  # NOQA
-
 
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 
 import requests
 
 
-log = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 DEFAULT_HTTP_TIMEOUT = 5
@@ -27,31 +23,40 @@ def get_audience(request):
     """
     Uses Django settings to format the audience.
 
-    To use this function, make sure SITE_URL is set in your settings.py file.
+    To figure out the audience to use, it does this:
 
-    Examples using SITE_URL::
+    1. If settings.DEBUG is True and settings.SITE_URL is not set or
+       empty, then the domain on the request will be used.
+
+       This is *not* secure!
+
+    2. Otherwise, settings.SITE_URL is compared with the request
+       domain and will raise an ImproperlyConfigured error if they
+       don't match.
+
+    Examples of settings.SITE_URL::
 
         SITE_URL = 'http://127.0.0.1:8001'
         SITE_URL = 'https://example.com'
         SITE_URL = 'http://example.com'
 
-    If none are set, we trust the request to populate the audience.
-    This is *not secure*!
     """
-    site_url = getattr(settings, 'SITE_URL', False)
-
-    # Note audience based on request for developer warnings
-    if request.is_secure():
-        req_proto = 'https://'
-    else:
-        req_proto = 'http://'
+    req_proto = 'https://' if request.is_secure() else 'http://'
     req_domain = request.get_host()
+    req_url = '%s%s' % (req_proto, req_domain)
 
-    req_url = "%s%s" % (req_proto, req_domain)
-    if site_url != "%s%s" % (req_proto, req_domain):
-        log.warning('Misconfigured SITE_URL? settings has {0}, but '
-                    'actual request was {1} BrowserID may fail on '
-                    'audience'.format(site_url, req_url))
+    site_url = getattr(settings, 'SITE_URL', False)
+    if not site_url:
+        if settings.DEBUG:
+            site_url = req_url
+        else:
+            raise ImproperlyConfigured('`SITE_URL` must be set. See '
+                                       'documentation for django-browserid')
+
+    if site_url != req_url:
+        raise ImproperlyConfigured('SITE_URL incorrect. Settting is `{0}`, but '
+                                   'request was `{1}`'
+                                   .format(site_url, req_url))
     return site_url
 
 
@@ -73,7 +78,8 @@ def _verify_http_request(url, data):
     try:
         rv = json.loads(r.content)
     except ValueError:
-        log.debug('Failed to decode JSON. Resp: {0}, Content: {1}'.format(r.status_code, r.content))
+        logger.warning('Failed to decode JSON. Resp: %s, Content: %s',
+                       r.status_code, r.content)
         return dict(status='failure')
 
     return rv
@@ -104,7 +110,7 @@ def verify(assertion, audience, extra_params=None, url=None):
         url = getattr(settings, 'BROWSERID_VERIFICATION_URL',
                       DEFAULT_VERIFICATION_URL)
 
-    log.info("Verification URL: {0}".format(url))
+    logger.info('Verification URL: %s', url)
 
     args = {'assertion': assertion,
             'audience': audience}
@@ -115,7 +121,34 @@ def verify(assertion, audience, extra_params=None, url=None):
     if result['status'] == OKAY_RESPONSE:
         return result
 
-    log.error('BrowserID verification failure. Response: {0} '
-              'Audience: {1}'.format(result, audience))
-    log.error("BID assert: {0}".format(assertion))
+    logger.warning('BrowserID verification failure. Response: %s '
+                   'Audience: %s', result, audience)
+    logger.warning('BID assert: %s', assertion)
     return False
+
+
+def sanity_checks(request):
+    """Small checks for common errors."""
+    if not getattr(settings, 'BROWSERID_DISABLE_SANITY_CHECKS', False):
+        return
+
+    # SESSION_COOKIE_SECURE should be False in development unless you can
+    # use https.
+    if settings.SESSION_COOKIE_SECURE and not request.is_secure():
+        logger.warning('SESSION_COOKIE_SECURE is currently set to True, '
+                       'which may cause issues with django_browserid '
+                       'login during local development. Consider setting '
+                       'it to False.')
+
+    # If you're using django-csp, you should include persona.
+    if 'csp.middleware.CSPMiddleware' in settings.MIDDLEWARE_CLASSES:
+        persona = 'https://login.persona.org'
+        in_default = persona in getattr(settings, 'CSP_DEFAULT_SRC', None)
+        in_script = persona in getattr(settings, 'CSP_SCRIPT_SRC', None)
+        in_frame = persona in getattr(settings, 'CSP_FRAME_SRC', None)
+
+        if (not in_script or not in_frame) and not in_default:
+            logger.warning('django-csp detected, but %s was not found in '
+                           'your CSP policies. Consider adding it to '
+                           'CSP_SCRIPT_SRC and CSP_FRAME_SRC',
+                           persona)
