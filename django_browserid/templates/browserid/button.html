@@ -6,11 +6,11 @@
       <input type="hidden" name="{{ key }}" value="{{ value }}">
     {% endfor %}
   </form>
-  <a href="{{ login_fallback }}" class="browserid-login" data-request-args="{{ request_args }}">
+  <a href="{{ login_fallback }}" class="{{ link_class }} browserid-login" data-request-args="{{ request_args }}">
     {{ sign_in }}
   </a>
 {% else %}
-  <a href="{{ logout_url }}" class="browserid-logout">
+  <a href="{{ logout_url }}" class="{{ link_class }} browserid-logout">
     {{ sign_out }}
   </a>
 {% endif %}

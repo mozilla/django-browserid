@@ -71,3 +71,14 @@ class BrowserIDButtonTests(TestCase):
         d = pq(button)
         hidden_input = d('form.browserid-form input[name="test"]')
         self.assertEqual(hidden_input.val(), 'blah')
+
+    def test_link_class(self):
+        """link_class should control the class attribute on the link."""
+        request = self.factory.get('/')
+        button = browserid_button(request, link_class='blah goo')
+        d = pq(button)
+        link = d('a')
+        self.assertTrue(link.hasClass('blah'))
+        self.assertTrue(link.hasClass('goo'))
+        self.assertTrue(link.hasClass('browserid-login'))
+
