@@ -21,7 +21,8 @@ except ImportError:
 
 
 def browserid_button(request, sign_in='Sign In', sign_out='Sign Out',
-                     login_fallback='#', request_args={}, form_extras={}):
+                     login_fallback='#', link_class='', request_args=None,
+                     form_extras=None):
     """
     Output the HTML for a BrowserID login button.
 
@@ -37,6 +38,11 @@ def browserid_button(request, sign_in='Sign In', sign_out='Sign Out',
     :param login_fallback:
         Fallback URL to use for login with users who have JavaScript disabled.
 
+    :param link_class:
+        Value to use for the ``class`` attribute on the login/logout link. The
+        ``browserid-login`` or ``browserid-logout`` class will automatically be
+        added to thus value.
+
     :param request_args:
         Dictionary of arguments to be passed to navigator.id.request for
         customizing the BrowserID login popup. Can also be a string of JSON.
@@ -48,6 +54,9 @@ def browserid_button(request, sign_in='Sign In', sign_out='Sign Out',
         Dictionary of extra form fields to include as hidden inputs. Useful for
         including things like a post-login redirect.
     """
+    request_args = request_args or {}
+    form_extras = form_extras or {}
+
     if isinstance(request_args, dict):
         request_args = json.dumps(request_args)
     elif isinstance(request_args, basestring):
@@ -60,7 +69,8 @@ def browserid_button(request, sign_in='Sign In', sign_out='Sign Out',
         'sign_in': sign_in,
         'sign_out': sign_out,
         'login_url': reverse('browserid_login'),
-        'logout_url': reverse('browserid_logout')
+        'logout_url': reverse('browserid_logout'),
+        'link_class': link_class
     }, RequestContext(request))
 
 
