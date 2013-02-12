@@ -34,7 +34,7 @@
                     return;
                 }
 
-                if (assertion) {
+                if (assertion && $loginButton) {
                     var $form = $loginButton.prev('.browserid-form');
                     assertion = assertion.toString();
                     $form.find('input[name="assertion"]').val(assertion);
