@@ -3,7 +3,6 @@ Setup
 
 Installation
 ------------
-
 You can use pip to install django-browserid and requirements:
 
    pip install django-browserid
@@ -11,7 +10,6 @@ You can use pip to install django-browserid and requirements:
 
 Configuration
 -------------
-
 To use ``django-browserid``, you'll need to make a few changes to your
 ``settings.py`` file::
 
@@ -22,9 +20,6 @@ To use ``django-browserid``, you'll need to make a few changes to your
         'django_browserid',  # Load after auth
         # ...
     )
-
-    # Add the domain and protocol you expect to use in SITE_URL.
-    SITE_URL = 'https://example.com:8000'  # Note: No trailing slash
 
     # Add the django_browserid authentication backend.
     AUTHENTICATION_BACKENDS = (
@@ -130,9 +125,23 @@ a logout button if the user is logged in.
 .. _Jinja2: http://jinja.pocoo.org/
 .. _`Django docs`: https://docs.djangoproject.com/en/dev/ref/settings/#template-context-processors
 
+
+Deploying to Production
+-----------------------
+There are a few changes you need to make when deploying your app to production:
+
+- BrowserID uses an assertion and an audience to verify the user. The
+  ``SITE_URL`` setting is used to determine the audience. For security reasons,
+  it is *very important* that you set ``SITE_URL`` correctly.
+
+   ``SITE_URL`` should be set to the domain and protocol users will use to
+   access your site, such as ``https://affiliates.mozilla.org``. This URL does
+   not have to be publicly available, however, so sites limited to a certain
+   network can still use django-browserid.
+
+
 Static Files
 ------------
-
 ``browserid_js`` uses `Form Media`_ and the Django `staticfiles`_ app to serve
 the JavaScript for the buttons. If you don't want to use the static files
 framework, you'll need to include the JavaScript manually on any page you use
@@ -160,3 +169,51 @@ If you're using `django-csp`_, the following settings will work::
 
 .. _Content Security Policy: https://developer.mozilla.org/en/Security/CSP
 .. _django-csp: https://github.com/mozilla/django-csp
+
+
+Alternate Template Languages (Jingo/Jinja)
+------------------------------------------
+If you are using a library like `Jingo`_ in order to use a template language
+besides the Django template language, you may need to configure the library to
+use the Django template language for django-browserid templates. With Jingo,
+you can do this using the ``JINGO_EXCLUDE_APPS`` setting::
+
+    JINGO_EXCLUDE_APPS = ('browserid',)
+
+.. _Jingo: https://github.com/jbalogh/jingo
+
+
+Troubleshooting Issues
+----------------------
+If you run into any issues while setting up django-browserid, try the following
+steps:
+
+1. Check for any warnings in the server log. You may have to edit your
+   development server's logging settings to output ``django_browserid`` log
+   entries. Here's an example ``LOGGING`` setup to start with::
+
+       LOGGING = {
+           'version': 1,
+           'handlers': {
+               'console':{
+                   'level': 'DEBUG',
+                   'class': 'logging.StreamHandler'
+               },
+           },
+           'loggers': {
+               'django_browserid': {
+                   'handlers': ['console'],
+                   'level': 'DEBUG',
+               }
+           },
+        }
+
+2. Check the :doc:`details/troubleshooting` document for commonly-reported
+   issues.
+
+3. Ask for help in the `#webdev`_ channel on irc.mozilla.org.
+
+4. Post an issue on the `django-browserid Issue Tracker`_.
+
+.. _#webdev: http://chat.mibbit.com/?channel=%23chat&server=irc.mozilla.org
+.. _django-browserid Issue Tracker: https://github.com/mozilla/django-browserid/issues

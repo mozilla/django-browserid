@@ -52,7 +52,7 @@ BrowserID assertion with something like the following::
       # ...
       if request.method == 'POST':
           form = BrowserIDForm(data=request.POST)
-          if not form.is_valid():
+          if form.is_valid():
               result = verify(form.cleaned_data['assertion'], get_audience(request))
               if result:
                   # check for user account, create account for new users, etc
