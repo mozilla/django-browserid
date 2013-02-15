@@ -6,11 +6,19 @@ import logging
 from django.conf import settings
 from django.contrib import auth
 from django.core.exceptions import ImproperlyConfigured
+from django.core.urlresolvers import NoReverseMatch
 from django.shortcuts import redirect
 from django.views.generic.edit import BaseFormView
 
 from django_browserid.base import get_audience, sanity_checks
 from django_browserid.forms import BrowserIDForm
+
+# Try to import funfactory's reverse and fall back to django's version.
+try:
+    from funfactory.urlresolvers import reverse
+except ImportError:
+    from django.core.urlresolvers import reverse
+
 
 
 logger = logging.getLogger(__name__)
@@ -39,12 +47,20 @@ class Verify(BaseFormView):
         """Handle a failed login. Use this to perform complex redirects
         post-login.
         """
-        # Append "?bid_login_failed=1" to the URL to notify the JavaScript that
-        # login failed.
         failure_url = self.get_failure_url()
 
+        # If this url is a view name, we need to reverse it first to
+        # get the url.
+        try:
+            failure_url = reverse(failure_url)
+        except NoReverseMatch:
+            pass
+
+        # Append "?bid_login_failed=1" to the URL to notify the
+        # JavaScript that the login failed.
         if not failure_url.endswith('?'):
             failure_url += '?' if not '?' in failure_url else '&'
+
         failure_url += 'bid_login_failed=1'
 
         return redirect(failure_url)

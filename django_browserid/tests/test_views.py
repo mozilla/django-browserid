@@ -68,8 +68,20 @@ def test_auth_fail_redirect_failure():
 
 
 @mock_browserid(None)
+def test_auth_fail_redirect_view_name_failure():
+    # If authentication fails, redirect to the failure URL which
+    # actually specifies a view name.
+    response = verify('post', failure_url='epic_fail', assertion='asdf')
+    assert response.status_code == 302
+    assert response['Location'].endswith('/epic-fail/?bid_login_failed=1')
+
+
+@mock_browserid(None)
 def test_auth_fail_url_parameters():
     # Ensure that bid_login_failed=1 is appended to the failure url.
+    response = verify('post', failure_url='/fail', assertion='asdf')
+    assert response['Location'].endswith('/fail?bid_login_failed=1')
+
     response = verify('post', failure_url='/fail?', assertion='asdf')
     assert response['Location'].endswith('/fail?bid_login_failed=1')
 
