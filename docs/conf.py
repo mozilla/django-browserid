@@ -11,7 +11,7 @@
 # All configuration values have a default; values that are commented out
 # serve to show the default.
 
-import sys, os, codecs, re
+import sys, os
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -19,26 +19,13 @@ import sys, os, codecs, re
 #sys.path.insert(0, os.path.abspath('.'))
 
 # Add project root where setup.py lives:
-project_root = os.path.join(os.path.dirname(__file__), '..')
-sys.path.insert(0, project_root)
-
-
-def read(*parts):
-    return codecs.open(os.path.join(os.path.dirname(__file__), *parts)).read()
-
-
-def find_version(*file_paths):
-    version_file = read(*file_paths)
-    version_match = re.search(r"^__version__ = ['\"]([^'\"]*)['\"]",
-                              version_file, re.M)
-    if version_match:
-        return version_match.group(1)
-    raise RuntimeError("Unable to find version string.")
-
-version = find_version(os.path.join(project_root, 'django_browserid/__init__.py'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 # Set up Django so we can import django_browserid.
 os.environ['DJANGO_SETTINGS_MODULE'] = 'django_browserid.tests.settings'
+
+# Now we can import django_browserid
+from django_browserid import __version__
 
 # -- General configuration -----------------------------------------------------
 
@@ -70,7 +57,7 @@ copyright = u'2012, Paul Osman, Michael Kelly'
 # built documents.
 #
 # The short X.Y version.
-version = find_version(os.path.join(project_root, 'django_browserid/__init__.py'))
+version = __version__
 # The full version, including alpha/beta/rc tags.
 release = version  # keeping things simple
 
