@@ -91,6 +91,7 @@ A complete example
         <article>
           <p>Welcome to my site!</p>
         </article>
+        <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
         {% browserid_js %}
       </body>
     </html>
@@ -112,6 +113,7 @@ passed to your template by the context processor
         <article>
           <p>Welcome to my site!</p>
         </article>
+        <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
         {{ browserid_js() }}
       </body>
     </html>
