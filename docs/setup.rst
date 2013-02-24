@@ -117,6 +117,25 @@ passed to your template by the context processor::
 ``browserid_button`` will display a login button if the user is logged out, and
 a logout button if the user is logged in.
 
+If you want to have more control over the form that is rendered, for e.g. to pass
+a custom ``next`` url, use the ``browserid_form`` form and POST it to the url with name
+``browserid_login``. For example:
+
+.. code-block:: html+django
+
+    <div class="authentication">
+        {% if request.user.is_authenticated %}
+        <a href="{% url browserid_logout %}" class="browserid-logout">Log out</a>
+        {% else %}
+        <form class="browserid-form" method="POST" action="{% url browserid_login %}" style="display: none;">
+            {% csrf_token %}
+            {{ browserid_form.as_p }}
+            <input type="hidden" name="next" id="id_next" value="/next" />
+        </form>
+        <a href="" class="browserid-login" data-request-args="{}">Login</a>
+        {% endif %}
+    </div>
+
 .. autofunction:: django_browserid.context_processors.browserid_button
 
 .. autofunction:: django_browserid.context_processors.browserid_js
