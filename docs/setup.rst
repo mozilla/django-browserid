@@ -74,7 +74,9 @@ things you will need to add to your templates:
 
 3. ``{% browserid_button %}``: Outputs the HTML for the login button itself.
 
-A complete example::
+A complete example
+
+.. code-block:: html+django
 
     {% load browserid %}
     <html>
@@ -94,7 +96,9 @@ A complete example::
     </html>
 
 If you're using `Jinja2`_ as your templating system, you can use the functions
-passed to your template by the context processor::
+passed to your template by the context processor
+
+.. code-block:: jinja
 
     <html>
       <body>
