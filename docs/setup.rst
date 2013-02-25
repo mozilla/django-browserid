@@ -78,9 +78,6 @@ A complete example::
 
     {% load browserid %}
     <html>
-      <head>
-        <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
-      </head>
       <body>
         {{ browserid_info }}
         <header>
@@ -92,6 +89,7 @@ A complete example::
         <article>
           <p>Welcome to my site!</p>
         </article>
+        <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
         {% browserid_js %}
       </body>
     </html>
@@ -100,9 +98,6 @@ If you're using `Jinja2`_ as your templating system, you can use the functions
 passed to your template by the context processor::
 
     <html>
-      <head>
-        <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
-      </head>
       <body>
         {{ browserid_info }}
         <header>
@@ -114,6 +109,7 @@ passed to your template by the context processor::
         <article>
           <p>Welcome to my site!</p>
         </article>
+        <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
         {{ browserid_js() }}
       </body>
     </html>
