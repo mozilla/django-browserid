@@ -6,6 +6,8 @@ History
 Latest
 ++++++
 
+- Dropped support for Django 1.3.
+
 - Remove ability to set a custom name for the Verify redirect parameter: it's
   just ``next``.
 

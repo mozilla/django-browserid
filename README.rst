@@ -21,9 +21,8 @@ Tested Under
 
 * Django
 
-  * 1.3.4
-  * 1.4.2
-  * 1.5a1
+  * 1.4.5
+  * 1.5c2
 
 Documentation
 -------------
