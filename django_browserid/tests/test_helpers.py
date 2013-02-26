@@ -1,9 +1,13 @@
 from django.test import TestCase
+from django.test.client import RequestFactory
+from django.test.utils import override_settings
 
-from mock import patch
+from mock import Mock, patch
 from pyquery import PyQuery as pq
 
-from django_browserid.helpers import browserid_button, browserid_js
+from django_browserid.helpers import (browserid_button, browserid_info,
+                                      browserid_js, browserid_login,
+                                      browserid_logout)
 
 
 @patch('django_browserid.helpers.FORM_JAVASCRIPT',
@@ -48,3 +52,52 @@ class BrowserIDButtonTests(TestCase):
         self.assertEqual(a.attr('data-next'), '5678')
         self.assertEqual(a.attr('target'), '_blank')
         self.assertEqual(a.text(), 'qwer')
+
+    def test_login_class(self):
+        # If browserid-login isn't in the link_class argument, it should be
+        # appended to it prior to calling browserid_button.
+        button = browserid_login(link_class='go button')
+        a = pq(button)('a')
+
+        self.assertTrue(a.hasClass('browserid-login'))
+
+    def test_logout_class(self):
+        # If browserid-logout isn't in the link_class argument, it should be
+        # appended to it prior to calling browserid_button.
+        button = browserid_logout(link_class='go button')
+        a = pq(button)('a')
+
+        self.assertTrue(a.hasClass('browserid-logout'))
+
+
+class BrowserIDInfoTests(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+
+    def test_defaults(self):
+        request = self.factory.get('/')
+        request.user = object()
+        info = browserid_info(request)
+        d = pq(info)
+
+        info_div = d('#browserid-info')
+        self.assertEqual(info_div.attr('data-user-email'), '')
+        self.assertEqual(info_div.attr('data-request-args'), '{}')
+
+        form = d('#browserid-form')
+        self.assertEqual(form.attr('action'), '/browserid/login/')
+
+    @override_settings(BROWSERID_REQUEST_ARGS={'siteName': 'asdf'})
+    def test_custom_values(self):
+        request = self.factory.get('/')
+        request.user = Mock(email='a@example.com')
+        info = browserid_info(request)
+        d = pq(info)
+
+        info_div = d('#browserid-info')
+        self.assertEqual(info_div.attr('data-user-email'), 'a@example.com')
+        self.assertEqual(info_div.attr('data-request-args'),
+                         '{"siteName": "asdf"}')
+
+        form = d('#browserid-form')
+        self.assertEqual(form.attr('action'), '/browserid/login/')

@@ -3,6 +3,10 @@ Settings
 
 .. module:: django.conf.settings
 
+
+Core Settings
+-------------
+
 .. data:: SITE_URL
 
    **Default:** No default
@@ -13,6 +17,10 @@ Settings
    Note that this does not have to be a publicly accessible URL, so local URLs
    like ``localhost:8000`` or ``127.0.0.1`` are acceptable as long as they match
    what you are using to access your site.
+
+
+Redirect URLs
+-------------
 
 .. data:: LOGIN_REDIRECT_URL
 
@@ -33,6 +41,24 @@ Settings
 
    Path to redirect to on logout.
 
+
+Customizing the Login Popup
+---------------------------
+
+.. data:: BROWSERID_REQUEST_ARGS
+
+   **Default:** ``{}``
+
+   Controls the arguments passed to ``navigator.id.request``, which are used to
+   customize the login popup box. To see a list of valid keys and what they do,
+   check out the `navigator.id.request documentation`_.
+
+   .. _navigator.id.request documentation: https://developer.mozilla.org/en-US/docs/DOM/navigator.id.request
+
+
+Customizing the Verify View
+---------------------------
+
 .. data:: BROWSERID_CREATE_USER
 
     **Default:** ``True``
@@ -51,6 +77,10 @@ Settings
     mistakes. Useful if you're getting warnings for things you know aren't
     errors.
 
+
+Using a Different Identity Provider
+-----------------------------------
+
 .. data:: BROWSERID_VERIFICATION_URL
 
     **Default:** ``'https://browserid.org/verify``
@@ -62,6 +92,10 @@ Settings
    **Default:** 'https://login.persona.org/include.js'
 
    The URL to use for the BrowserID JavaScript shim.
+
+
+Customizing Verification
+------------------------
 
 .. data:: BROWSERID_DISABLE_CERT_CHECK
 

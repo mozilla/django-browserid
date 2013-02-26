@@ -1,6 +1,8 @@
 Advanced Usage
 ==============
 
+.. _auto-user:
+
 Automatic Account Creation
 --------------------------
 

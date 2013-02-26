@@ -11,7 +11,7 @@
         var logoutRedirect = null; // Path to redirect to post-logout.
 
         var $loginForm = $('#browserid-form'); // Form used to submit login.
-        var $browseridInfo = $('#browseridInfo'); // Useful info from backend.
+        var $browseridInfo = $('#browserid-info'); // Useful info from backend.
 
         var requestArgs = $browseridInfo.data('requestArgs') || {};
         var loginFailed = location.search.indexOf('bid_login_failed=1') !== -1;

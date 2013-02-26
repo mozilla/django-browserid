@@ -10,7 +10,7 @@ Latest
   just ``next``.
 
 - Replace ``browserid_button`` with ``browserid_login`` and
-  ``browserid_logout``.
+  ``browserid_logout``, and make ``browserid_info`` a function.
 
 - #109: Fix issue with unicode strings in the ``extra_params`` kwarg for
   ``verify``.

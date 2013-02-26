@@ -65,8 +65,8 @@ You can also set the following optional settings in ``settings.py``::
 Finally, you'll need to add the login button to your templates. There are three
 things you will need to add to your templates:
 
-1. ``{{ browserid_info }}``: Invisible element that stores info about the
-   current user. Must be within the ``<body>`` tag and appear only **once**.
+1. ``{% browserid_info %}``: Outputs an invisible element that stores info about
+   the current user. Must be within the ``<body>`` tag and appear only **once**.
 
 2. ``{% browserid_js %}``: Outputs the ``<script>`` tags for the button
    JavaScript. Must be somewhere on the page, typically at the bottom right
@@ -83,7 +83,7 @@ A complete example
     {% load browserid %}
     <html>
       <body>
-        {{ browserid_info }}
+        {% browserid_info %}
         <header>
           <h1>My Site</h1>
           <div class="authentication">
@@ -109,7 +109,7 @@ passed to your template by the context processor
 
     <html>
       <body>
-        {{ browserid_info }}
+        {{ browserid_info() }}
         <header>
           <h1>My Site</h1>
           <div class="authentication">

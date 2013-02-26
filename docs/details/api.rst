@@ -4,6 +4,8 @@ API
 Template Helpers
 ----------------
 
+.. autofunction:: django_browserid.helpers.browserid_info()
+
 .. autofunction:: django_browserid.helpers.browserid_login
 
 .. autofunction:: django_browserid.helpers.browserid_logout

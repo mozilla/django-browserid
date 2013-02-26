@@ -4,19 +4,46 @@
 import json
 
 from django.conf import settings
+from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 
-from django_browserid.forms import FORM_JAVASCRIPT, BROWSERID_SHIM
+from django_browserid.forms import (BROWSERID_SHIM, BrowserIDForm,
+                                    FORM_JAVASCRIPT)
 
 
-def browserid_button(text=None, next=None, link_class=None, attrs=None):
+# If funfactory is available, we want to use it's locale-aware reverse instead
+# of Django's reverse, so we try to import funfactory's first and fallback to
+# Django's if it is not found.
+try:
+    from funfactory.urlresolvers import reverse
+except ImportError:
+    from django.core.urlresolvers import reverse
+
+
+def browserid_info(request):
+    """
+    Output the HTML for the login form and the info tag. Should be called once
+    at the top of the page just below the <body> tag.
+    """
+    form = BrowserIDForm(auto_id=False)
+    request_args = getattr(settings, 'BROWSERID_REQUEST_ARGS', {})
+    return render_to_string('browserid/info.html', {
+        'email': getattr(request.user, 'email', ''),
+        'login_url': reverse('browserid_login'),
+        'request_args': json.dumps(request_args),
+        'form': form,
+    }, RequestContext(request))
+
+
+def browserid_button(text=None, next=None, link_class=None, attrs=None,
+                     href='#'):
     attrs = attrs or {}
     if isinstance(attrs, basestring):
         attrs = json.loads(attrs)
 
     attrs.setdefault('class', link_class)
-    attrs.setdefault('href', '#')
+    attrs.setdefault('href', href)
     attrs.setdefault('data-next', next)
 
     return render_to_string('browserid/button.html', {
@@ -26,7 +53,7 @@ def browserid_button(text=None, next=None, link_class=None, attrs=None):
 
 
 def browserid_login(text='Sign in', next=None, link_class='browserid-login',
-                    attrs=None):
+                    attrs=None, fallback_href='#'):
     """
     Output the HTML for a BrowserID login link.
 
@@ -38,37 +65,44 @@ def browserid_login(text='Sign in', next=None, link_class='browserid-login',
         the LOGIN_REDIRECT_URL setting will be used.
 
     :param link_class:
-        CSS class for the link.
+        CSS class for the link. `browserid-login` will be added to this
+        automatically.
 
     :param attrs:
         Attributes for the <a> element itself. Attributes specified by this take
         precedence over those specified by other arguments.
+
+    :param fallback_href:
+        Value to use for the href of the link. If the user has disabled
+        JavaScript, the login link will bring them to this page, which can be
+        used as a non-JavaScript login fallback.
     """
+    if 'browserid-login' not in link_class:
+        link_class += ' browserid-login'
     next = next or getattr(settings, 'LOGIN_REDIRECT_URL', '/')
-    return browserid_button(text, next, link_class, attrs)
+    return browserid_button(text, next, link_class, attrs, fallback_href)
 
 
-def browserid_logout(text='Sign out', next=None, link_class='browserid-logout',
-                    attrs=None):
+def browserid_logout(text='Sign out', link_class='browserid-logout',
+                     attrs=None):
     """
     Output the HTML for a BrowserID logout link.
 
     :param text:
         Text to use inside the link.
 
-    :param next:
-        URL to redirect users to after they logout from this link. If omitted,
-        the LOGOUT_REDIRECT_URL setting will be used.
-
     :param link_class:
-        CSS class for the link.
+        CSS class for the link. `browserid-logout` will be added to this
+        automatically.
 
     :param attrs:
         Attributes for the <a> element itself. Attributes specified by this take
         precedence over those specified by other arguments.
     """
-    next = next or getattr(settings, 'LOGOUT_REDIRECT_URL', '/')
-    return browserid_button(text, next, link_class, attrs)
+    if 'browserid-logout' not in link_class:
+        link_class += ' browserid-logout'
+    return browserid_button(text, None, link_class, attrs,
+                            reverse('browserid_logout'))
 
 
 def browserid_js(include_shim=True):
