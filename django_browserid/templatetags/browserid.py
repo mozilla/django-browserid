@@ -7,8 +7,13 @@ register = template.Library()
 
 
 @fancy_tag(register, takes_context=True)
-def browserid_button(context, **kwargs):
-    return context['browserid_button'](**kwargs)
+def browserid_login(context, **kwargs):
+    return context['browserid_login'](**kwargs)
+
+
+@fancy_tag(register, takes_context=True)
+def browserid_logout(context, **kwargs):
+    return context['browserid_logout'](**kwargs)
 
 
 @fancy_tag(register, takes_context=True)

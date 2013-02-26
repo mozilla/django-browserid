@@ -1,16 +1,3 @@
-{% if not user.is_authenticated %}
-  <form class="browserid-form" method="POST" action="{{ login_url }}" style="display: none;">
-    {% csrf_token %}
-    {{ form.as_p }}
-    {% for key, value in form_extras.items %}
-      <input type="hidden" name="{{ key }}" value="{{ value }}">
-    {% endfor %}
-  </form>
-  <a href="{{ login_fallback }}" class="{{ link_class }} browserid-login" data-request-args="{{ request_args }}">
-    {{ sign_in }}
-  </a>
-{% else %}
-  <a href="{{ logout_url }}" class="{{ link_class }} browserid-logout">
-    {{ sign_out }}
-  </a>
-{% endif %}
+<a {% for key, value in attrs.items %}{{ key }}="{{ value }}" {% endfor %}>
+  {{ text }}
+</a>

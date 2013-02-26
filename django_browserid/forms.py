@@ -12,6 +12,7 @@ BROWSERID_SHIM = getattr(settings, 'BROWSERID_SHIM',
 
 class BrowserIDForm(forms.Form):
     assertion = forms.CharField(widget=forms.HiddenInput())
+    next = forms.CharField(required=False, widget=forms.HiddenInput())
 
     class Media:
         js = FORM_JAVASCRIPT + (BROWSERID_SHIM,)
