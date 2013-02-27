@@ -41,3 +41,4 @@ Patches and Suggestions
 - JR Conlin
 - Prasoon Shukla
 - Peter Bengtsson
+- Javed Khan
