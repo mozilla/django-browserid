@@ -99,7 +99,7 @@ A complete example
 If you're using `Jinja2`_ as your templating system, you can use the functions
 passed to your template by the context processor
 
-.. code-block:: jinja
+.. code-block:: html+jinja
 
     <html>
       <body>
