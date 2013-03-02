@@ -1,13 +1,14 @@
+from django.contrib.auth.models import AnonymousUser, User
 from django.test import TestCase
 from django.test.client import RequestFactory
-from django.test.utils import override_settings
 
-from mock import Mock, patch
+from mock import patch
 from pyquery import PyQuery as pq
 
 from django_browserid.helpers import (browserid_button, browserid_info,
                                       browserid_js, browserid_login,
                                       browserid_logout)
+from django_browserid.tests import patch_settings
 
 
 @patch('django_browserid.helpers.FORM_JAVASCRIPT',
@@ -16,7 +17,7 @@ from django_browserid.helpers import (browserid_button, browserid_info,
        'https://example.com/test3.js')
 class BrowserIDJSTests(TestCase):
     def test_basic(self):
-        output = browserid_js().strip()
+        output = browserid_js()
         self.assertTrue('src="static/test1.js"' in output)
         self.assertTrue('src="static/test2.js"' in output)
         self.assertTrue('src="https://example.com/test3.js"' in output)
@@ -76,7 +77,7 @@ class BrowserIDInfoTests(TestCase):
 
     def test_defaults(self):
         request = self.factory.get('/')
-        request.user = object()
+        request.user = AnonymousUser()
         info = browserid_info(request)
         d = pq(info)
 
@@ -87,10 +88,10 @@ class BrowserIDInfoTests(TestCase):
         form = d('#browserid-form')
         self.assertEqual(form.attr('action'), '/browserid/login/')
 
-    @override_settings(BROWSERID_REQUEST_ARGS={'siteName': 'asdf'})
+    @patch_settings(BROWSERID_REQUEST_ARGS={'siteName': 'asdf'})
     def test_custom_values(self):
         request = self.factory.get('/')
-        request.user = Mock(email='a@example.com')
+        request.user = User.objects.create_user('asdf', 'a@example.com')
         info = browserid_info(request)
         d = pq(info)
 

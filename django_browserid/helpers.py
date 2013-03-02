@@ -10,6 +10,7 @@ from django.utils.safestring import mark_safe
 
 from django_browserid.forms import (BROWSERID_SHIM, BrowserIDForm,
                                     FORM_JAVASCRIPT)
+from django_browserid.util import static_url
 
 
 # If funfactory is available, we want to use it's locale-aware reverse instead
@@ -38,6 +39,27 @@ def browserid_info(request):
 
 def browserid_button(text=None, next=None, link_class=None, attrs=None,
                      href='#'):
+    """
+    Output the HTML for a BrowserID link.
+
+    :param text:
+        Text to use inside the link.
+
+    :param next:
+        Value to use for the data-next attribute on the link.
+
+    :param link_class:
+        Class to use for the link.
+
+    :param attrs:
+        Dictionary of attributes to add to the link. Values here override those
+        set by other arguments.
+
+        If given a string, it is parsed as JSON and is expected to be an object.
+
+    :param href:
+        href to use for the link.
+    """
     attrs = attrs or {}
     if isinstance(attrs, basestring):
         attrs = json.loads(attrs)
@@ -58,7 +80,8 @@ def browserid_login(text='Sign in', next=None, link_class='browserid-login',
     Output the HTML for a BrowserID login link.
 
     :param text:
-        Text to use inside the link.
+        Text to use inside the link. Defaults to 'Sign in', which is not
+        localized.
 
     :param next:
         URL to redirect users to after they login from this link. If omitted,
@@ -69,8 +92,10 @@ def browserid_login(text='Sign in', next=None, link_class='browserid-login',
         automatically.
 
     :param attrs:
-        Attributes for the <a> element itself. Attributes specified by this take
-        precedence over those specified by other arguments.
+        Dictionary of attributes to add to the link. Values here override those
+        set by other arguments.
+
+        If given a string, it is parsed as JSON and is expected to be an object.
 
     :param fallback_href:
         Value to use for the href of the link. If the user has disabled
@@ -79,7 +104,8 @@ def browserid_login(text='Sign in', next=None, link_class='browserid-login',
     """
     if 'browserid-login' not in link_class:
         link_class += ' browserid-login'
-    next = next or getattr(settings, 'LOGIN_REDIRECT_URL', '/')
+    next = next if next is not None else getattr(settings, 'LOGIN_REDIRECT_URL',
+                                                 '/')
     return browserid_button(text, next, link_class, attrs, fallback_href)
 
 
@@ -89,15 +115,18 @@ def browserid_logout(text='Sign out', link_class='browserid-logout',
     Output the HTML for a BrowserID logout link.
 
     :param text:
-        Text to use inside the link.
+        Text to use inside the link. Defaults to 'Sign out', which is not
+        localized.
 
     :param link_class:
         CSS class for the link. `browserid-logout` will be added to this
         automatically.
 
     :param attrs:
-        Attributes for the <a> element itself. Attributes specified by this take
-        precedence over those specified by other arguments.
+        Dictionary of attributes to add to the link. Values here override those
+        set by other arguments.
+
+        If given a string, it is parsed as JSON and is expected to be an object.
     """
     if 'browserid-logout' not in link_class:
         link_class += ' browserid-logout'
@@ -115,10 +144,9 @@ def browserid_js(include_shim=True):
         in the output. Useful if you want to minify the button JavaScript using
         a library like django-compressor that can't handle external JavaScript.
     """
-    from django.contrib.staticfiles.storage import staticfiles_storage
-
-    files = [staticfiles_storage.url(path) for path in FORM_JAVASCRIPT]
-    files += ((BROWSERID_SHIM,) if include_shim else ())
+    files = [static_url(path) for path in FORM_JAVASCRIPT]
+    if include_shim:
+        files.append(BROWSERID_SHIM)
 
     tags = ['<script type="text/javascript" src="{0}"></script>'.format(path)
             for path in files]

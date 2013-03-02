@@ -92,7 +92,7 @@ class Verify(BaseFormView):
         if self.failure_url:
             url = self.failure_url
         else:
-            raise ImproperlyConfigured('No URL to redirect to. Provide a '
+            raise ImproperlyConfigured('No redirect URL found. Provide a '
                                        'failure_url.')
         return url
 

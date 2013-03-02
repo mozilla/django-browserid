@@ -3,8 +3,9 @@ python:
   - 2.6
   - 2.7
 env:
+  - DJANGO_VERSION=1.3.7
   - DJANGO_VERSION=1.4.5
-  - DJANGO_VERSION=1.5c2
+  - DJANGO_VERSION=1.5
 install:
   - pip install -e git+git://github.com/django/django.git@${DJANGO_VERSION}#egg=django
   - pip install -r requirements.txt --use-mirrors

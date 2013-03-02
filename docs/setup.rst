@@ -87,7 +87,7 @@ A complete example
         <header>
           <h1>My Site</h1>
           <div class="authentication">
-            {% if user.authenticated %}
+            {% if user.is_authenticated %}
               {% browserid_logout text='Logout' %}
             {% else %}
               {% browserid_login text='Login' %}
