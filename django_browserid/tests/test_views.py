@@ -15,8 +15,8 @@ factory = RequestFactory()
 
 def verify(request_type, success_url=None, failure_url=None, **kwargs):
     """
-    Call the verify view function. All kwargs not specified above will be
-    passed as GET or POST arguments.
+    Call the verify view function. All kwargs not specified above will be passed
+    as GET or POST arguments.
     """
     if request_type == 'get':
         request = factory.get('/browserid/verify', kwargs)
@@ -63,12 +63,23 @@ def test_auth_fail_redirect_failure():
 
 
 @mock_browserid(None)
-def test_auth_fail_redirect_view_name_failure():
-    # If authentication fails, redirect to the failure URL which
-    # actually specifies a view name.
-    response = verify('post', failure_url='epic_fail', assertion='asdf')
+def test_auth_fail_redirect_invalid_failure():
+    # If authentication fails and the given redirect url isn't valid, redirect
+    # to the default failure URL.
+    response = verify('post', next='epic_fail', failure_url='/fail',
+                      assertion='asdf')
     assert response.status_code == 302
-    assert response['Location'].endswith('/epic-fail/?bid_login_failed=1')
+    assert response['Location'].endswith('/fail?bid_login_failed=1')
+
+
+@mock_browserid(None)
+def test_auth_fail_redirect_invalid_host():
+    # If authentication fails and the given redirect url points to an invalid
+    # host, redirect to the default failure URL.
+    response = verify('post', next='http://example.com/login_failure',
+                      failure_url='/local_fail', assertion='asdf')
+    assert response.status_code == 302
+    assert response['Location'].endswith('/local_fail?bid_login_failed=1')
 
 
 @mock_browserid(None)
