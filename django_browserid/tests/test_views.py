@@ -63,26 +63,6 @@ def test_auth_fail_redirect_failure():
 
 
 @mock_browserid(None)
-def test_auth_fail_redirect_invalid_failure():
-    # If authentication fails and the given redirect url isn't valid, redirect
-    # to the default failure URL.
-    response = verify('post', next='epic_fail', failure_url='/fail',
-                      assertion='asdf')
-    assert response.status_code == 302
-    assert response['Location'].endswith('/fail?bid_login_failed=1')
-
-
-@mock_browserid(None)
-def test_auth_fail_redirect_invalid_host():
-    # If authentication fails and the given redirect url points to an invalid
-    # host, redirect to the default failure URL.
-    response = verify('post', next='http://example.com/login_failure',
-                      failure_url='/local_fail', assertion='asdf')
-    assert response.status_code == 302
-    assert response['Location'].endswith('/local_fail?bid_login_failed=1')
-
-
-@mock_browserid(None)
 def test_auth_fail_url_parameters():
     # Ensure that bid_login_failed=1 is appended to the failure url.
     response = verify('post', failure_url='/fail', assertion='asdf')
@@ -119,6 +99,16 @@ def test_redirect_field():
     response = verify('post', success_url='/success', **kwargs)
     assert response.status_code == 302
     assert response['Location'].endswith('/field_success')
+
+
+@mock_browserid('test@example.com')
+def test_redirect_invalid_host():
+    # If the given redirect url points to an invalid host, redirect to the
+    # default failure URL.
+    response = verify('post', next='http://example.com/login_failure',
+                      success_url='/woo', assertion='asdf')
+    assert response.status_code == 302
+    assert response['Location'].endswith('/woo')
 
 
 @patch_settings(DEBUG=True, SESSION_COOKIE_SECURE=True)
