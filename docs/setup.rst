@@ -76,7 +76,7 @@ things you will need to add to your templates:
 3. ``{% browserid_login %}`` and ``{% browserid_logout %}``: Outputs the HTML
    for the login and logout buttons.
 
-A complete example
+A complete example:
 
 .. code-block:: html+django
 
@@ -103,7 +103,7 @@ A complete example
     </html>
 
 If you're using `Jinja2`_ as your templating system, you can use the functions
-passed to your template by the context processor
+passed to your template by the context processor:
 
 .. code-block:: html+jinja
 

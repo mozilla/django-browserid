@@ -41,39 +41,31 @@ following::
 Custom Verification
 -------------------
 
-If you want full control over account verification, don't use
-django-browserid's ``browserid_verify`` view. Create your own view and
-use :func:`django_browserid.verify` to manually verify a
-BrowserID assertion with something like the following::
+If you want to customize the verification view, you can do so by subclassing
+:class:`django_browserid.views.Verify` and overriding the methods to insert your
+custom logic.
+
+If you want complete control over account verification, you should create your
+own view and use :func:`django_browserid.verify` to manually verify a
+BrowserID assertion with something like the following:
+
+.. code-block:: python
 
    from django_browserid import get_audience, verify
    from django_browserid.forms import BrowserIDForm
 
 
    def myview(request):
-      # ...
-      if request.method == 'POST':
-          form = BrowserIDForm(data=request.POST)
-          if form.is_valid():
-              result = verify(form.cleaned_data['assertion'], get_audience(request))
-              if result:
-                  # check for user account, create account for new users, etc
-                  user = my_get_or_create_user(result.email)
+       # ...
+       if request.method == 'POST':
+           form = BrowserIDForm(data=request.POST)
+           if form.is_valid():
+               result = verify(form.cleaned_data['assertion'], get_audience(request))
+               if result:
+                   # check for user account, create account for new users, etc
+                   user = my_get_or_create_user(result['email'])
 
-``result`` will be ``False`` if the assertion failed, or a dictionary
-similar to the following::
-
-   {
-      u'audience': u'https://mysite.com:443',
-      u'email': u'myemail@example.com',
-      u'issuer': u'browserid.org',
-      u'status': u'okay',
-      u'expires': 1311377222765
-   }
-
-You are of course then free to store the email in the session and
-prompt the user to sign up using a chosen identifier as their
-username, or whatever else makes sense for your site.
+See :func:`django_browserid.verify` for more info on what ``verify`` returns.
 
 
 Custom User Model

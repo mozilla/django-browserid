@@ -21,6 +21,14 @@ Verification Functions
 .. autofunction:: django_browserid.get_audience
 
 
+Views
+-----
+
+.. autoclass:: django_browserid.views.Verify
+   :members:
+   :show-inheritance:
+
+
 Signals
 -------
 
