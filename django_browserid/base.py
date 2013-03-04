@@ -3,7 +3,6 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 import json
 import logging
-import urllib
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
@@ -17,6 +16,16 @@ logger = logging.getLogger(__name__)
 DEFAULT_HTTP_TIMEOUT = 5
 DEFAULT_VERIFICATION_URL = 'https://verifier.login.persona.org/verify'
 OKAY_RESPONSE = 'okay'
+
+
+class BrowserIDException(Exception):
+    """
+    Raised when there is an issue verifying an assertion with
+    :func:`django_browserid.base.verify`.
+    """
+    def __init__(self, exc):
+        #: Original exception that caused this to be raised.
+        self.exc = exc
 
 
 def get_audience(request):
@@ -73,7 +82,10 @@ def _verify_http_request(url, data):
     if parameters['verify']:
         parameters['verify'] = getattr(settings, 'BROWSERID_CACERT_FILE', True)
 
-    r = requests.post(url, **parameters)
+    try:
+        r = requests.post(url, **parameters)
+    except requests.exceptions.RequestException as e:
+        raise BrowserIDException(e)
 
     try:
         rv = json.loads(r.content)
@@ -118,6 +130,9 @@ def verify(assertion, audience, extra_params=None, url=None):
                u'status': u'okay',
                u'expires': 1311377222765
            }
+
+    :raises: BrowserIDException: Error connecting to remote verification
+        service.
     """
     if not url:
         url = getattr(settings, 'BROWSERID_VERIFICATION_URL',

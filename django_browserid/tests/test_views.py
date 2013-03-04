@@ -6,7 +6,7 @@ from django.test.client import RequestFactory
 
 from mock import patch
 
-from django_browserid import views
+from django_browserid import BrowserIDException, views
 from django_browserid.tests import mock_browserid, patch_settings
 
 
@@ -81,6 +81,18 @@ def test_auth_fail_url_parameters():
                       assertion='asdf')
     assert response['Location'].endswith('/fail?asdf=4&bid_login_failed=1'
                                          '&bid_login_failed=1')
+
+
+@mock_browserid(None)
+@patch('django_browserid.views.auth.authenticate')
+def test_authenticate_browserid_exception(authenticate):
+    # If authenticate raises a BrowserIDException, redirect to the failure URL.
+    err = BrowserIDException('test')
+    authenticate.side_effect = err
+
+    response = verify('post', failure_url='/fail', assertion='asdf')
+    assert response.status_code == 302
+    assert response['Location'].endswith('/fail?bid_login_failed=1')
 
 
 @mock_browserid('test@example.com')
