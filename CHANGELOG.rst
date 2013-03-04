@@ -6,6 +6,9 @@ History
 Latest
 ++++++
 
+- #125: Prevent the Verify view from running reverse on user input and add check
+  to not redirect to URLs with a different host.
+
 - Remove ability to set a custom name for the Verify redirect parameter: it's
   just ``next``.
 
