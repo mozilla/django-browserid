@@ -40,7 +40,8 @@ To use ``django-browserid``, you'll need to make a few changes to your
    *very important* that you set ``SITE_URL`` correctly.
 
 .. note:: ``TEMPLATE_CONTEXT_PROCESSORS`` is not in the settings file by
-   default. You can find the default value in the `Django docs`_
+   default. You can find the default value in the `Context Processor
+   documentation`_.
 
 Next, edit your ``urls.py`` file and add the following::
 
@@ -64,15 +65,16 @@ You can also set the following optional settings in ``settings.py``::
 Finally, you'll need to add the login button to your templates. There are three
 things you will need to add to your templates:
 
-1. ``{{ browserid_info }}``: Invisible element that stores info about the
-   current user. Must be within the ``<body>`` tag and appear only **once**.
+1. ``{% browserid_info %}``: Outputs an invisible element that stores info about
+   the current user. Must be within the ``<body>`` tag and appear only **once**.
 
 2. ``{% browserid_js %}``: Outputs the ``<script>`` tags for the button
    JavaScript. Must be somewhere on the page, typically at the bottom right
    before the ``</body>`` tag to allow the page to visibly load before
    executing.
 
-3. ``{% browserid_button %}``: Outputs the HTML for the login button itself.
+3. ``{% browserid_login %}`` and ``{% browserid_logout %}``: Outputs the HTML
+   for the login and logout buttons.
 
 A complete example
 
@@ -81,11 +83,15 @@ A complete example
     {% load browserid %}
     <html>
       <body>
-        {{ browserid_info }}
+        {% browserid_info %}
         <header>
           <h1>My Site</h1>
           <div class="authentication">
-            {% browserid_button sign_in='Login' %}
+            {% if user.is_authenticated %}
+              {% browserid_logout text='Logout' %}
+            {% else %}
+              {% browserid_login text='Login' %}
+            {% endif %}
           </div>
         </header>
         <article>
@@ -103,11 +109,15 @@ passed to your template by the context processor
 
     <html>
       <body>
-        {{ browserid_info }}
+        {{ browserid_info() }}
         <header>
           <h1>My Site</h1>
           <div class="authentication">
-            {{ browserid_button(sign_in='Login') }}
+            {% if user.is_authenticated() %}
+              {{ browserid_logout(text='Logout') }}
+            {% else %}
+              {{ browserid_login(text='Login') }}
+            {% endif %}
           </div>
         </header>
         <article>
@@ -120,16 +130,12 @@ passed to your template by the context processor
 
 .. note:: The JavaScript assumes you have `jQuery`_ 1.7 or higher on your site.
 
-``browserid_button`` will display a login button if the user is logged out, and
-a logout button if the user is logged in.
-
-.. autofunction:: django_browserid.context_processors.browserid_button
-
-.. autofunction:: django_browserid.context_processors.browserid_js
+.. note:: For more information about the template helper functions, check out
+   the :doc:`details/api` document.
 
 .. _jQuery: http://jquery.com/
 .. _Jinja2: http://jinja.pocoo.org/
-.. _`Django docs`: https://docs.djangoproject.com/en/dev/ref/settings/#template-context-processors
+.. _`Context Processor documentation`: https://docs.djangoproject.com/en/dev/ref/settings/#template-context-processors
 
 
 Deploying to Production

@@ -24,6 +24,7 @@ to fork_ and contribute!
    details/advanced
    details/settings
    details/troubleshooting
+   details/api
 
 Developer Guide
 ---------------

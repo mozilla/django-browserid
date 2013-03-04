@@ -6,6 +6,12 @@ History
 Latest
 ++++++
 
+- Remove ability to set a custom name for the Verify redirect parameter: it's
+  just ``next``.
+
+- Replace ``browserid_button`` with ``browserid_login`` and
+  ``browserid_logout``, and make ``browserid_info`` a function.
+
 - #109: Fix issue with unicode strings in the ``extra_params`` kwarg for
   ``verify``.
 

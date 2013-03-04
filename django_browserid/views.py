@@ -20,7 +20,6 @@ except ImportError:
     from django.core.urlresolvers import reverse
 
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -34,11 +33,9 @@ class Verify(BaseFormView):
         post-login.
         """
         auth.login(self.request, self.user)
-        redirect_field_name = self.kwargs.get('redirect_field_name',
-                                              auth.REDIRECT_FIELD_NAME)
-        redirect_to = self.request.REQUEST.get(redirect_field_name, None)
+        redirect_to = self.request.REQUEST.get('next', None)
 
-        if redirect_to is not None:
+        if redirect_to:
             return redirect(redirect_to)
         else:
             return redirect(self.get_success_url())
@@ -95,8 +92,8 @@ class Verify(BaseFormView):
         if self.failure_url:
             url = self.failure_url
         else:
-            raise ImproperlyConfigured(
-                "No URL to redirect to. Provide a failure_url.")
+            raise ImproperlyConfigured('No redirect URL found. Provide a '
+                                       'failure_url.')
         return url
 
     def dispatch(self, request, *args, **kwargs):

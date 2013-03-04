@@ -7,26 +7,33 @@
 
     $(function() {
         // State? Ewwwwww.
-        var logoutUrl = null;
-        var $loginButton = null;
+        var loginRedirect = null; // Path to redirect to post-login.
+        var logoutRedirect = null; // Path to redirect to post-logout.
+
+        var $loginForm = $('#browserid-form'); // Form used to submit login.
+        var $browseridInfo = $('#browserid-info'); // Useful info from backend.
+
+        var requestArgs = $browseridInfo.data('requestArgs') || {};
         var loginFailed = location.search.indexOf('bid_login_failed=1') !== -1;
 
+        // Call navigator.id.request whenever a login link is clicked.
         $(document).on('click', '.browserid-login', function(e) {
             e.preventDefault();
 
-            // Pull request arguments from the data-request-args attribute.
-            $loginButton = $(this);
-            navigator.id.request($loginButton.data('requestArgs'));
+            loginRedirect = $(this).data('next');
+            navigator.id.request(requestArgs);
         });
 
+        // Call navigator.id.logout whenever a logout link is clicked.
         $(document).on('click', '.browserid-logout', function(e) {
             e.preventDefault();
-            logoutUrl = $(this).attr('href');
+
+            logoutRedirect = $(this).attr('href');
             navigator.id.logout();
         });
 
         navigator.id.watch({
-            loggedInUser: $('#browserid-info').data('userEmail') || null,
+            loggedInUser: $browseridInfo.data('userEmail') || null,
             onlogin: function(assertion) {
                 // Avoid auto-login on failure.
                 if (loginFailed) {
@@ -34,18 +41,17 @@
                     return;
                 }
 
-                if (assertion && $loginButton) {
-                    var $form = $loginButton.prev('.browserid-form');
-                    assertion = assertion.toString();
-                    $form.find('input[name="assertion"]').val(assertion);
-                    $form.submit();
+                if (assertion) {
+                    $loginForm.find('input[name="next"]').val(loginRedirect);
+                    $loginForm.find('input[name="assertion"]').val(assertion);
+                    $loginForm.submit();
                 }
             },
             onlogout: function() {
                 // Follow the logout link's href once logout is complete.
-                var currentLogoutUrl = logoutUrl;
+                var currentLogoutUrl = logoutRedirect;
                 if (currentLogoutUrl !== null) {
-                    logoutUrl = null;
+                    logoutRedirect = null;
                     window.location = currentLogoutUrl;
                 } else {
                     // Sometimes you can get caught in a loop where BrowserID

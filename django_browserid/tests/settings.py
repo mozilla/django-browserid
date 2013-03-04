@@ -19,6 +19,7 @@ INSTALLED_APPS = (
 
     'django.contrib.auth',
     'django.contrib.contenttypes',
+    'django.contrib.staticfiles',
 )
 
 ROOT_URLCONF = 'django_browserid.tests.urls'
@@ -29,3 +30,5 @@ AUTHENTICATION_BACKENDS = (
 
 BROWSERID_CREATE_USER = True
 BROWSERID_USERNAME_ALGO = None
+
+STATIC_URL = 'static/'

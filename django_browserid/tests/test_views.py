@@ -13,9 +13,9 @@ from django_browserid.tests import mock_browserid, patch_settings
 factory = RequestFactory()
 
 
-def verify(request_type, redirect_field_name=None, success_url=None,
-           failure_url=None, **kwargs):
-    """Call the verify view function. All kwargs not specified above will be
+def verify(request_type, success_url=None, failure_url=None, **kwargs):
+    """
+    Call the verify view function. All kwargs not specified above will be
     passed as GET or POST arguments.
     """
     if request_type == 'get':
@@ -30,17 +30,12 @@ def verify(request_type, redirect_field_name=None, success_url=None,
     if failure_url is not None:
         patches['LOGIN_REDIRECT_URL_FAILURE'] = failure_url
 
-    # Only pass redirect_field_name if it is specified
-    verify_kwargs = {}
-    if redirect_field_name is not None:
-        verify_kwargs['redirect_field_name'] = redirect_field_name
-
     # We need to reload verify for the setting changes to take effect.
     with patch_settings(**patches):
         reload(views)
         verify_view = views.Verify.as_view()
         with patch.object(auth, 'login'):
-            response = verify_view(request, **verify_kwargs)
+            response = verify_view(request)
 
     return response
 
@@ -106,22 +101,11 @@ def test_auth_success_redirect_success():
 
 
 @mock_browserid('test@example.com')
-def test_default_redirect_field():
+def test_redirect_field():
     # If a redirect is passed as an argument to the request, redirect to that
     # instead of the success URL.
-    kwargs = {auth.REDIRECT_FIELD_NAME: '/field_success', 'assertion': 'asdf'}
+    kwargs = {'next': '/field_success', 'assertion': 'asdf'}
     response = verify('post', success_url='/success', **kwargs)
-    assert response.status_code == 302
-    assert response['Location'].endswith('/field_success')
-
-
-@mock_browserid('test@example.com')
-def test_redirect_field_name():
-    # If a redirect field name is specified, use the request argument matching
-    # that name as the path to redirect to.
-    kwargs = {'my_redirect': '/field_success', 'assertion': 'asdf'}
-    response = verify('post', success_url='/success',
-                      redirect_field_name='my_redirect', **kwargs)
     assert response.status_code == 302
     assert response['Location'].endswith('/field_success')
 

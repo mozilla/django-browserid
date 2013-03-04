@@ -1,6 +1,8 @@
 Advanced Usage
 ==============
 
+.. _auto-user:
+
 Automatic Account Creation
 --------------------------
 
@@ -73,17 +75,6 @@ You are of course then free to store the email in the session and
 prompt the user to sign up using a chosen identifier as their
 username, or whatever else makes sense for your site.
 
-.. autofunction:: django_browserid.verify
-
-.. autofunction:: django_browserid.get_audience
-
-
-Signals
--------
-
-.. automodule:: django_browserid.signals
-   :members:
-
 
 Custom User Model
 -----------------
@@ -98,7 +89,7 @@ customizations to make things work properly:
   have to subclass ``BrowserIDBackend`` and override these methods to work with
   your custom User class.
 
-* ``browserid_button`` assumes that your custom User class has an attribute
+* ``browserid_login`` assumes that your custom User class has an attribute
   called ``email`` that contains the user's email address. You can either add
   an email field to your model, or add a `property`_ to the model that returns
   the user's email address.
