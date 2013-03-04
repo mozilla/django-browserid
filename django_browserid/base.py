@@ -105,6 +105,19 @@ def verify(assertion, audience, extra_params=None, url=None):
         A custom verification URL for the service.
         The service URL can also be set using the
         ``BROWSERID_VERIFICATION_URL`` setting.
+
+    :returns:
+        A dictionary similar to the following:
+
+        .. code-block:: python
+
+           {
+               u'audience': u'https://mysite.com:443',
+               u'email': u'myemail@example.com',
+               u'issuer': u'browserid.org',
+               u'status': u'okay',
+               u'expires': 1311377222765
+           }
     """
     if not url:
         url = getattr(settings, 'BROWSERID_VERIFICATION_URL',

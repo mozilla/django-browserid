@@ -26,14 +26,30 @@ logger = logging.getLogger(__name__)
 
 
 class Verify(BaseFormView):
+    """
+    Login view for django-browserid. Takes in an assertion and sends it to the
+    remote verification service to be verified, and logs in the user upon
+    success.
+    """
     form_class = BrowserIDForm
+
+    #: URL to redirect users to when login fails. This uses the value of
+    #: ``settings.LOGIN_REDIRECT_URL_FAILURE``, and defaults to ``'/'`` if the
+    #: setting doesn't exist.
     failure_url = getattr(settings, 'LOGIN_REDIRECT_URL_FAILURE', '/')
+
+    #: URL to redirect users to when login succeeds if ``next`` isn't specified
+    #: in the request. This uses the value of ``settings.LOGIN_REDIRECT_URL``,
+    #: and defaults to ``'/'`` if the setting doesn't exist.
     success_url = getattr(settings, 'LOGIN_REDIRECT_URL', '/')
 
     def login_success(self):
         """
-        Handle a successful login. Use this to perform complex redirects
-        post-login.
+        Log the user into the site and redirect them to the post-login URL.
+
+        If ``next`` is found in the request parameters, it's value will be used
+        as the URL to redirect to. If ``next`` points to a different host than
+        the current request, it is ignored.
         """
         auth.login(self.request, self.user)
         redirect_to = self.request.REQUEST.get('next')
@@ -48,7 +64,9 @@ class Verify(BaseFormView):
 
     def login_failure(self):
         """
-        Handle a failed login. Use this to perform complex redirects post-login.
+        Redirect the user to a login-failed page, and add the
+        ``bid_login_failed`` parameter to the URL to signify that login failed
+        to the JavaScript.
         """
         failure_url = self.get_failure_url()
 
@@ -70,9 +88,11 @@ class Verify(BaseFormView):
 
     def form_valid(self, form):
         """
-        Handles the return post request from the browserID form and puts
-        interesting variables into the class. If everything checks out, then
-        we call login_success to decide how to handle a valid user
+        Send the given assertion to the remote verification service and,
+        depending on the result, trigger login success or failure.
+
+        :param form:
+            Instance of BrowserIDForm that was submitted by the user.
         """
         self.assertion = form.cleaned_data['assertion']
         self.audience = get_audience(self.request)
@@ -87,15 +107,17 @@ class Verify(BaseFormView):
         return self.login_failure()
 
     def form_invalid(self, *args, **kwargs):
+        """Trigger login failure since the form is invalid."""
         return self.login_failure()
 
     def get(self, *args, **kwargs):
+        """Trigger login failure since we don't support GET on this view."""
         return self.login_failure()
 
     def get_failure_url(self):
         """
-        This is just the django version of get_success_url
-        https://github.com/django/django/blob/master/django/views/generic/edit.py#L51
+        Retrieve `failure_url` from the class. Raises ImproperlyConfigured if
+        the attribute is not found.
         """
         if not self.failure_url:
             raise ImproperlyConfigured('No redirect URL found. Provide a '
@@ -103,5 +125,6 @@ class Verify(BaseFormView):
         return self.failure_url
 
     def dispatch(self, request, *args, **kwargs):
+        """Run some sanity checks on the request prior to dispatching it."""
         sanity_checks(request)
         return super(Verify, self).dispatch(request, *args, **kwargs)
