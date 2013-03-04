@@ -34,3 +34,10 @@ Signals
 
 .. automodule:: django_browserid.signals
    :members:
+
+
+Exceptions
+----------
+
+.. autoexception:: django_browserid.base.BrowserIDException
+   :members:

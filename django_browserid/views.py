@@ -12,7 +12,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.views.generic.edit import BaseFormView
 
-from django_browserid.base import get_audience, sanity_checks
+from django_browserid.base import BrowserIDException, get_audience, sanity_checks
 from django_browserid.forms import BrowserIDForm
 
 # Try to import funfactory's reverse and fall back to django's version.
@@ -62,11 +62,15 @@ class Verify(BaseFormView):
 
         return HttpResponseRedirect(redirect_to or self.get_success_url())
 
-    def login_failure(self):
+    def login_failure(self, error=None):
         """
         Redirect the user to a login-failed page, and add the
         ``bid_login_failed`` parameter to the URL to signify that login failed
         to the JavaScript.
+
+        :param error:
+            If login failed due to an error raised during verification, this
+            will be the BrowserIDException instance that was raised.
         """
         failure_url = self.get_failure_url()
 
@@ -96,10 +100,14 @@ class Verify(BaseFormView):
         """
         self.assertion = form.cleaned_data['assertion']
         self.audience = get_audience(self.request)
-        self.user = auth.authenticate(
-            assertion=self.assertion,
-            audience=self.audience
-        )
+
+        try:
+            self.user = auth.authenticate(
+                assertion=self.assertion,
+                audience=self.audience
+            )
+        except BrowserIDException as e:
+            return self.login_failure(e)
 
         if self.user and self.user.is_active:
             return self.login_success()
