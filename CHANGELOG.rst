@@ -3,8 +3,8 @@
 History
 -------
 
-Latest
-++++++
+0.8 (2013-03-05)
+++++++++++++++++
 
 - #97: Add BrowserIDException that is raised by verify when there are issues
   connecting to the remote verification servie. Update the Verify view to handle
