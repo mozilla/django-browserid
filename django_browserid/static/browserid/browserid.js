@@ -37,6 +37,7 @@
             onlogin: function(assertion) {
                 // Avoid auto-login on failure.
                 if (loginFailed) {
+                    navigator.id.logout();
                     loginFailed = false;
                     return;
                 }
