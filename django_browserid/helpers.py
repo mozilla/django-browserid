@@ -37,8 +37,8 @@ def browserid_info(request):
     }, RequestContext(request))
 
 
-def browserid_button(text=None, next=None, link_class=None, attrs=None,
-                     href='#'):
+def browserid_button(text=None, next=None, link_class=None,
+                     attrs=None, href='#'):
     """
     Output the HTML for a BrowserID link.
 
@@ -67,21 +67,66 @@ def browserid_button(text=None, next=None, link_class=None, attrs=None,
     attrs.setdefault('class', link_class)
     attrs.setdefault('href', href)
     attrs.setdefault('data-next', next)
-
     return render_to_string('browserid/button.html', {
         'text': text,
         'attrs': attrs,
     })
 
 
-def browserid_login(text='Sign in', next=None, link_class='browserid-login',
-                    attrs=None, fallback_href='#'):
+def browserid_image_link(image=None, next=None, link_class=None,
+                         attrs=None, href='#'):
+    """
+    Output the HTML for a BrowserID image link.
+
+    :param image:
+        Image path to use inside the link.
+
+    :param next:
+        Value to use for the data-next attribute on the link.
+
+    :param link_class:
+        Class to use for the link.
+
+    :param attrs:
+        Dictionary of attributes to add to the link. Values here override those
+        set by other arguments.
+
+        If given a string, it is parsed as JSON and is expected to be an object.
+
+    :param href:
+        href to use for the link.
+    """
+    attrs = attrs or {}
+    if isinstance(attrs, basestring):
+        attrs = json.loads(attrs)
+
+    attrs.setdefault('class', link_class)
+    attrs.setdefault('href', href)
+    attrs.setdefault('data-next', next)
+
+    return render_to_string('browserid/image.html', {
+        'attrs': attrs,
+        'image': image,
+    })
+
+
+def browserid_login(text='Sign in', image=None, next=None,
+                    link_class='browserid-login', attrs=None,
+                    fallback_href='#'):
     """
     Output the HTML for a BrowserID login link.
 
     :param text:
         Text to use inside the link. Defaults to 'Sign in', which is not
         localized.
+
+    :param image:
+        Personal branded button image to use in place of text. Accepts the
+        official Mozilla Persona image names.
+
+        Example: 'plain_sign_in_red.png'
+
+        Note: Prepends 'browserid/' to the image path.
 
     :param next:
         URL to redirect users to after they login from this link. If omitted,
@@ -106,7 +151,13 @@ def browserid_login(text='Sign in', next=None, link_class='browserid-login',
         link_class += ' browserid-login'
     next = next if next is not None else getattr(settings, 'LOGIN_REDIRECT_URL',
                                                  '/')
-    return browserid_button(text, next, link_class, attrs, fallback_href)
+    if image:
+        image_path = 'browserid/' + image
+        html = browserid_image_link(image_path, next, link_class, attrs, fallback_href)
+    else:
+        html = browserid_button(text, next, link_class, attrs, fallback_href)
+
+    return html
 
 
 def browserid_logout(text='Sign out', link_class='browserid-logout',
