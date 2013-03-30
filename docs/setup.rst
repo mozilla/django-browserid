@@ -76,6 +76,15 @@ things you will need to add to your templates:
 3. ``{% browserid_login %}`` and ``{% browserid_logout %}``: Outputs the HTML
    for the login and logout buttons.
 
+.. note:: The ``{% browserid_login %}`` template tag takes an optional *image*
+  parameter to display the official Persona branded sign in buttons. The image
+  names are the same as those found on the `Persona site <https://developer.mozilla.org/en-US/docs/persona/branding>`_.
+
+  Example: ``{% browserid_login image='plain_sign_in_red.png' %}``
+
+  The images are included with the library.
+
+
 A complete example:
 
 .. code-block:: html+django
@@ -163,6 +172,8 @@ The files needed are the Persona JavaScript shim, which should be loaded from
 ``https://login.persona.org/include.js`` in a script tag, and
 ``django_browserid/static/browserid/browserid.js``, which is part of the
 django-browserid library.
+
+If you are using the optional Persona branded images you need to make sure they are uploaded with the static files. 
 
 .. _Form Media: https://docs.djangoproject.com/en/dev/topics/forms/media/
 .. _staticfiles: https://docs.djangoproject.com/en/dev/howto/static-files/
