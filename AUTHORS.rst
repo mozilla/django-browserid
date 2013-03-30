@@ -42,4 +42,4 @@ Patches and Suggestions
 - Prasoon Shukla
 - Peter Bengtsson
 - Javed Khan
-- Kalail
+- Kalail (Kashif Malik)

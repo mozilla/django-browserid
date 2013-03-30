@@ -8,7 +8,7 @@ from pyquery import PyQuery as pq
 
 from django_browserid.helpers import (browserid_button, browserid_info,
                                       browserid_js, browserid_login,
-                                      browserid_logout)
+                                      browserid_css, browserid_logout)
 from django_browserid.tests import patch_settings
 
 
@@ -28,6 +28,14 @@ class BrowserIDJSTests(TestCase):
         self.assertTrue('src="static/test1.js"' in output)
         self.assertTrue('src="static/test2.js"' in output)
         self.assertTrue('src="https://example.com/test3.js"' not in output)
+
+@patch('django_browserid.helpers.FORM_CSS',
+       ('test1.css', 'test2.css'))
+class BrowserIDCSSTests(TestCase):
+    def test_basic(self):
+        output = browserid_css()
+        self.assertTrue('href="static/test1.css"' in output)
+        self.assertTrue('href="static/test2.css"' in output)
 
 
 class BrowserIDButtonTests(TestCase):
@@ -70,7 +78,7 @@ class BrowserIDButtonTests(TestCase):
         a = pq(button)('a')
 
         self.assertTrue(a.hasClass('browserid-logout'))
-
+    
 
 def _lazy_request_args():
     return {'siteName': 'asdf'}

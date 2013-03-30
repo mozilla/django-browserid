@@ -9,7 +9,8 @@ from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 
 from django_browserid.forms import (BROWSERID_SHIM, BrowserIDForm,
-                                    FORM_JAVASCRIPT)
+                                    FORM_CSS, FORM_JAVASCRIPT)
+
 from django_browserid.util import LazyEncoder, static_url
 
 
@@ -40,8 +41,8 @@ def browserid_info(request):
     }, RequestContext(request))
 
 
-def browserid_button(text=None, next=None, link_class=None, attrs=None,
-                     href='#'):
+def browserid_button(text=None, next=None, link_class=None,
+                     attrs=None, href='#'):
     """
     Output the HTML for a BrowserID link.
 
@@ -70,21 +71,28 @@ def browserid_button(text=None, next=None, link_class=None, attrs=None,
     attrs.setdefault('class', link_class)
     attrs.setdefault('href', href)
     attrs.setdefault('data-next', next)
-
     return render_to_string('browserid/button.html', {
         'text': text,
         'attrs': attrs,
     })
 
 
-def browserid_login(text='Sign in', next=None, link_class='browserid-login',
-                    attrs=None, fallback_href='#'):
+def browserid_login(text='Sign in', color=None, next=None,
+                    link_class='browserid-login', attrs=None,
+                    fallback_href='#'):
     """
     Output the HTML for a BrowserID login link.
 
     :param text:
         Text to use inside the link. Defaults to 'Sign in', which is not
         localized.
+
+    :param color:
+        Adds the official Mozilla Persona CSS branding classes on the link.
+        The CSS must be linked on the page. Accepts only the 3 official
+        colors.
+
+        Example: 'dark', 'blue', 'orange'
 
     :param next:
         URL to redirect users to after they login from this link. If omitted,
@@ -109,6 +117,8 @@ def browserid_login(text='Sign in', next=None, link_class='browserid-login',
         link_class += ' browserid-login'
     next = next if next is not None else getattr(settings, 'LOGIN_REDIRECT_URL',
                                                  '/')
+    if color:
+        link_class += ' persona-button {0}'.format(color)
     return browserid_button(text, next, link_class, attrs, fallback_href)
 
 
@@ -152,5 +162,17 @@ def browserid_js(include_shim=True):
         files.append(BROWSERID_SHIM)
 
     tags = ['<script type="text/javascript" src="{0}"></script>'.format(path)
+            for path in files]
+    return mark_safe('\n'.join(tags))
+
+
+def browserid_css():
+    """
+    Returns <link> tags for the Stylesheet required by the Persona themes.
+    Requires use of the staticfiles app.
+    """
+    files = [static_url(path) for path in FORM_CSS]
+
+    tags = ['<link rel="stylesheet" href="{0}" />'.format(path)
             for path in files]
     return mark_safe('\n'.join(tags))
