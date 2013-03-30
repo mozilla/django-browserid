@@ -1,4 +1,4 @@
 {% load static %}
 <a {% for key, value in attrs.items %}{{ key }}="{{ value }}" {% endfor %}>
-  <img src="{% static image_path %}">
+  <img src="{% static image %}">
 </a>
