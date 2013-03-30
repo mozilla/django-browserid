@@ -42,3 +42,4 @@ Patches and Suggestions
 - Prasoon Shukla
 - Peter Bengtsson
 - Javed Khan
+- Kashif Malik
