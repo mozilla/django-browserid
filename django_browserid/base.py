@@ -63,7 +63,7 @@ def get_audience(request):
                                        'documentation for django-browserid')
 
     if site_url != req_url:
-        raise ImproperlyConfigured('SITE_URL incorrect. Settting is `{0}`, but '
+        raise ImproperlyConfigured('SITE_URL incorrect. Setting is `{0}`, but '
                                    'request was `{1}`'
                                    .format(site_url, req_url))
     return site_url
