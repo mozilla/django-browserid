@@ -87,3 +87,62 @@ class patch_settings(object):
             with self:
                 return func(*args, **kwargs)
         return inner
+
+
+def skipped(func):
+    """ Decorator that marks a function as skipped. Uses nose's SkipTest exception
+if installed. Without nose, this will count skipped tests as passing tests."""
+    try:
+        from nose.plugins.skip import SkipTest
+        def skipme(*a, **k):
+            raise SkipTest()
+        skipme.__name__ = func.__name__
+        return skipme
+    except ImportError:
+        # no nose, we'll just skip the test ourselves
+        def skipme(*a, **k):
+            print "Skipping", func.__name__
+        skipme.__name__ = func.__name__
+        return skipme
+
+
+def skip_if(condition):
+    """ Decorator that skips a test if the *condition* evaluates True.
+*condition* can be a boolean or a callable that accepts one argument.
+The callable will be called with the function to be decorated, and
+should return True to skip the test.
+"""
+    def skipped_wrapper(func):
+        def wrapped(*a, **kw):
+            if isinstance(condition, bool):
+                result = condition
+            else:
+                result = condition(func)
+            if result:
+                return skipped(func)(*a, **kw)
+            else:
+                return func(*a, **kw)
+        wrapped.__name__ = func.__name__
+        return wrapped
+    return skipped_wrapper
+
+
+def skip_unless(condition):
+    """ Decorator that skips a test if the *condition* does not return True.
+*condition* can be a boolean or a callable that accepts one argument.
+The callable will be called with the function to be decorated, and
+should return True if the condition is satisfied.
+"""
+    def skipped_wrapper(func):
+        def wrapped(*a, **kw):
+            if isinstance(condition, bool):
+                result = condition
+            else:
+                result = condition(func)
+            if not result:
+                return skipped(func)(*a, **kw)
+            else:
+                return func(*a, **kw)
+        wrapped.__name__ = func.__name__
+        return wrapped
+    return skipped_wrapper

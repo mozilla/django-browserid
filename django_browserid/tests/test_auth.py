@@ -8,13 +8,7 @@ from django.test import TestCase
 from mock import ANY, patch
 
 from django_browserid.auth import BrowserIDBackend, default_username_algo, verify
-from django_browserid.tests import mock_browserid
-
-# Support Python 2.6 by using unittest2
-try:
-    from unittest import skipIf
-except ImportError:
-    from unittest2 import skipIf
+from django_browserid.tests import mock_browserid, skip_if
 
 try:
     from django.contrib.auth import get_user_model
@@ -107,8 +101,8 @@ class BrowserIDBackendTests(TestCase):
 
 # Only run custom user model tests if we're using a version of Django that
 # supports it.
+@skip_if(not get_user_model)  # 'Not supported in Django < 1.5'
 @patch.object(settings, 'AUTH_USER_MODEL', 'tests.CustomUser')
-@skipIf(not get_user_model, 'Not supported in Django < 1.5')
 class CustomUserModelTests(TestCase):
     def _auth(self, backend=None, verified_email=None):
         if backend is None:
