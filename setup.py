@@ -15,7 +15,7 @@ except ImportError:
 
 
 def read(*parts):
-    return codecs.open(os.path.join(os.path.dirname(__file__), *parts)).read()
+    return codecs.open(os.path.join(os.path.dirname(__file__), *parts), encoding='utf8').read()
 
 
 def find_version(*file_paths):
@@ -37,7 +37,7 @@ setup(
     author_email='mkelly@mozilla.com',
     url='https://github.com/mozilla/django-browserid',
     license='MPL v2.0',
-    install_requires=['requests>=0.9.1', 'fancy_tag==0.2.0'],
+    install_requires=['requests>=0.9.1', 'fancy_tag==0.2.0', 'six>=1.3'],
     test_suite="runtests.runtests",
     include_package_data=True,
     classifiers=[

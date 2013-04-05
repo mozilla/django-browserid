@@ -9,6 +9,7 @@ from mock import patch
 from django_browserid import BrowserIDException, views
 from django_browserid.tests import mock_browserid, patch_settings
 
+from six.moves import reload_module
 
 factory = RequestFactory()
 
@@ -32,7 +33,7 @@ def verify(request_type, success_url=None, failure_url=None, **kwargs):
 
     # We need to reload verify for the setting changes to take effect.
     with patch_settings(**patches):
-        reload(views)
+        reload_module(views)
         verify_view = views.Verify.as_view()
         with patch.object(auth, 'login'):
             response = verify_view(request)

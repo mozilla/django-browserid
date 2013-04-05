@@ -13,6 +13,7 @@ from django_browserid.forms import (BROWSERID_SHIM, BrowserIDForm,
 
 from django_browserid.util import LazyEncoder, static_url
 
+from six import string_types
 
 # If funfactory is available, we want to use it's locale-aware reverse instead
 # of Django's reverse, so we try to import funfactory's first and fallback to
@@ -73,7 +74,7 @@ def browserid_button(text=None, next=None, link_class=None,
         href to use for the link.
     """
     attrs = attrs or {}
-    if isinstance(attrs, basestring):
+    if isinstance(attrs, string_types):
         attrs = json.loads(attrs)
 
     attrs.setdefault('class', link_class)

@@ -4,6 +4,10 @@
 from django import forms
 from django.conf import settings
 
+try:
+    from django.utils.encoding import smart_bytes
+except ImportError:
+    from django.utils.encoding import smart_str as smart_bytes
 
 FORM_JAVASCRIPT = ('browserid/browserid.js',)
 FORM_CSS = ('browserid/persona-buttons.css',)
@@ -20,7 +24,10 @@ class BrowserIDForm(forms.Form):
 
     def clean_assertion(self):
         try:
-            return str(self.cleaned_data['assertion'])
+            return smart_bytes(
+                self.cleaned_data['assertion'],
+                encoding='ascii'
+            )
         except UnicodeEncodeError:
             # not ascii :(
             raise forms.ValidationError('non-ascii string')

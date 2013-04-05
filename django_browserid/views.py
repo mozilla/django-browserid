@@ -2,7 +2,14 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 import logging
-import urlparse
+
+import six
+
+if six.PY3:
+    from urllib import parse as urllib_parse
+else:
+    import urlparse as urllib_parse
+
 
 from django.conf import settings
 from django.contrib import auth
@@ -56,7 +63,7 @@ class Verify(BaseFormView):
 
         # Do not accept redirect URLs pointing to a different host.
         if redirect_to:
-            netloc = urlparse.urlparse(redirect_to).netloc
+            netloc = urllib_parse.urlparse(redirect_to).netloc
             if netloc and netloc != self.request.get_host():
                 redirect_to = None
 

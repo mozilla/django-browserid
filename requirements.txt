@@ -4,8 +4,7 @@ fancy_tag==0.2.0
 # Tests
 mock>=0.8.0
 Django>=1.3
-django-nose
-unittest2==0.5.1
+-e git+git://github.com/sobotklp/django-nose@b3f485e914965e0a7b7012c309864d6a6dcac3ed#egg=django-nose
 pyquery==1.2.4
 
 # Documentation

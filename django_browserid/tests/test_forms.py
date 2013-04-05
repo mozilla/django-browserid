@@ -11,5 +11,5 @@ def test_invalid_assertion():
 
 
 def test_valid_assertion():
-    form = BrowserIDForm({'assertion': 'xxx'})
+    form = BrowserIDForm({'assertion': b'xxx'})
     assert form.is_valid()
