@@ -28,6 +28,7 @@ setup(
     url='https://github.com/mozilla/django-browserid',
     license='MPL v2.0',
     install_requires=['requests>=0.9.1', 'fancy_tag==0.2.0'],
+    test_suite="django_browserid.tests.runtests.runtests",
     include_package_data=True,
     classifiers=[
         'Development Status :: 4 - Beta',
