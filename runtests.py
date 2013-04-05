@@ -1,10 +1,12 @@
 #This file mainly exists to allow python setup.py test to work.
 # http://ericholscher.com/blog/2009/jun/29/enable-setuppy-test-your-django-apps/
-import os, sys
+import os
+import sys
+
 os.environ['DJANGO_SETTINGS_MODULE'] = 'django_browserid.tests.settings'
 os.environ['REUSE_DB'] = '0'
-test_dir = os.path.dirname(__file__)
-sys.path.insert(0, test_dir)
+
+print sys.path
 
 from django.test.utils import get_runner
 from django.conf import settings
