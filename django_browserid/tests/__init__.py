@@ -4,7 +4,6 @@
 from django.utils.functional import wraps
 
 from mock import patch
-from nose.plugins.skip import SkipTest
 
 
 def fake_create_user(email):
@@ -88,18 +87,3 @@ class patch_settings(object):
             with self:
                 return func(*args, **kwargs)
         return inner
-
-
-def skip_if(condition):
-    """Skips tests if condition is True.
-    """
-    def skipped_wrapper(func):
-        @wraps(func)
-        def wrapped(*args, **kwargs):
-            if condition:
-                def skip_function(*args, **kwargs):
-                    raise SkipTest()
-                return skip_function
-            return func(*args, **kwargs)
-        return wrapped
-    return skipped_wrapper
