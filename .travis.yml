@@ -8,10 +8,12 @@ env:
   - DJANGO_VERSION=1.5
 matrix:
   include:
+    - python: 3.2
+      env: DJANGO_VERSION=1.5
     - python: 3.3
-    - DJANGO_VERSION=1.5
+      env: DJANGO_VERSION=1.5
   allow_failures:
-    - python: 3.3
+    - python: 3.2
 install:
   - pip install -e git+git://github.com/sobotklp/django-nose@b3f485e914965e0a7b7012c309864d6a6dcac3ed#egg=django-nose
   - pip install -e git+git://github.com/django/django.git@${DJANGO_VERSION}#egg=django
