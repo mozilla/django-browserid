@@ -10,12 +10,6 @@ from mock import ANY, patch
 from django_browserid.auth import BrowserIDBackend, default_username_algo, verify
 from django_browserid.tests import mock_browserid
 
-# Support Python 2.6 by using unittest2
-try:
-    from unittest import skipIf
-except ImportError:
-    from unittest2 import skipIf
-
 try:
     from django.contrib.auth import get_user_model
     from django_browserid.tests.models import CustomUser
@@ -105,34 +99,34 @@ class BrowserIDBackendTests(TestCase):
         user_verify.assert_called_with('asdf', 'asdf', extra_params=dic)
 
 
+if get_user_model:
 # Only run custom user model tests if we're using a version of Django that
 # supports it.
-@patch.object(settings, 'AUTH_USER_MODEL', 'tests.CustomUser')
-@skipIf(not get_user_model, 'Not supported in Django < 1.5')
-class CustomUserModelTests(TestCase):
-    def _auth(self, backend=None, verified_email=None):
-        if backend is None:
-            backend = BrowserIDBackend()
+    @patch.object(settings, 'AUTH_USER_MODEL', 'tests.CustomUser')
+    class CustomUserModelTests(TestCase):
+        def _auth(self, backend=None, verified_email=None):
+            if backend is None:
+                backend = BrowserIDBackend()
 
-        with mock_browserid(verified_email):
-            return backend.authenticate(assertion='asdf', audience='asdf')
+            with mock_browserid(verified_email):
+                return backend.authenticate(assertion='asdf', audience='asdf')
 
-    def test_existing_user(self):
-        """If a custom user exists with the given email, return them."""
-        user = CustomUser.objects.create(email='a@test.com')
-        authed_user = self._auth(verified_email='a@test.com')
-        self.assertEqual(user, authed_user)
+        def test_existing_user(self):
+            """If a custom user exists with the given email, return them."""
+            user = CustomUser.objects.create(email='a@test.com')
+            authed_user = self._auth(verified_email='a@test.com')
+            self.assertEqual(user, authed_user)
 
-    @patch.object(settings, 'BROWSERID_CREATE_USER', True)
-    def test_create_new_user(self):
-        """
-        If a custom user does not exist with the given email, create a new
-        user and return them.
-        """
-        class CustomUserBrowserIDBackend(BrowserIDBackend):
-            def create_user(self, email):
-                return CustomUser.objects.create(email=email)
-        user = self._auth(backend=CustomUserBrowserIDBackend(),
-                          verified_email='b@test.com')
-        self.assertTrue(isinstance(user, CustomUser))
-        self.assertEqual(user.email, 'b@test.com')
+        @patch.object(settings, 'BROWSERID_CREATE_USER', True)
+        def test_create_new_user(self):
+            """
+            If a custom user does not exist with the given email, create a new
+            user and return them.
+            """
+            class CustomUserBrowserIDBackend(BrowserIDBackend):
+                def create_user(self, email):
+                    return CustomUser.objects.create(email=email)
+            user = self._auth(backend=CustomUserBrowserIDBackend(),
+                              verified_email='b@test.com')
+            self.assertTrue(isinstance(user, CustomUser))
+            self.assertEqual(user.email, 'b@test.com')

@@ -8,6 +8,10 @@ import logging
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.importlib import import_module
+try:
+    from django.utils.encoding import smart_bytes
+except ImportError:
+    from django.utils.encoding import smart_str as smart_bytes
 
 from django_browserid.base import verify
 from django_browserid.signals import user_created
@@ -29,7 +33,9 @@ def default_username_algo(email):
     # this protects against data leakage because usernames are often
     # treated as public identifiers (so we can't use the email address).
     username = base64.urlsafe_b64encode(
-        hashlib.sha1(email).digest()).rstrip('=')
+        hashlib.sha1(
+            smart_bytes(email)
+        ).digest()).rstrip(b'=')
     return username
 
 
