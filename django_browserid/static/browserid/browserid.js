@@ -2,34 +2,64 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-(function($) {
+(function($, window) {
     'use strict';
 
-    $(function() {
-        // State? Ewwwwww.
-        var loginRedirect = null; // Path to redirect to post-login.
-        var logoutRedirect = null; // Path to redirect to post-logout.
+    // State? Ewwwwww.
+    var loginRedirect = null; // Path to redirect to post-login.
+    var logoutRedirect = null; // Path to redirect to post-logout.
 
+    // Public API
+    window.django_browserid = {
+        /**
+         * Triggers BrowserID login.
+         * @param {string} next URL to redirect the user to after login.
+         * @param {object} requestArgs Options to pass to navigator.id.request.
+         */
+        login: function login(next, requestArgs) {
+            var defaults = $('#browserid-info').data('requestArgs');
+            requestArgs = $.extend({}, defaults, requestArgs);
+
+            loginRedirect = next;
+            navigator.id.request(requestArgs);
+        },
+
+        /**
+         * Triggers BrowserID logout.
+         * @param {string} next URL to redirect the user to after logout.
+         */
+        logout: function logout(next) {
+            logoutRedirect = next;
+            navigator.id.logout();
+        },
+
+        /**
+         * Check to see if the current user has authenticated via
+         * django_browserid.
+         * @return {boolean} True if the user has authenticated, false
+         *                   otherwise.
+         */
+        isUserAuthenticated: function isUserAuthenticated() {
+            return !!$('#browserid-info').data('userEmail');
+        }
+    };
+
+    $(function() {
         var $loginForm = $('#browserid-form'); // Form used to submit login.
         var $browseridInfo = $('#browserid-info'); // Useful info from backend.
 
-        var requestArgs = $browseridInfo.data('requestArgs') || {};
         var loginFailed = location.search.indexOf('bid_login_failed=1') !== -1;
 
         // Call navigator.id.request whenever a login link is clicked.
         $(document).on('click', '.browserid-login', function(e) {
             e.preventDefault();
-
-            loginRedirect = $(this).data('next');
-            navigator.id.request(requestArgs);
+            django_browserid.login($(this).data('next'));
         });
 
         // Call navigator.id.logout whenever a logout link is clicked.
         $(document).on('click', '.browserid-logout', function(e) {
             e.preventDefault();
-
-            logoutRedirect = $(this).attr('href');
-            navigator.id.logout();
+            django_browserid.logout($(this).attr('href'));
         });
 
         navigator.id.watch({
@@ -69,4 +99,4 @@
             }
         });
     });
-})(jQuery);
+})(jQuery, window);
