@@ -39,34 +39,50 @@ def get_audience(request):
 
        This is *not* secure!
 
-    2. Otherwise, settings.SITE_URL is compared with the request
-       domain and will raise an ImproperlyConfigured error if they
-       don't match.
+    2. Otherwise, settings.SITE_URL is checked for the request
+       domain and an ImproperlyConfigured error is raised if it
+       is not found.
 
     Examples of settings.SITE_URL::
 
         SITE_URL = 'http://127.0.0.1:8001'
         SITE_URL = 'https://example.com'
         SITE_URL = 'http://example.com'
+        SITE_URL = [
+            'http://127.0.0.1:8001',
+            'https://example.com',
+            'http://example.com'
+        ]
 
     """
+    # Get url
     req_proto = 'https://' if request.is_secure() else 'http://'
     req_domain = request.get_host()
     req_url = '%s%s' % (req_proto, req_domain)
-
-    site_url = getattr(settings, 'SITE_URL', False)
+    # Get SITE_URL
+    site_url = getattr(settings, 'SITE_URL', None)
+    # If SITE_URL is not set, check if debug
     if not site_url:
         if settings.DEBUG:
             site_url = req_url
         else:
             raise ImproperlyConfigured('`SITE_URL` must be set. See '
                                        'documentation for django-browserid')
+    # Try SITE_URL as a callable
+    try:
+        urls = site_url()
+    except Exception:
+        urls = site_url
+    # Catch not iterable
+    try:
+        # Check if req_url is in site_url urls
+        if req_url not in urls:
+            raise ImproperlyConfigured('request `{0}`, was not found in SITE_URL `{1}`'
+                                       .format(req_url, urls))
+    except TypeError:
+        raise ImproperlyConfigured('`SITE_URL` must be a string, iterable or a callable')
 
-    if site_url != req_url:
-        raise ImproperlyConfigured('SITE_URL incorrect. Setting is `{0}`, but '
-                                   'request was `{1}`'
-                                   .format(site_url, req_url))
-    return site_url
+    return req_url
 
 
 def _verify_http_request(url, data):
