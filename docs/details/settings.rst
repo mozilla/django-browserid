@@ -14,6 +14,8 @@ Core Settings
    Domain and protocol used to access your site. BrowserID uses this value to
    determine if an assertion was meant for your site.
 
+   Can be a string, an iterable of strings or a callable that returns either.
+
    Note that this does not have to be a publicly accessible URL, so local URLs
    like ``localhost:8000`` or ``127.0.0.1`` are acceptable as long as they match
    what you are using to access your site.

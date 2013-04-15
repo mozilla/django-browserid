@@ -35,8 +35,14 @@ To use ``django-browserid``, you'll need to make a few changes to your
        # ...
     )
 
+    # Set your site url for security
+    SITE_URL = 'localhost.com'
+
 .. note:: BrowserID uses an assertion and an audience to verify the user. This
-   ``SITE_URL`` is used to determine the audience. For security reasons, it is
+   ``SITE_URL`` is used to determine the audience. It can be string, an
+   iterable of strings or a callable that returns either.
+
+   For security reasons, it is
    *very important* that you set ``SITE_URL`` correctly.
 
 .. note:: ``TEMPLATE_CONTEXT_PROCESSORS`` is not in the settings file by
