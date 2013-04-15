@@ -9,4 +9,4 @@ env:
 install:
   - pip install -e git+git://github.com/django/django.git@${DJANGO_VERSION}#egg=django
   - pip install -r requirements.txt --use-mirrors
-script: fab test
+script: python setup.py test
