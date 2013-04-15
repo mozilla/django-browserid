@@ -73,16 +73,20 @@ things you will need to add to your templates:
    before the ``</body>`` tag to allow the page to visibly load before
    executing.
 
-3. ``{% browserid_login %}`` and ``{% browserid_logout %}``: Outputs the HTML
+3. ``{% browserid_css %}``: Outputs the ``<link>`` tags for the Persona
+   css. Must be included somewhere on the page if passing the optional ``css``
+   parameter to ``{% browserid_login %}``.
+
+4. ``{% browserid_login %}`` and ``{% browserid_logout %}``: Outputs the HTML
    for the login and logout buttons.
 
-.. note:: The ``{% browserid_login %}`` template tag takes an optional *image*
-  parameter to display the official Persona branded sign in buttons. The image
-  names are the same as those found on the `Persona site <https://developer.mozilla.org/en-US/docs/persona/branding>`_.
+.. note:: The ``{% browserid_login %}`` template tag takes an optional *css*
+  parameter to display the official Persona branded sign in buttons. The css
+  parameter takes the 3 values ``dark``, ``blue`` and ``orange`` as per `<https://developer.mozilla.org/en-US/docs/persona/branding>`_.
 
-  Example: ``{% browserid_login image='plain_sign_in_red.png' %}``
+  Example: ``{% browserid_login css='dark' %}``
 
-  The images are included with the library.
+  The css is included with the library.
 
 
 A complete example:
@@ -100,6 +104,33 @@ A complete example:
               {% browserid_logout text='Logout' %}
             {% else %}
               {% browserid_login text='Login' %}
+            {% endif %}
+          </div>
+        </header>
+        <article>
+          <p>Welcome to my site!</p>
+        </article>
+        <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>
+        {% browserid_js %}
+      </body>
+    </html>
+
+A complete example using Mozilla Persona branded CSS:
+
+.. code-block:: html+django
+
+    {% load browserid %}
+    <html>
+    {% browserid_css %}
+      <body>
+        {% browserid_info %}
+        <header>
+          <h1>My Site</h1>
+          <div class="authentication">
+            {% if user.is_authenticated %}
+              {% browserid_logout text='Logout' %}
+            {% else %}
+              {% browserid_login text='Login' css='dark' %}
             {% endif %}
           </div>
         </header>
@@ -163,17 +194,18 @@ There are a few changes you need to make when deploying your app to production:
 
 Static Files
 ------------
-``browserid_js`` uses `Form Media`_ and the Django `staticfiles`_ app to serve
-the JavaScript for the buttons. If you don't want to use the static files
+``browserid_js`` and ``browserid_css`` uses `Form Media`_ and the Django `staticfiles`_ app to serve
+the static files for the buttons. If you don't want to use the static files
 framework, you'll need to include the JavaScript manually on any page you use
 the ``browserid_button`` function.
 
-The files needed are the Persona JavaScript shim, which should be loaded from
+For ``browserid_js`` the files needed are the Persona JavaScript shim, which should be loaded from
 ``https://login.persona.org/include.js`` in a script tag, and
 ``django_browserid/static/browserid/browserid.js``, which is part of the
 django-browserid library.
 
-If you are using the optional Persona branded images you need to make sure they are uploaded with the static files. 
+For ``browserid_css`` the file needed is ``django_browserid/static/browserid/persona-buttons.css``
+, which is also part of the django-browserid library.
 
 .. _Form Media: https://docs.djangoproject.com/en/dev/topics/forms/media/
 .. _staticfiles: https://docs.djangoproject.com/en/dev/howto/static-files/
