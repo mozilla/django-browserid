@@ -5,9 +5,9 @@ from django.test.client import RequestFactory
 from mock import patch
 from pyquery import PyQuery as pq
 
-from django_browserid.helpers import (browserid_button, browserid_image_link,
-                                      browserid_info, browserid_js,
-                                      browserid_login, browserid_logout)
+from django_browserid.helpers import (browserid_button, browserid_info,
+                                      browserid_js, browserid_login,
+                                      browserid_css, browserid_logout)
 from django_browserid.tests import patch_settings
 
 
@@ -27,6 +27,14 @@ class BrowserIDJSTests(TestCase):
         self.assertTrue('src="static/test1.js"' in output)
         self.assertTrue('src="static/test2.js"' in output)
         self.assertTrue('src="https://example.com/test3.js"' not in output)
+
+@patch('django_browserid.helpers.FORM_CSS',
+       ('test1.css', 'test2.css'))
+class BrowserIDCSSTests(TestCase):
+    def test_basic(self):
+        output = browserid_css()
+        self.assertTrue('src="static/test1.css"' in output)
+        self.assertTrue('src="static/test2.css"' in output)
 
 
 class BrowserIDButtonTests(TestCase):
@@ -70,7 +78,7 @@ class BrowserIDButtonTests(TestCase):
 
         self.assertTrue(a.hasClass('browserid-logout'))
 
-    def test_image(self):
+    def test_css(self):
         button = browserid_login(image='plain_sign_in_red.png', next='1234',
                                       link_class='fake-button',
                                       attrs={'target': '_blank'})
