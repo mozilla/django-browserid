@@ -18,5 +18,6 @@ def browserid(request):
         'browserid_info': partial(helpers.browserid_info, request),
         'browserid_login': helpers.browserid_login,
         'browserid_logout': helpers.browserid_logout,
-        'browserid_js': helpers.browserid_js
+        'browserid_js': helpers.browserid_js,
+        'browserid_css': helpers.browserid_css
     }

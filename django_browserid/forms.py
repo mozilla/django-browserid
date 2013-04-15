@@ -6,6 +6,7 @@ from django.conf import settings
 
 
 FORM_JAVASCRIPT = ('browserid/browserid.js',)
+FORM_CSS = ('browserid/persona-buttons.css',)
 BROWSERID_SHIM = getattr(settings, 'BROWSERID_SHIM',
                          'https://login.persona.org/include.js')
 
