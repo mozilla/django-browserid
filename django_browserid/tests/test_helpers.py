@@ -33,8 +33,8 @@ class BrowserIDJSTests(TestCase):
 class BrowserIDCSSTests(TestCase):
     def test_basic(self):
         output = browserid_css()
-        self.assertTrue('src="static/test1.css"' in output)
-        self.assertTrue('src="static/test2.css"' in output)
+        self.assertTrue('href="static/test1.css"' in output)
+        self.assertTrue('href="static/test2.css"' in output)
 
 
 class BrowserIDButtonTests(TestCase):
@@ -77,20 +77,6 @@ class BrowserIDButtonTests(TestCase):
         a = pq(button)('a')
 
         self.assertTrue(a.hasClass('browserid-logout'))
-
-    def test_css(self):
-        button = browserid_login(image='plain_sign_in_red.png', next='1234',
-                                      link_class='fake-button',
-                                      attrs={'target': '_blank'})
-        a = pq(button)('a')
-        img = pq(button)('img')
-
-        self.assertTrue(a.hasClass('fake-button'))
-        self.assertEqual(a.attr('href'), '#')
-        self.assertEqual(a.attr('data-next'), '1234')
-        self.assertEqual(a.text(), '')
-        self.assertEqual(a.attr('target'), '_blank')
-        self.assertEqual(img.attr('src'), 'static/browserid/plain_sign_in_red.png')
     
 
 class BrowserIDInfoTests(TestCase):
