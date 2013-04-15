@@ -39,34 +39,42 @@ def get_audience(request):
 
        This is *not* secure!
 
-    2. Otherwise, settings.SITE_URL is compared with the request
-       domain and will raise an ImproperlyConfigured error if they
-       don't match.
+    2. Otherwise, settings.SITE_URL is checked for the request
+       domain and an ImproperlyConfigured error is raised if it
+       is not found.
 
     Examples of settings.SITE_URL::
 
         SITE_URL = 'http://127.0.0.1:8001'
         SITE_URL = 'https://example.com'
         SITE_URL = 'http://example.com'
+        SITE_URL = [
+            'http://127.0.0.1:8001',
+            'https://example.com',
+            'http://example.com'
+        ]
 
     """
     req_proto = 'https://' if request.is_secure() else 'http://'
     req_domain = request.get_host()
     req_url = '%s%s' % (req_proto, req_domain)
-
-    site_url = getattr(settings, 'SITE_URL', False)
+    site_url = getattr(settings, 'SITE_URL', None)
     if not site_url:
         if settings.DEBUG:
-            site_url = req_url
+            return req_url
         else:
             raise ImproperlyConfigured('`SITE_URL` must be set. See '
                                        'documentation for django-browserid')
-
-    if site_url != req_url:
-        raise ImproperlyConfigured('SITE_URL incorrect. Setting is `{0}`, but '
-                                   'request was `{1}`'
-                                   .format(site_url, req_url))
-    return site_url
+    if isinstance(site_url, str):
+        site_url = [site_url]
+    try:
+        url_iterator = iter(site_url)
+    except TypeError:
+        raise ImproperlyConfigured('`SITE_URL` is not a string or an iterable')
+    if req_url not in url_iterator:
+        raise ImproperlyConfigured('request `{0}`, was not found in SITE_URL `{1}`'
+                                   .format(req_url, site_url))
+    return req_url
 
 
 def _verify_http_request(url, data):
