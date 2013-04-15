@@ -36,7 +36,7 @@ To use ``django-browserid``, you'll need to make a few changes to your
     )
 
     # Set your site url for security
-    SITE_URL = 'localhost.com'
+    SITE_URL = 'https://example.com'
 
 .. note:: BrowserID uses an assertion and an audience to verify the user. This
    ``SITE_URL`` is used to determine the audience. It can be string, an
