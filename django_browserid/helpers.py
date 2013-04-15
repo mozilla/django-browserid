@@ -9,7 +9,7 @@ from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 
 from django_browserid.forms import (BROWSERID_SHIM, BrowserIDForm,
-                                    FORM_JAVASCRIPT)
+                                    FORM_JAVASCRIPT, FORM_CSS)
 from django_browserid.util import static_url
 
 
@@ -73,44 +73,7 @@ def browserid_button(text=None, next=None, link_class=None,
     })
 
 
-def browserid_image_link(image=None, next=None, link_class=None,
-                         attrs=None, href='#'):
-    """
-    Output the HTML for a BrowserID image link.
-
-    :param image:
-        Image path to use inside the link.
-
-    :param next:
-        Value to use for the data-next attribute on the link.
-
-    :param link_class:
-        Class to use for the link.
-
-    :param attrs:
-        Dictionary of attributes to add to the link. Values here override those
-        set by other arguments.
-
-        If given a string, it is parsed as JSON and is expected to be an object.
-
-    :param href:
-        href to use for the link.
-    """
-    attrs = attrs or {}
-    if isinstance(attrs, basestring):
-        attrs = json.loads(attrs)
-
-    attrs.setdefault('class', link_class)
-    attrs.setdefault('href', href)
-    attrs.setdefault('data-next', next)
-
-    return render_to_string('browserid/image.html', {
-        'attrs': attrs,
-        'image': image,
-    })
-
-
-def browserid_login(text='Sign in', image=None, next=None,
+def browserid_login(text='Sign in', css=None, next=None,
                     link_class='browserid-login', attrs=None,
                     fallback_href='#'):
     """
@@ -120,13 +83,12 @@ def browserid_login(text='Sign in', image=None, next=None,
         Text to use inside the link. Defaults to 'Sign in', which is not
         localized.
 
-    :param image:
-        Personal branded button image to use in place of text. Accepts the
-        official Mozilla Persona image names.
+    :param css:
+        Adds the official Mozilla Persona CSS branding classes on the link.
+        The CSS must be linked on the page. Accepts only the 3 official
+        colors.
 
-        Example: 'plain_sign_in_red.png'
-
-        Note: Prepends 'browserid/' to the image path.
+        Example: 'dark', 'blue', 'orange'
 
     :param next:
         URL to redirect users to after they login from this link. If omitted,
@@ -151,12 +113,11 @@ def browserid_login(text='Sign in', image=None, next=None,
         link_class += ' browserid-login'
     next = next if next is not None else getattr(settings, 'LOGIN_REDIRECT_URL',
                                                  '/')
-    if image:
-        image_path = 'browserid/' + image
-        html = browserid_image_link(image_path, next, link_class, attrs, fallback_href)
-    else:
-        html = browserid_button(text, next, link_class, attrs, fallback_href)
-
+    # Add CSS to link_class
+    if css:
+        link_class += ' persona-button %s' % css
+    # Render HTML
+    html = browserid_button(text, next, link_class, attrs, fallback_href)
     return html
 
 
@@ -200,5 +161,18 @@ def browserid_js(include_shim=True):
         files.append(BROWSERID_SHIM)
 
     tags = ['<script type="text/javascript" src="{0}"></script>'.format(path)
+            for path in files]
+    return mark_safe('\n'.join(tags))
+
+
+def browserid_css():
+    """
+    Returns <link> tags for the Stylesheet required by the Persona themes.
+    Requires use of the staticfiles app.
+
+    """
+    files = [static_url(path) for path in FORM_CSS]
+
+    tags = ['<link rel="stylesheet" href="{0}" />'.format(path)
             for path in files]
     return mark_safe('\n'.join(tags))
