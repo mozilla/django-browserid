@@ -73,7 +73,7 @@ def browserid_button(text=None, next=None, link_class=None,
     })
 
 
-def browserid_login(text='Sign in', css=None, next=None,
+def browserid_login(text='Sign in', color=None, next=None,
                     link_class='browserid-login', attrs=None,
                     fallback_href='#'):
     """
@@ -83,7 +83,7 @@ def browserid_login(text='Sign in', css=None, next=None,
         Text to use inside the link. Defaults to 'Sign in', which is not
         localized.
 
-    :param css:
+    :param color:
         Adds the official Mozilla Persona CSS branding classes on the link.
         The CSS must be linked on the page. Accepts only the 3 official
         colors.
@@ -113,12 +113,9 @@ def browserid_login(text='Sign in', css=None, next=None,
         link_class += ' browserid-login'
     next = next if next is not None else getattr(settings, 'LOGIN_REDIRECT_URL',
                                                  '/')
-    # Add CSS to link_class
-    if css:
-        link_class += ' persona-button %s' % css
-    # Render HTML
-    html = browserid_button(text, next, link_class, attrs, fallback_href)
-    return html
+    if color:
+        link_class += ' persona-button %s' % color
+    return browserid_button(text, next, link_class, attrs, fallback_href)
 
 
 def browserid_logout(text='Sign out', link_class='browserid-logout',
