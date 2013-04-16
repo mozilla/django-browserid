@@ -67,7 +67,7 @@ def get_audience(request):
                                        'documentation for django-browserid')
     try:
         urls = site_url()
-    except Exception:
+    except TypeError:
         urls = site_url
     try:
         if req_url not in urls:
