@@ -74,17 +74,17 @@ things you will need to add to your templates:
    executing.
 
 3. ``{% browserid_css %}``: Outputs the ``<link>`` tags for the Persona
-   css. Must be included somewhere on the page if passing the optional ``css``
+   css. Must be included somewhere on the page if passing the optional ``color``
    parameter to ``{% browserid_login %}``.
 
 4. ``{% browserid_login %}`` and ``{% browserid_logout %}``: Outputs the HTML
    for the login and logout buttons.
 
-.. note:: The ``{% browserid_login %}`` template tag takes an optional *css*
-  parameter to display the official Persona branded sign in buttons. The css
+.. note:: The ``{% browserid_login %}`` template tag takes an optional *color*
+  parameter to display the official Persona branded sign in buttons. The *color*
   parameter takes the 3 values ``dark``, ``blue`` and ``orange`` as per `<https://developer.mozilla.org/en-US/docs/persona/branding>`_.
 
-  Example: ``{% browserid_login css='dark' %}``
+  Example: ``{% browserid_login color='dark' %}``
 
   The css is included with the library.
 
@@ -130,7 +130,7 @@ A complete example using Mozilla Persona branded CSS:
             {% if user.is_authenticated %}
               {% browserid_logout text='Logout' %}
             {% else %}
-              {% browserid_login text='Login' css='dark' %}
+              {% browserid_login text='Login' color='dark' %}
             {% endif %}
           </div>
         </header>
