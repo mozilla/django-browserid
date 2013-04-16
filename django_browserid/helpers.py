@@ -114,7 +114,7 @@ def browserid_login(text='Sign in', color=None, next=None,
     next = next if next is not None else getattr(settings, 'LOGIN_REDIRECT_URL',
                                                  '/')
     if color:
-        link_class += ' persona-button %s' % color
+        link_class += ' persona-button {0}'.format(color)
     return browserid_button(text, next, link_class, attrs, fallback_href)
 
 
@@ -166,7 +166,6 @@ def browserid_css():
     """
     Returns <link> tags for the Stylesheet required by the Persona themes.
     Requires use of the staticfiles app.
-
     """
     files = [static_url(path) for path in FORM_CSS]
 
