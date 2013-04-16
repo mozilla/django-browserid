@@ -55,27 +55,21 @@ def get_audience(request):
         ]
 
     """
-    # Get url
     req_proto = 'https://' if request.is_secure() else 'http://'
     req_domain = request.get_host()
     req_url = '%s%s' % (req_proto, req_domain)
-    # Get SITE_URL
     site_url = getattr(settings, 'SITE_URL', None)
-    # If SITE_URL is not set, check if debug
     if not site_url:
         if settings.DEBUG:
             site_url = req_url
         else:
             raise ImproperlyConfigured('`SITE_URL` must be set. See '
                                        'documentation for django-browserid')
-    # Try SITE_URL as a callable
     try:
         urls = site_url()
     except Exception:
         urls = site_url
-    # Catch not iterable
     try:
-        # Check if req_url is in site_url urls
         if req_url not in urls:
             raise ImproperlyConfigured('request `{0}`, was not found in SITE_URL `{1}`'
                                        .format(req_url, urls))
