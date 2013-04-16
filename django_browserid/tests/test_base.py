@@ -30,15 +30,15 @@ class TestGetAudience(TestCase):
         request = self.factory.post('/', SERVER_NAME='example.com')
         self.assertEqual('http://example.com', get_audience(request))
 
-    @patch_settings(SITE_URL=[ 'http://example1.com', 'http://example2.com'])
+    @patch_settings(SITE_URL=['http://example1.com', 'http://example2.com'])
     def test_iterable(self):
-        # Return SITE_URL if it matches the request URL and DEBUG = True.
+        # Return correct url from iterable SITE_URL, if it contains request URL.
         request = self.factory.post('/', SERVER_NAME='example2.com')
         self.assertEqual('http://example2.com', get_audience(request))
 
     @patch_settings(SITE_URL=lambda: 'http://example.com')
     def test_callable(self):
-        # Return SITE_URL if it matches the request URL and DEBUG = True.
+        # Return url returned from calling SITE_URL, if it matches request URL.
         request = self.factory.post('/', SERVER_NAME='example.com')
         self.assertEqual('http://example.com', get_audience(request))
 
