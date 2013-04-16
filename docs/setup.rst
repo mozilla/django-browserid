@@ -73,10 +73,10 @@ things you will need to add to your templates:
     before the ``</body>`` tag to allow the page to visibly load before
     executing.
 
-3. ``{% browserid_css %}``: Outputs ``<link>`` tags for optional CSS that
+3.  ``{% browserid_css %}``: Outputs ``<link>`` tags for optional CSS that
     styles login buttons to match Persona.
 
-4. ``{% browserid_login %}`` and ``{% browserid_logout %}``: Outputs the HTML
+4.  ``{% browserid_login %}`` and ``{% browserid_logout %}``: Outputs the HTML
     for the login and logout buttons.
 
 A complete example:
