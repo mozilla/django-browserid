@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AnonymousUser, User
 from django.test import TestCase
 from django.test.client import RequestFactory
+from django.utils.functional import lazy
 
 from mock import patch
 from pyquery import PyQuery as pq
@@ -71,6 +72,11 @@ class BrowserIDButtonTests(TestCase):
         self.assertTrue(a.hasClass('browserid-logout'))
 
 
+def _lazy_request_args():
+    return {'siteName': 'asdf'}
+lazy_request_args = lazy(_lazy_request_args, dict)
+
+
 class BrowserIDInfoTests(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
@@ -102,3 +108,15 @@ class BrowserIDInfoTests(TestCase):
 
         form = d('#browserid-form')
         self.assertEqual(form.attr('action'), '/browserid/login/')
+
+    @patch_settings(BROWSERID_REQUEST_ARGS=lazy_request_args())
+    def test_lazy_request_args(self):
+        # Ensure that request_args can be a lazy-evaluated dictionary.
+        request = self.factory.get('/')
+        request.user = AnonymousUser()
+        info = browserid_info(request)
+        d = pq(info)
+
+        info_div = d('#browserid-info')
+        self.assertEqual(info_div.attr('data-request-args'),
+                         '{"siteName": "asdf"}')
