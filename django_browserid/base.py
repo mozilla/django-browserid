@@ -48,11 +48,11 @@ def get_audience(request):
         SITE_URL = 'http://127.0.0.1:8001'
         SITE_URL = 'https://example.com'
         SITE_URL = 'http://example.com'
-        SITE_URL = [
+        SITE_URL = (
             'http://127.0.0.1:8001',
             'https://example.com',
             'http://example.com'
-        ]
+        )
 
     """
     req_proto = 'https://' if request.is_secure() else 'http://'
@@ -65,7 +65,7 @@ def get_audience(request):
         else:
             raise ImproperlyConfigured('`SITE_URL` must be set. See '
                                        'documentation for django-browserid')
-    if isinstance(site_url, str):
+    if isinstance(site_url, basestring):
         site_url = [site_url]
     try:
         url_iterator = iter(site_url)
