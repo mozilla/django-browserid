@@ -2,7 +2,7 @@
 test.db
 /build/
 /dist/
-/django_browserid.egg-info/
+django_browserid.egg-info/
 docs/_build
 MANIFEST
 .DS_Store
