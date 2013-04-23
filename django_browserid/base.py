@@ -68,10 +68,10 @@ def get_audience(request):
     if isinstance(site_url, str):
         site_url = [site_url]
     try:
-        iter(site_url)
+        url_iterator = iter(site_url)
     except TypeError:
         raise ImproperlyConfigured('`SITE_URL` is not a string or an iterable')
-    if req_url not in site_url:
+    if req_url not in url_iterator:
         raise ImproperlyConfigured('request `{0}`, was not found in SITE_URL `{1}`'
                                    .format(req_url, site_url))
     return req_url
