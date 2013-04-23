@@ -61,21 +61,19 @@ def get_audience(request):
     site_url = getattr(settings, 'SITE_URL', None)
     if not site_url:
         if settings.DEBUG:
-            site_url = req_url
+            return req_url
         else:
             raise ImproperlyConfigured('`SITE_URL` must be set. See '
                                        'documentation for django-browserid')
+    if isinstance(site_url, str):
+        site_url = list(site_url)
     try:
-        urls = site_url()
+        iter(site_url)
     except TypeError:
-        urls = site_url
-    try:
-        if req_url not in urls:
-            raise ImproperlyConfigured('request `{0}`, was not found in SITE_URL `{1}`'
-                                       .format(req_url, urls))
-    except TypeError:
-        raise ImproperlyConfigured('`SITE_URL` must be a string, iterable or a callable')
-
+        raise ImproperlyConfigured('`SITE_URL` is not a string or an iterable')
+    if req_url not in site_url:
+        raise ImproperlyConfigured('request `{0}`, was not found in SITE_URL `{1}`'
+                                   .format(req_url, site_url))
     return req_url
 
 
