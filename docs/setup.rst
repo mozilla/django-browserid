@@ -65,16 +65,19 @@ You can also set the following optional settings in ``settings.py``::
 Finally, you'll need to add the login button to your templates. There are three
 things you will need to add to your templates:
 
-1. ``{% browserid_info %}``: Outputs an invisible element that stores info about
-   the current user. Must be within the ``<body>`` tag and appear only **once**.
+1.  ``{% browserid_info %}``: Outputs an invisible element that stores info about
+    the current user. Must be within the ``<body>`` tag and appear only **once**.
 
-2. ``{% browserid_js %}``: Outputs the ``<script>`` tags for the button
-   JavaScript. Must be somewhere on the page, typically at the bottom right
-   before the ``</body>`` tag to allow the page to visibly load before
-   executing.
+2.  ``{% browserid_js %}``: Outputs the ``<script>`` tags for the button
+    JavaScript. Must be somewhere on the page, typically at the bottom right
+    before the ``</body>`` tag to allow the page to visibly load before
+    executing.
 
-3. ``{% browserid_login %}`` and ``{% browserid_logout %}``: Outputs the HTML
-   for the login and logout buttons.
+3.  ``{% browserid_css %}``: Outputs ``<link>`` tags for optional CSS that
+    styles login buttons to match Persona.
+
+4.  ``{% browserid_login %}`` and ``{% browserid_logout %}``: Outputs the HTML
+    for the login and logout buttons.
 
 A complete example:
 
@@ -82,6 +85,7 @@ A complete example:
 
     {% load browserid %}
     <html>
+    {% browserid_css %}
       <body>
         {% browserid_info %}
         <header>
@@ -90,7 +94,7 @@ A complete example:
             {% if user.is_authenticated %}
               {% browserid_logout text='Logout' %}
             {% else %}
-              {% browserid_login text='Login' %}
+              {% browserid_login text='Login' color='dark' %}
             {% endif %}
           </div>
         </header>
@@ -154,15 +158,18 @@ There are a few changes you need to make when deploying your app to production:
 
 Static Files
 ------------
-``browserid_js`` uses `Form Media`_ and the Django `staticfiles`_ app to serve
-the JavaScript for the buttons. If you don't want to use the static files
-framework, you'll need to include the JavaScript manually on any page you use
-the ``browserid_button`` function.
+``browserid_js`` and ``browserid_css`` use `Form Media`_ and the Django
+`staticfiles`_ app to serve the static files for the buttons. If you don't
+want to use the static files framework, you'll need to include the JavaScript
+manually on any page you use the ``browserid_button`` function.
 
-The files needed are the Persona JavaScript shim, which should be loaded from
+For ``browserid_js`` the files needed are the Persona JavaScript shim, which should be loaded from
 ``https://login.persona.org/include.js`` in a script tag, and
 ``django_browserid/static/browserid/browserid.js``, which is part of the
 django-browserid library.
+
+For ``browserid_css`` the file needed is ``django_browserid/static/browserid/persona-buttons.css``
+, which is also part of the django-browserid library.
 
 .. _Form Media: https://docs.djangoproject.com/en/dev/topics/forms/media/
 .. _staticfiles: https://docs.djangoproject.com/en/dev/howto/static-files/

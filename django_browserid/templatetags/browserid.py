@@ -24,3 +24,7 @@ def browserid_logout(context, **kwargs):
 @fancy_tag(register, takes_context=True)
 def browserid_js(context, **kwargs):
     return context['browserid_js'](**kwargs)
+
+@fancy_tag(register, takes_context=True)
+def browserid_css(context, **kwargs):
+    return context['browserid_css'](**kwargs)
