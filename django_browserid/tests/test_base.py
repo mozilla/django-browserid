@@ -36,12 +36,6 @@ class TestGetAudience(TestCase):
         request = self.factory.post('/', SERVER_NAME='example2.com')
         self.assertEqual('http://example2.com', get_audience(request))
 
-    @patch_settings(SITE_URL=lambda: 'http://example.com')
-    def test_callable(self):
-        # Return url returned from calling SITE_URL, if it matches request URL.
-        request = self.factory.post('/', SERVER_NAME='example.com')
-        self.assertEqual('http://example.com', get_audience(request))
-
     @patch_settings(DEBUG=True)
     def test_no_site_url(self):
         # If SITE_URL isn't set, use the domain from the request.
