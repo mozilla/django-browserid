@@ -66,7 +66,7 @@ def get_audience(request):
             raise ImproperlyConfigured('`SITE_URL` must be set. See '
                                        'documentation for django-browserid')
     if isinstance(site_url, str):
-        site_url = list(site_url)
+        site_url = [site_url]
     try:
         iter(site_url)
     except TypeError:
