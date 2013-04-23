@@ -10,7 +10,8 @@ from django.utils.safestring import mark_safe
 
 from django_browserid.forms import (BROWSERID_SHIM, BrowserIDForm,
                                     FORM_JAVASCRIPT, FORM_CSS)
-from django_browserid.util import static_url
+
+from django_browserid.util import LazyEncoder, static_url
 
 
 # If funfactory is available, we want to use it's locale-aware reverse instead
@@ -28,11 +29,14 @@ def browserid_info(request):
     at the top of the page just below the <body> tag.
     """
     form = BrowserIDForm(auto_id=False)
-    request_args = getattr(settings, 'BROWSERID_REQUEST_ARGS', {})
+
+    # Force request_args to be a dictionary, in case it is lazily generated.
+    request_args = dict(getattr(settings, 'BROWSERID_REQUEST_ARGS', {}))
+
     return render_to_string('browserid/info.html', {
         'email': getattr(request.user, 'email', ''),
         'login_url': reverse('browserid_login'),
-        'request_args': json.dumps(request_args),
+        'request_args': json.dumps(request_args, cls=LazyEncoder),
         'form': form,
     }, RequestContext(request))
 
