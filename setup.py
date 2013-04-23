@@ -4,6 +4,15 @@ import os
 import re
 from setuptools import setup, find_packages
 
+# Hack to prevent stupid TypeError: 'NoneType' object is not callable error on
+# exit of python setup.py test # in multiprocessing/util.py _exit_function when
+# running python setup.py test (see
+# http://www.eby-sarna.com/pipermail/peak/2010-May/003357.html)
+try:
+    import multiprocessing
+except ImportError:
+    pass
+
 
 def read(*parts):
     return codecs.open(os.path.join(os.path.dirname(__file__), *parts)).read()
