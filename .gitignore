@@ -7,3 +7,4 @@ docs/_build
 MANIFEST
 .DS_Store
 virtualenv/
+*.egg

@@ -33,8 +33,16 @@ def browserid_info(request):
     # Force request_args to be a dictionary, in case it is lazily generated.
     request_args = dict(getattr(settings, 'BROWSERID_REQUEST_ARGS', {}))
 
+    # Only pass an email to the JavaScript if the current user was authed with
+    # our auth backend.
+    backend = getattr(request.user, 'backend', None)
+    if backend == 'django_browserid.auth.BrowserIDBackend':
+        email = getattr(request.user, 'email', '')
+    else:
+        email = ''
+
     return render_to_string('browserid/info.html', {
-        'email': getattr(request.user, 'email', ''),
+        'email': email,
         'login_url': reverse('browserid_login'),
         'request_args': json.dumps(request_args, cls=LazyEncoder),
         'form': form,

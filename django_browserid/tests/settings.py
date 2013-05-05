@@ -25,6 +25,7 @@ INSTALLED_APPS = (
 ROOT_URLCONF = 'django_browserid.tests.urls'
 
 AUTHENTICATION_BACKENDS = (
+    'django.contrib.auth.backends.ModelBackend',
     'django_browserid.auth.BrowserIDBackend',
 )
 

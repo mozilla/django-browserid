@@ -1,3 +1,4 @@
+from django.contrib.auth import authenticate
 from django.contrib.auth.models import AnonymousUser, User
 from django.test import TestCase
 from django.test.client import RequestFactory
@@ -9,7 +10,7 @@ from pyquery import PyQuery as pq
 from django_browserid.helpers import (browserid_button, browserid_info,
                                       browserid_js, browserid_login,
                                       browserid_css, browserid_logout)
-from django_browserid.tests import patch_settings
+from django_browserid.tests import mock_browserid, patch_settings
 
 
 @patch('django_browserid.helpers.FORM_JAVASCRIPT',
@@ -78,7 +79,7 @@ class BrowserIDButtonTests(TestCase):
         a = pq(button)('a')
 
         self.assertTrue(a.hasClass('browserid-logout'))
-    
+
 
 def _lazy_request_args():
     return {'siteName': 'asdf'}
@@ -105,7 +106,12 @@ class BrowserIDInfoTests(TestCase):
     @patch_settings(BROWSERID_REQUEST_ARGS={'siteName': 'asdf'})
     def test_custom_values(self):
         request = self.factory.get('/')
-        request.user = User.objects.create_user('asdf', 'a@example.com')
+
+        User.objects.create_user('asdf', 'a@example.com')
+        with mock_browserid('a@example.com'):
+            user = authenticate(assertion='asdf', audience='1234')
+            request.user = user
+
         info = browserid_info(request)
         d = pq(info)
 
@@ -116,6 +122,25 @@ class BrowserIDInfoTests(TestCase):
 
         form = d('#browserid-form')
         self.assertEqual(form.attr('action'), '/browserid/login/')
+
+    def test_non_browserid_user(self):
+        """
+        If the current user was not authenticated via django-browserid,
+        data-user-email should be empty.
+        """
+        request = self.factory.get('/')
+
+        User.objects.create_user('asdf', 'a@example.com', '1234')
+        with mock_browserid(None):
+            user = authenticate(username='asdf', password='1234')
+            self.assertTrue(user.is_authenticated())
+            request.user = user
+
+        info = browserid_info(request)
+        d = pq(info)
+
+        info_div = d('#browserid-info')
+        self.assertEqual(info_div.attr('data-user-email'), '')
 
     @patch_settings(BROWSERID_REQUEST_ARGS=lazy_request_args())
     def test_lazy_request_args(self):
