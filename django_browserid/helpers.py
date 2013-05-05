@@ -88,11 +88,11 @@ def browserid_login(text='Sign in', color=None, next=None,
         localized.
 
     :param color:
-        Adds the official Mozilla Persona CSS branding classes on the link.
-        The CSS must be linked on the page. Accepts only the 3 official
-        colors.
+        Color to use for the login button; this will only work if you have
+        included the default CSS provided by
+        :py:func:`django_browserid.helpers.browserid_css`.
 
-        Example: 'dark', 'blue', 'orange'
+        Supported colors are: `'dark'`, `'blue'`, and `'orange'`.
 
     :param next:
         URL to redirect users to after they login from this link. If omitted,
@@ -168,7 +168,7 @@ def browserid_js(include_shim=True):
 
 def browserid_css():
     """
-    Returns <link> tags for the Stylesheet required by the Persona themes.
+    Returns <link> tags for the optional CSS included with django-browserid.
     Requires use of the staticfiles app.
     """
     files = [static_url(path) for path in FORM_CSS]

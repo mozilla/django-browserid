@@ -3,9 +3,9 @@ Setup
 
 Installation
 ------------
-You can use pip to install django-browserid and requirements:
+You can use pip to install django-browserid and requirements::
 
-   pip install django-browserid
+    pip install django-browserid
 
 
 Configuration
@@ -91,7 +91,9 @@ A complete example:
 
     {% load browserid %}
     <html>
-    {% browserid_css %}
+      <head>
+        {% browserid_css %}
+      </head>
       <body>
         {% browserid_info %}
         <header>
@@ -118,6 +120,9 @@ passed to your template by the context processor:
 .. code-block:: html+jinja
 
     <html>
+      <head>
+        {{ browserid_css() }}
+      </head>
       <body>
         {{ browserid_info() }}
         <header>
@@ -126,7 +131,7 @@ passed to your template by the context processor:
             {% if user.is_authenticated() %}
               {{ browserid_logout(text='Logout') }}
             {% else %}
-              {{ browserid_login(text='Login') }}
+              {{ browserid_login(text='Login', color='dark') }}
             {% endif %}
           </div>
         </header>
@@ -156,10 +161,10 @@ There are a few changes you need to make when deploying your app to production:
   ``SITE_URL`` setting is used to determine the audience. For security reasons,
   it is *very important* that you set ``SITE_URL`` correctly.
 
-   ``SITE_URL`` should be set to the domain and protocol users will use to
-   access your site, such as ``https://affiliates.mozilla.org``. This URL does
-   not have to be publicly available, however, so sites limited to a certain
-   network can still use django-browserid.
+  ``SITE_URL`` should be set to the domain and protocol users will use to
+  access your site, such as ``https://affiliates.mozilla.org``. This URL does
+  not have to be publicly available, however, so sites limited to a certain
+  network can still use django-browserid.
 
 
 Static Files
@@ -167,15 +172,17 @@ Static Files
 ``browserid_js`` and ``browserid_css`` use `Form Media`_ and the Django
 `staticfiles`_ app to serve the static files for the buttons. If you don't
 want to use the static files framework, you'll need to include the JavaScript
-manually on any page you use the ``browserid_button`` function.
+and CSS manually on any page you use the ``browserid_button`` function.
 
-For ``browserid_js`` the files needed are the Persona JavaScript shim, which should be loaded from
+For ``browserid_js`` the files needed are the Persona JavaScript shim, which
+should be loaded from
 ``https://login.persona.org/include.js`` in a script tag, and
 ``django_browserid/static/browserid/browserid.js``, which is part of the
 django-browserid library.
 
-For ``browserid_css`` the file needed is ``django_browserid/static/browserid/persona-buttons.css``
-, which is also part of the django-browserid library.
+For ``browserid_css`` the file needed is
+``django_browserid/static/browserid/persona-buttons.css``, which is also part of
+the django-browserid library.
 
 .. _Form Media: https://docs.djangoproject.com/en/dev/topics/forms/media/
 .. _staticfiles: https://docs.djangoproject.com/en/dev/howto/static-files/
