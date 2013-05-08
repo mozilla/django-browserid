@@ -43,3 +43,4 @@ Patches and Suggestions
 - Peter Bengtsson
 - Javed Khan
 - Kalail (Kashif Malik)
+- Richard Mansfield
