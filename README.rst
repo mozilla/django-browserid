@@ -18,12 +18,14 @@ Tested Under
 
   * 2.6
   * 2.7
+  * 3.2 (experimental)
+  * 3.3
 
 * Django
 
   * 1.3.7
   * 1.4.5
-  * 1.5
+  * 1.5.1
 
 Documentation
 -------------
