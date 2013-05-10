@@ -32,11 +32,9 @@ def default_username_algo(email):
     # store the username as a base64 encoded sha1 of the email address
     # this protects against data leakage because usernames are often
     # treated as public identifiers (so we can't use the email address).
-    username = base64.urlsafe_b64encode(
-        hashlib.sha1(
-            smart_bytes(email)
-        ).digest()).rstrip(b'=')
-    return username
+    return base64.urlsafe_b64encode(
+        hashlib.sha1(smart_bytes(email)).digest()
+    ).rstrip(b'=')
 
 
 class BrowserIDBackend(object):

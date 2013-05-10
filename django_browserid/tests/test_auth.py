@@ -100,8 +100,8 @@ class BrowserIDBackendTests(TestCase):
 
 
 if get_user_model:
-# Only run custom user model tests if we're using a version of Django that
-# supports it.
+    # Only run custom user model tests if we're using a version of Django that
+    # supports it.
     @patch.object(settings, 'AUTH_USER_MODEL', 'tests.CustomUser')
     class CustomUserModelTests(TestCase):
         def _auth(self, backend=None, verified_email=None):

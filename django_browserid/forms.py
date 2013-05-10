@@ -23,7 +23,10 @@ class BrowserIDForm(forms.Form):
 
     def clean_assertion(self):
         try:
-            return smart_bytes(self.cleaned_data['assertion'], encoding='ascii')
+            return smart_bytes(
+                self.cleaned_data['assertion'],
+                encoding='ascii'
+            )
         except UnicodeEncodeError:
             # not ascii :(
             raise forms.ValidationError('non-ascii string')
