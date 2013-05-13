@@ -40,6 +40,7 @@ setup(
     install_requires=['requests>=0.9.1', 'fancy_tag==0.2.0', 'six>=1.3'],
     test_suite="runtests.runtests",
     include_package_data=True,
+    zip_safe=False,  # because we rely on finding templates on the filesystem
     classifiers=[
         'Development Status :: 4 - Beta',
         'Environment :: Web Environment',
