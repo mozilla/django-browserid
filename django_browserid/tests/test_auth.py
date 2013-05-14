@@ -98,6 +98,14 @@ class BrowserIDBackendTests(TestCase):
         self.auth('a@b.com', browserid_extra=dic)
         user_verify.assert_called_with('asdf', 'asdf', extra_params=dic)
 
+    def test_get_user(self):
+        # If a user is retrieved by the BrowserIDBackend, it should have
+        # 'django_browserid.auth.BrowserIDBackend' for the backend attribute.
+        user = new_user('a@example.com')
+        backend = BrowserIDBackend()
+        self.assertEqual(backend.get_user(user.id).backend,
+                         'django_browserid.auth.BrowserIDBackend')
+
 
 if get_user_model:
     # Only run custom user model tests if we're using a version of Django that
