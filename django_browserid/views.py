@@ -142,4 +142,4 @@ class Verify(BaseFormView):
     def dispatch(self, request, *args, **kwargs):
         """Run some sanity checks on the request prior to dispatching it."""
         sanity_checks(request)
-        return super(Verify, self).dispatch(request, *args, **kwargs)
+        return super(BaseFormView, self).dispatch(request, *args, **kwargs)

@@ -1,8 +1,12 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
+import os
+import sys
+
+from django.conf import settings
 from django.contrib import auth
-from django.test.client import RequestFactory
+from django.test.client import RequestFactory, Client
 
 from mock import patch
 
@@ -169,3 +173,27 @@ def test_sanity_csp(debug):
                         CSP_FRAME_SRC=[]):
         verify('post', assertion='asdf')
         debug.called = True
+
+
+_here = (
+    '%s.%s' %
+    (__package__, os.path.splitext(os.path.basename(__file__))[0])
+)
+
+
+class MyVerifyClass(views.Verify):
+
+    failure_url = '/hell'
+
+
+@patch_settings(BROWSERID_VERIFY_CLASS='%s.MyVerifyClass' % _here)
+def test_override_verify_class():
+    # reload so that the settings.BROWSERID_VERIFY_CLASS takes affect this time
+    reload(sys.modules['django_browserid.urls'])
+
+    # now we should be able to run a browser/verify/ request and
+    # it should instead use our MyVerifyClass
+    login_pattern = sys.modules['django_browserid.urls'].urlpatterns[0]
+    request = factory.get('/browserid/verify', {'email': 'test@example.com'})
+    response = login_pattern.callback(request)
+    assert response['location'].startswith('/hell')
