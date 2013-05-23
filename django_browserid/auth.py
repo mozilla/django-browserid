@@ -64,6 +64,11 @@ class BrowserIDBackend(object):
 
         return self.User.objects.create_user(username, email)
 
+    def is_valid_email(self, email):
+        """Return True if the email address is ok to log in."""
+        # This method is basically for your overriding pleasures.
+        return True
+
     def authenticate(self, assertion=None, audience=None, browserid_extra=None, **kw):
         """``django.contrib.auth`` compatible authentication method.
 
@@ -81,6 +86,8 @@ class BrowserIDBackend(object):
             return None
 
         email = result['email']
+        if not self.is_valid_email(email):
+            return None
 
         # In the rare case that two user accounts have the same email address,
         # log and bail. Randomly selecting one seems really wrong.
