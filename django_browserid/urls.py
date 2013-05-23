@@ -7,8 +7,36 @@ try:
 except ImportError:
     from django.conf.urls.defaults import patterns, url
 from django.contrib.auth.views import logout
+from django.core.exceptions import ImproperlyConfigured
+from django.utils.importlib import import_module
 
-from django_browserid.views import Verify
+
+def _load_module_setting(name):
+    path = getattr(settings, name)
+    i = path.rfind('.')
+    module, attr = path[:i], path[i + 1:]
+
+    try:
+        mod = import_module(module)
+    except ImportError:
+        raise ImproperlyConfigured('Error importing %s'
+                                   ' function.' % name)
+    except ValueError:
+        raise ImproperlyConfigured('Error importing %(name)s'
+                                   ' function. Is %(name)s a'
+                                   ' string?' % dict(name=name))
+
+    try:
+        return getattr(mod, attr)
+    except AttributeError:
+        raise ImproperlyConfigured('Module {0} does not define a {1} '
+                                   'function.'.format(module, attr))
+
+
+if getattr(settings, 'BROWSERID_VERIFY_CLASS', None):
+    Verify = _load_module_setting('BROWSERID_VERIFY_CLASS')
+else:
+    from django_browserid.views import Verify
 
 
 urlpatterns = patterns('',
