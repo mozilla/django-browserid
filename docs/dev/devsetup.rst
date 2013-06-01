@@ -7,7 +7,7 @@ Check out the code from the `github project`_::
     git clone git://github.com/mozilla/django-browserid.git
     cd django-browserid
 
-Create a `virtualenv`_ (the example here is with `virtualenvwrapper`_)
+Create a `virtualenv`_ (the example here uses `virtualenvwrapper`_)
 and install all development packages::
 
     mkvirtualenv django-browserid
@@ -15,7 +15,7 @@ and install all development packages::
 
 Here is how to run the test suite::
 
-    fab test
+    python runtests.py
 
 Here is how to build the documentation::
 
