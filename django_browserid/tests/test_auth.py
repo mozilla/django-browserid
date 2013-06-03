@@ -106,6 +106,25 @@ class BrowserIDBackendTests(TestCase):
         self.assertEqual(backend.get_user(user.id).backend,
                          'django_browserid.auth.BrowserIDBackend')
 
+    def test_overriding_valid_email(self):
+
+        class PickyBackend(BrowserIDBackend):
+            def is_valid_email(self, email):
+                return email != 'a@example.com'
+
+        new_user('a@example.com', 'test1')
+        new_user('b@example.com', 'test2')
+
+        with mock_browserid('a@example.com'):
+            backend = PickyBackend()
+            result = backend.authenticate(assertion='asdf', audience='asdf')
+            self.assertTrue(not result)
+
+        with mock_browserid('b@example.com'):
+            backend = PickyBackend()
+            result = backend.authenticate(assertion='asdf', audience='asdf')
+            self.assertTrue(result)
+
 
 if get_user_model:
     # Only run custom user model tests if we're using a version of Django that
