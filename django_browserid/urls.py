@@ -2,7 +2,10 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 from django.conf import settings
-from django.conf.urls import patterns, url
+try:
+    from django.conf.urls import patterns, url
+except ImportError:
+    from django.conf.urls.defaults import patterns, url
 from django.contrib.auth.views import logout
 
 from django_browserid.views import Verify
