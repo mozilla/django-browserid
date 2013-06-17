@@ -44,3 +44,4 @@ Patches and Suggestions
 - Javed Khan
 - Kalail (Kashif Malik)
 - Richard Mansfield
+- Francesco Pischedda
