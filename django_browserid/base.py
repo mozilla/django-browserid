@@ -15,7 +15,9 @@ logger = logging.getLogger(__name__)
 
 DEFAULT_HTTP_TIMEOUT = 5
 DEFAULT_VERIFICATION_URL = 'https://verifier.login.persona.org/verify'
-OKAY_RESPONSE = 'okay'
+DEFAULT_PROXY_INFO = None
+DEFAULT_DISABLE_CERT_CHECK = False
+DEFAULT_HEADERS = {'Content-type': 'application/x-www-form-urlencoded'}
 
 
 class BrowserIDException(Exception):
@@ -80,9 +82,11 @@ def get_audience(request):
 def _verify_http_request(url, data):
     parameters = {
         'data': data,
-        'proxies': getattr(settings, 'BROWSERID_PROXY_INFO', None),
-        'verify': not getattr(settings, 'BROWSERID_DISABLE_CERT_CHECK', False),
-        'headers': {'Content-type': 'application/x-www-form-urlencoded'},
+        'proxies': getattr(settings, 'BROWSERID_PROXY_INFO',
+                           DEFAULT_PROXY_INFO),
+        'verify': not getattr(settings, 'BROWSERID_DISABLE_CERT_CHECK',
+                              DEFAULT_DISABLE_CERT_CHECK),
+        'headers': DEFAULT_HEADERS,
         'timeout': getattr(settings, 'BROWSERID_HTTP_TIMEOUT',
                            DEFAULT_HTTP_TIMEOUT),
     }
@@ -97,7 +101,7 @@ def _verify_http_request(url, data):
 
     try:
         rv = json.loads(r.content)
-    except ValueError:
+    except (ValueError, TypeError):
         logger.warning('Failed to decode JSON. Resp: %s, Content: %s',
                        r.status_code, r.content)
         return dict(status='failure')
@@ -148,19 +152,19 @@ def verify(assertion, audience, extra_params=None, url=None):
 
     logger.info('Verification URL: %s', url)
 
-    args = {'assertion': assertion,
-            'audience': audience}
+    args = {'assertion': assertion, 'audience': audience}
     if extra_params:
         args.update(extra_params)
+
     result = _verify_http_request(url, args)
 
-    if result['status'] == OKAY_RESPONSE:
+    if result['status'] != 'okay':
+        logger.warning('BrowserID verification failure. Response: %s '
+                       'Audience: %s', result, audience)
+        logger.warning('BID assert: %s', assertion)
+        return False
+    else:
         return result
-
-    logger.warning('BrowserID verification failure. Response: %s '
-                   'Audience: %s', result, audience)
-    logger.warning('BID assert: %s', assertion)
-    return False
 
 
 def sanity_checks(request):
