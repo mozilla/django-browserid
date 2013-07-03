@@ -24,6 +24,7 @@ To use ``django-browserid``, you'll need to make a few changes to your
     # Add the django_browserid authentication backend.
     AUTHENTICATION_BACKENDS = (
        # ...
+       'django.contrib.auth.backends.ModelBackend', # required for admin
        'django_browserid.auth.BrowserIDBackend',
        # ...
     )
