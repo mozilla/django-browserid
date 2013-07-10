@@ -30,3 +30,22 @@ includes a a few public functions that are exposed through the
    DOM already. If it hasn't, this will return false.
 
    :returns: True if the user has authenticated, false otherwise.
+
+
+.. js:function:: django_browserid.getAssertion(callback)
+
+   Retrieve an assertion from BrowserID and execute the given callback with the
+   assertion as the single argument.
+
+   :param function callback: Callback to execute after the assertion has been
+                             retrieved.
+
+
+.. js:function:: django_browserid.verifyAssertion(assertion, [redirectTo])
+
+   Verify an assertion, and redirect to a URL on success. Calling this method
+   submits a form to the server and changes the current page as if the user
+   was attempting to login.
+
+   :param string assertion: Assertion to verify.
+   :param string redirectTo: URL to redirect to on success.

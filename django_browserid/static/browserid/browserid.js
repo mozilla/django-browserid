@@ -8,6 +8,7 @@
     // State? Ewwwwww.
     var loginRedirect = null; // Path to redirect to post-login.
     var logoutRedirect = null; // Path to redirect to post-logout.
+    var loginCallback = null; // Callback to run post-login.
 
     // Public API
     window.django_browserid = {
@@ -41,6 +42,31 @@
          */
         isUserAuthenticated: function isUserAuthenticated() {
             return !!$('#browserid-info').data('userEmail');
+        },
+
+        /**
+         * Retrieve an assertion from BrowserID and execute a callback.
+         * @param {function} Callback to run after requesting an assertion.
+         */
+        getAssertion: function getAssertion(callback, requestArgs) {
+            var defaults = $('#browserid-info').data('requestArgs');
+            requestArgs = $.extend({}, defaults, requestArgs);
+
+            loginCallback = callback || null;
+            navigator.id.request(requestArgs);
+        },
+
+        /**
+         * Verify that the given assertion is valid, and redirect to another
+         * page if successful.
+         * @param {string} Assertion to verify.
+         * @param {string} URL to redirect to after successful verification.
+         */
+        verifyAssertion: function verifyAssertion(assertion, redirectTo) {
+            var $loginForm = $('#browserid-form'); // Form used to submit login.
+            $loginForm.find('input[name="next"]').val(redirectTo);
+            $loginForm.find('input[name="assertion"]').val(assertion);
+            $loginForm.submit();
         }
     };
 
@@ -72,10 +98,10 @@
                     return;
                 }
 
-                if (assertion) {
-                    $loginForm.find('input[name="next"]').val(loginRedirect);
-                    $loginForm.find('input[name="assertion"]').val(assertion);
-                    $loginForm.submit();
+                if (isFunction(loginCallback)) {
+                    loginCallback(assertion);
+                } else if (assertion) {
+                    django_browserid.verifyAssertion(assertion, loginRedirect);
                 }
             },
             onlogout: function() {
@@ -99,4 +125,9 @@
             }
         });
     });
+
+    // Courtesy of http://jsperf.com/alternative-isfunction-implementations/9
+    function isFunction(obj) {
+        return typeof(obj) == 'function';
+    }
 })(jQuery, window);
