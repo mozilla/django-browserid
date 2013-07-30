@@ -3,6 +3,10 @@ include AUTHORS.rst
 include LICENSE
 include README.rst
 include requirements.txt
+include .travis.yml
+include runtests.py
+
+recursive-include docs Makefile make.bat *.py *.rst
 recursive-include django_browserid/static/browserid *.js *.css
 recursive-include django_browserid/templates *.html
 recursive-include django_browserid/templatetags *.py
