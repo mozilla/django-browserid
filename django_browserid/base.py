@@ -29,6 +29,9 @@ class BrowserIDException(Exception):
         #: Original exception that caused this to be raised.
         self.exc = exc
 
+    def __unicode__(self):
+        return unicode(self.exc)
+
 
 def get_audience(request):
     """
