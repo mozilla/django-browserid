@@ -79,6 +79,9 @@ class Verify(BaseFormView):
             If login failed due to an error raised during verification, this
             will be the BrowserIDException instance that was raised.
         """
+        if isinstance(error.exc, Exception):
+            logger.error(error.exc)
+
         failure_url = self.get_failure_url()
 
         # If this url is a view name, we need to reverse it first to
