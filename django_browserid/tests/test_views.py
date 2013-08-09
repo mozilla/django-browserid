@@ -85,15 +85,17 @@ def test_auth_fail_url_parameters():
 
 
 @mock_browserid(None)
+@patch('django_browserid.views.logger.error')
 @patch('django_browserid.views.auth.authenticate')
-def test_authenticate_browserid_exception(authenticate):
+def test_authenticate_browserid_exception(authenticate, logger_error):
     # If authenticate raises a BrowserIDException, redirect to the failure URL.
-    err = BrowserIDException('test')
-    authenticate.side_effect = err
+    excpt = Exception('hsakjw')
+    authenticate.side_effect = BrowserIDException(excpt)
 
     response = verify('post', failure_url='/fail', assertion='asdf')
     assert response.status_code == 302
     assert response['Location'].endswith('/fail?bid_login_failed=1')
+    logger_error.assert_called_with(excpt)
 
 
 @mock_browserid('test@example.com')
