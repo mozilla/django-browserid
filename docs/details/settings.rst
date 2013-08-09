@@ -61,6 +61,17 @@ Customizing the Login Popup
 Customizing the Verify View
 ---------------------------
 
+.. data:: BROWSERID_VERIFY_VIEW
+
+    **Default:** ``django_browserid.views.Verify``
+
+    Allows you to substitute a custom class-based view for verifying assertions.
+    For example, the string 'myapp.users.views.Verify' would import `Verify`
+    from `myapp.users.views` and use it in place of the default view.
+
+    When using a custom view, it is generally a good idea to subclass the
+    default Verify and override the methods you want to change.
+
 .. data:: BROWSERID_CREATE_USER
 
     **Default:** ``True``

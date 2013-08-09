@@ -1,19 +1,14 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
-import os
-import sys
-
-from django.conf import settings
 from django.contrib import auth
-from django.test.client import RequestFactory, Client
+from django.test.client import RequestFactory
 
 from mock import patch
 
 from django_browserid import BrowserIDException, views
 from django_browserid.tests import mock_browserid, patch_settings
 
-from six.moves import reload_module
 
 factory = RequestFactory()
 
@@ -35,9 +30,7 @@ def verify(request_type, success_url=None, failure_url=None, **kwargs):
     if failure_url is not None:
         patches['LOGIN_REDIRECT_URL_FAILURE'] = failure_url
 
-    # We need to reload verify for the setting changes to take effect.
     with patch_settings(**patches):
-        reload_module(views)
         verify_view = views.Verify.as_view()
         with patch.object(auth, 'login'):
             response = verify_view(request)
@@ -173,27 +166,3 @@ def test_sanity_csp(debug):
                         CSP_FRAME_SRC=[]):
         verify('post', assertion='asdf')
         debug.called = True
-
-
-_here = (
-    '%s.%s' %
-    (__package__, os.path.splitext(os.path.basename(__file__))[0])
-)
-
-
-class MyVerifyClass(views.Verify):
-
-    failure_url = '/hell'
-
-
-@patch_settings(BROWSERID_VERIFY_CLASS='%s.MyVerifyClass' % _here)
-def test_override_verify_class():
-    # reload so that the settings.BROWSERID_VERIFY_CLASS takes affect this time
-    reload(sys.modules['django_browserid.urls'])
-
-    # now we should be able to run a browser/verify/ request and
-    # it should instead use our MyVerifyClass
-    login_pattern = sys.modules['django_browserid.urls'].urlpatterns[0]
-    request = factory.get('/browserid/verify', {'email': 'test@example.com'})
-    response = login_pattern.callback(request)
-    assert response['location'].startswith('/hell')

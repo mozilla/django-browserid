@@ -1,6 +1,8 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
+import logging
+
 from django.conf import settings
 try:
     from django.conf.urls import patterns, url
@@ -8,34 +10,17 @@ except ImportError:
     from django.conf.urls.defaults import patterns, url
 from django.contrib.auth.views import logout
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.importlib import import_module
+
+from django_browserid.util import import_function_from_setting
+
+logger = logging.getLogger(__name__)
 
 
-def _load_module_setting(name):
-    path = getattr(settings, name)
-    i = path.rfind('.')
-    module, attr = path[:i], path[i + 1:]
-
-    try:
-        mod = import_module(module)
-    except ImportError:
-        raise ImproperlyConfigured('Error importing %s'
-                                   ' function.' % name)
-    except ValueError:
-        raise ImproperlyConfigured('Error importing %(name)s'
-                                   ' function. Is %(name)s a'
-                                   ' string?' % dict(name=name))
-
-    try:
-        return getattr(mod, attr)
-    except AttributeError:
-        raise ImproperlyConfigured('Module {0} does not define a {1} '
-                                   'function.'.format(module, attr))
-
-
-if getattr(settings, 'BROWSERID_VERIFY_CLASS', None):
-    Verify = _load_module_setting('BROWSERID_VERIFY_CLASS')
-else:
+try:
+    Verify = import_function_from_setting('BROWSERID_VERIFY_CLASS')
+except ImproperlyConfigured as e:
+    logger.info('Loading BROWSERID_VERIFY_CLASS failed: {0}.\nFalling back to '
+                'default.'.format(e))
     from django_browserid.views import Verify
 
 

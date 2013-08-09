@@ -40,15 +40,24 @@ class Verify(BaseFormView):
     """
     form_class = BrowserIDForm
 
-    #: URL to redirect users to when login fails. This uses the value of
-    #: ``settings.LOGIN_REDIRECT_URL_FAILURE``, and defaults to ``'/'`` if the
-    #: setting doesn't exist.
-    failure_url = getattr(settings, 'LOGIN_REDIRECT_URL_FAILURE', '/')
+    @property
+    def failure_url(self):
+        """
+        URL to redirect users to when login fails. This uses the value of
+        ``settings.LOGIN_REDIRECT_URL_FAILURE``, and defaults to ``'/'`` if the
+        setting doesn't exist.
+        """
+        return getattr(settings, 'LOGIN_REDIRECT_URL_FAILURE', '/')
 
-    #: URL to redirect users to when login succeeds if ``next`` isn't specified
-    #: in the request. This uses the value of ``settings.LOGIN_REDIRECT_URL``,
-    #: and defaults to ``'/'`` if the setting doesn't exist.
-    success_url = getattr(settings, 'LOGIN_REDIRECT_URL', '/')
+    @property
+    def success_url(self):
+        """
+        URL to redirect users to when login succeeds if ``next`` isn't
+        specified in the request. This uses the value of
+        ``settings.LOGIN_REDIRECT_URL``, and defaults to ``'/'`` if the setting
+        doesn't exist.
+        """
+        return getattr(settings, 'LOGIN_REDIRECT_URL', '/')
 
     def login_success(self):
         """
@@ -142,4 +151,4 @@ class Verify(BaseFormView):
     def dispatch(self, request, *args, **kwargs):
         """Run some sanity checks on the request prior to dispatching it."""
         sanity_checks(request)
-        return super(BaseFormView, self).dispatch(request, *args, **kwargs)
+        return super(Verify, self).dispatch(request, *args, **kwargs)

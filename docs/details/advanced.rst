@@ -106,7 +106,6 @@ Here's an example::
    # myapp.py
    from django_browserid.views import Verify
    class MyVerifyClass(Verify):
-
        @property
        def success_url(self):
            if self.user.username == 'Satan':
