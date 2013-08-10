@@ -3,9 +3,10 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.db import IntegrityError
 from django.test import TestCase
 
-from mock import ANY, patch
+from mock import ANY, Mock, patch
 
 from django_browserid.auth import BrowserIDBackend, default_username_algo, verify
 from django_browserid.tests import mock_browserid
@@ -107,7 +108,6 @@ class BrowserIDBackendTests(TestCase):
                          'django_browserid.auth.BrowserIDBackend')
 
     def test_overriding_valid_email(self):
-
         class PickyBackend(BrowserIDBackend):
             def is_valid_email(self, email):
                 return email != 'a@example.com'
@@ -124,6 +124,25 @@ class BrowserIDBackendTests(TestCase):
             backend = PickyBackend()
             result = backend.authenticate(assertion='asdf', audience='asdf')
             self.assertTrue(result)
+
+    @patch('django_browserid.auth.logger')
+    def test_create_user_integrity_error(self, logger):
+        # If an IntegrityError is raised during user creation, attempt to re-fetch the user in case
+        # the user was created since we checked for the existing account.
+        backend = BrowserIDBackend()
+        backend.User = Mock()
+        error = IntegrityError()
+        backend.User.objects.create_user.side_effect = error
+        backend.User.objects.get.return_value = 'asdf'
+
+        self.assertEqual(backend.create_user('a@example.com'), 'asdf')
+
+        # If get raises a DoesNotExist exception, re-raise the original exception.
+        backend.User.DoesNotExist = Exception
+        backend.User.objects.get.side_effect = backend.User.DoesNotExist
+        with self.assertRaises(IntegrityError) as e:
+            backend.create_user('a@example.com')
+        self.assertEqual(e.exception, error)
 
 
 if get_user_model:
