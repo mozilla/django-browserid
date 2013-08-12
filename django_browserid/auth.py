@@ -7,6 +7,7 @@ import logging
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from django.db import IntegrityError
 from django.utils.importlib import import_module
 try:
     from django.utils.encoding import smart_bytes
@@ -62,7 +63,17 @@ class BrowserIDBackend(object):
         else:
             username = default_username_algo(email)
 
-        return self.User.objects.create_user(username, email)
+        try:
+            return self.User.objects.create_user(username, email)
+        except IntegrityError as err:
+            # Race condition! Attempt to re-fetch from the database.
+            logger.warning('IntegrityError during user creation: {0}'.format(err))
+
+            try:
+                return self.User.objects.get(email=email)
+            except self.User.DoesNotExist:
+                # Whatevs, let's re-raise the error.
+                raise err
 
     def is_valid_email(self, email):
         """Return True if the email address is ok to log in."""
