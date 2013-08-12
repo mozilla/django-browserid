@@ -87,3 +87,28 @@ customizations to make things work properly:
   the user's email address.
 
 .. _property: http://docs.python.org/2/library/functions.html#property
+
+
+Custom Verify view
+------------------
+
+You can override which class is the view class for doing the
+verification. This can be useful in the case where you want to
+override certain methods that you need to work differently. To do
+this, set ``BROWSERID_VERIFY_CLASS`` to the path of your own preferred
+class.
+
+Here's an example::
+
+   # settings.py
+   BROWSERID_VERIFY_CLASS = 'myapp.MyVerifyClass'
+
+   # myapp.py
+   from django_browserid.views import Verify
+   class MyVerifyClass(Verify):
+       @property
+       def success_url(self):
+           if self.user.username == 'Satan':
+               return '/hell'
+           # the default behaviour
+           return getattr(settings, 'LOGIN_REDIRECT_URL', '/')

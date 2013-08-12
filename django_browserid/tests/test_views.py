@@ -9,7 +9,6 @@ from mock import patch
 from django_browserid import BrowserIDException, views
 from django_browserid.tests import mock_browserid, patch_settings
 
-from six.moves import reload_module
 
 factory = RequestFactory()
 
@@ -31,9 +30,7 @@ def verify(request_type, success_url=None, failure_url=None, **kwargs):
     if failure_url is not None:
         patches['LOGIN_REDIRECT_URL_FAILURE'] = failure_url
 
-    # We need to reload verify for the setting changes to take effect.
     with patch_settings(**patches):
-        reload_module(views)
         verify_view = views.Verify.as_view()
         with patch.object(auth, 'login'):
             response = verify_view(request)

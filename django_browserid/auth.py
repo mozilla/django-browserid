@@ -6,9 +6,8 @@ import hashlib
 import logging
 
 from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
 from django.db import IntegrityError
-from django.utils.importlib import import_module
+
 try:
     from django.utils.encoding import smart_bytes
 except ImportError:
@@ -16,6 +15,7 @@ except ImportError:
 
 from django_browserid.base import verify
 from django_browserid.signals import user_created
+from django_browserid.util import import_function_from_setting
 
 try:
     from django.contrib.auth import get_user_model
@@ -119,7 +119,7 @@ class BrowserIDBackend(object):
                 create_function = self.create_user
             else:
                 # Find the function to call.
-                create_function = self._load_module(create_user)
+                create_function = import_function_from_setting('BROWSERID_CREATE_USER')
 
             user = create_function(email)
             user_created.send(create_function, user=user)
@@ -132,26 +132,3 @@ class BrowserIDBackend(object):
             return user
         except self.User.DoesNotExist:
             return None
-
-    def _load_module(self, path):
-        """Code to load create user module. Based off django's load_backend"""
-
-        i = path.rfind('.')
-        module, attr = path[:i], path[i + 1:]
-
-        try:
-            mod = import_module(module)
-        except ImportError:
-            raise ImproperlyConfigured('Error importing BROWSERID_CREATE_USER'
-                                       ' function.')
-        except ValueError:
-            raise ImproperlyConfigured('Error importing BROWSERID_CREATE_USER'
-                                       ' function. Is BROWSERID_CREATE_USER a'
-                                       ' string?')
-
-        try:
-            create_user = getattr(mod, attr)
-        except AttributeError:
-            raise ImproperlyConfigured('Module {0} does not define a {1} '
-                                       'function.'.format(module, attr))
-        return create_user
