@@ -25,7 +25,7 @@ Tested Under
 
   * 1.3.7
   * 1.4.5
-  * 1.5.1
+  * 1.5.2
 
 Documentation
 -------------
