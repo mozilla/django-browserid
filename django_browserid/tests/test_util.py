@@ -13,7 +13,7 @@ from django_browserid.util import import_function_from_setting, LazyEncoder
 
 def _lazy_string():
     return 'blah'
-lazy_string = lazy(_lazy_string, unicode)()
+lazy_string = lazy(_lazy_string, str)()
 
 
 class TestLazyEncoder(TestCase):

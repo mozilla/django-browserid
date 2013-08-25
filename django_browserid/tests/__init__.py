@@ -29,11 +29,11 @@ class mock_browserid(object):
         self.pass_mock = pass_mock
         self.patcher = patch('django_browserid.base._verify_http_request')
         self.return_value = {
-            u'audience': audience,
-            u'email': email,
-            u'issuer': u'login.persona.org:443',
-            u'status': u'okay' if email is not None else u'failure',
-            u'valid-until': 1311377222765
+            'audience': audience,
+            'email': email,
+            'issuer': 'login.persona.org:443',
+            'status': 'okay' if email is not None else 'failure',
+            'valid-until': 1311377222765
         }
         if unverified_email is not None:
             self.return_value['unverified-email'] = unverified_email
@@ -71,7 +71,7 @@ class patch_settings(object):
         from django.conf import settings
         wrapped = settings._wrapped
         self.patches = [patch.object(wrapped, name, value, create=True) for
-                        name, value in kwargs.items()]
+                        name, value in list(kwargs.items())]
 
     def __enter__(self):
         for patcher in self.patches:
