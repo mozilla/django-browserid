@@ -3,6 +3,11 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 
 from mock import Mock
+try:
+    from imp import reload
+except ImportError:
+    # In Python 2.x, this was a builtin, but in 3.x, it's in the imp module.
+    pass
 
 from django_browserid.tests import patch_settings
 from django_browserid import urls

@@ -6,7 +6,7 @@ from django_browserid.forms import BrowserIDForm
 
 
 def test_invalid_assertion():
-    form = BrowserIDForm({'assertion': u'\xe3'})
+    form = BrowserIDForm({'assertion': '\xe3'})
     assert not form.is_valid()
 
 
