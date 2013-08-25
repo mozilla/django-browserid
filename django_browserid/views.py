@@ -8,7 +8,7 @@ import six
 if six.PY3:
     from urllib import parse as urllib_parse
 else:
-    import urllib.parse as urllib_parse
+    import urlparse as urllib_parse
 
 
 from django.conf import settings
