@@ -19,7 +19,7 @@ Tested Under
   * 2.6
   * 2.7
   * 3.2 (experimental)
-  * 3.3
+  * 3.3 (experimental)
 
 * Django
 
