@@ -49,3 +49,4 @@ Patches and Suggestions
 - Richard Mansfield
 - Francesco Pischedda
 - Edward Abraham
+- Eric Holscher
