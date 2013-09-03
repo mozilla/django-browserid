@@ -82,4 +82,4 @@ An example configuration might look like this::
 	    proxy_set_header X-Forwarded-Protocol https; # Tell django we're using https
     }
     
-.. _SECURE_PROXY_SSL_HEADER: https://docs.djangoproject.com/en/1.6/ref/settings/#secure-proxy-ssl-header
+.. _SECURE_PROXY_SSL_HEADER: https://docs.djangoproject.com/en/dev/ref/settings/#secure-proxy-ssl-header
