@@ -45,3 +45,4 @@ Patches and Suggestions
 - Kalail (Kashif Malik)
 - Richard Mansfield
 - Francesco Pischedda
+- Eric Holscher
