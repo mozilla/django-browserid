@@ -3,6 +3,35 @@
 History
 -------
 
+0.9 (2013-08-25)
+++++++++++++++++
+- Add ``BROWSERID_VERIFY_CLASS`` to make it easier to customize the verification view.
+
+- Add hook to authentication backend for validating the user's email.
+
+- Ensure backend attribute exists on user objects authenticated by django-browserid.
+
+- Prevent installation of the library as an unpackaged egg.
+
+- Add incomplete Python 3 support.
+
+- Fix an issue where users who logged in without Persona were being submitted to
+  ``navigator.id.watch`` anyway.
+
+- Add CSS to make the login/logout buttons prettier.
+
+- Support for ``SITE_URL`` being an iterable.
+
+- Add support for lazily-evaluated ``BROWSERID_REQUEST_ARGS``.
+
+- Add a small JavaScript API available on pages that include ``browserid.js``.
+
+- Support running tests via `python setup.py test`.
+
+- Fix an infinite loop where logging in with a valid Persona account while
+  ``BROWSERID_CREATE_USER`` is true would cause an infinite redirection.
+
+
 0.8 (2013-03-05)
 ++++++++++++++++
 
