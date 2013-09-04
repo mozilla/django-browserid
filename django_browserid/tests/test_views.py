@@ -86,8 +86,8 @@ def test_auth_fail_url_parameters():
 @patch('django_browserid.views.auth.authenticate')
 def test_authenticate_browserid_exception(authenticate, logger_error):
     # If authenticate raises a BrowserIDException, redirect to the failure URL.
-    excpt = Exception('hsakjw')
-    authenticate.side_effect = BrowserIDException(excpt)
+    excpt = BrowserIDException(Exception('hsakjw'))
+    authenticate.side_effect = excpt
 
     response = verify('post', failure_url='/fail', assertion='asdf')
     assert response.status_code == 302
