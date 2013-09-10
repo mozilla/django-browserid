@@ -112,3 +112,57 @@ Here's an example::
                return '/hell'
            # the default behaviour
            return getattr(settings, 'LOGIN_REDIRECT_URL', '/')
+
+
+Using Django-BrowswerId with AJAX
+---------------------------------
+
+If you can't use the provided template tags to load the supplied JavaScript
+and template tags to submit the form, you can still use Django-BrowserId.
+You need to load the Persona JavaScript library and register the 
+``navigator.id.watch`` similar to how it is documented in the
+Persona Quick Start tutorial_. When submitting the AJAX request, include
+the ``assertion`` and ``next`` in the ``data`` of the request. Also, the CSRF token
+needs to be included in the request.
+
+Here's an example::
+
+    navigator.id.watch({
+      onlogin: function(assertion) {
+        $.ajax({
+          type: 'POST',
+          url: '/persona/login/',
+          data: {
+            assertion: assertion,
+            next: '/next/url'
+          },
+          headers: {
+            'X-CSRFToken': csrftoken
+          },
+          success: function(res, status, xhr) { window.location.reload(); },
+          error: function(xhr, status, err) {
+            navigator.id.logout();
+            alert("Login failure: " + err);
+          }
+        });
+      },
+      onlogout: function() {
+        $.ajax({
+          type: 'POST',
+          url: '/persona/logout/',
+          headers: {
+            'X-CSRFToken': csrftoken
+          },
+          success: function(res, status, xhr) { window.location.reload(); },
+          error: function(xhr, status, err) { alert("Logout failure: " + err); }
+
+        });
+      }
+    });
+
+The CSRF token can be retrieved via the ``csrftoken`` cookie per the Django
+documentation_
+
+.. _tutorial: https://developer.mozilla.org/en-US/docs/Mozilla/Persona/Quick_Setup
+.. _documentation: https://docs.djangoproject.com/en/dev/ref/contrib/csrf/#ajax
+
