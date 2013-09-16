@@ -13,10 +13,17 @@ Template Helpers
 .. autofunction:: django_browserid.helpers.browserid_js
 
 
-Verification Functions
-----------------------
+Verification
+------------
 
-.. autofunction:: django_browserid.verify
+.. autoclass:: django_browserid.RemoteVerifier
+   :members: verify
+
+.. autoclass:: django_browserid.base.MockVerifier
+   :members: __init__, verify
+
+.. autoclass:: django_browserid.base.VerificationResult
+   :members: expires
 
 .. autofunction:: django_browserid.get_audience
 

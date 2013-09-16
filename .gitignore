@@ -9,3 +9,4 @@ MANIFEST
 virtualenv/
 *.egg
 .tox
+tmp

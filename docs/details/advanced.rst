@@ -46,12 +46,12 @@ If you want to customize the verification view, you can do so by subclassing
 custom logic.
 
 If you want complete control over account verification, you should create your
-own view and use :func:`django_browserid.verify` to manually verify a
+own view and use :func:`django_browserid.RemoteVerifier` to manually verify a
 BrowserID assertion with something like the following:
 
 .. code-block:: python
 
-   from django_browserid import get_audience, verify
+   from django_browserid import get_audience, RemoteVerifier
    from django_browserid.forms import BrowserIDForm
 
 
@@ -60,12 +60,14 @@ BrowserID assertion with something like the following:
        if request.method == 'POST':
            form = BrowserIDForm(data=request.POST)
            if form.is_valid():
-               result = verify(form.cleaned_data['assertion'], get_audience(request))
+               verifier = RemoteVerifier()
+               result = verifier.verify(form.cleaned_data['assertion'], get_audience(request))
                if result:
                    # check for user account, create account for new users, etc
                    user = my_get_or_create_user(result['email'])
 
-See :func:`django_browserid.verify` for more info on what ``verify`` returns.
+See :func:`django_browserid.RemoteVerifier` for more info on how to use the
+verifier object.
 
 
 Custom User Model

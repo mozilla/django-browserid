@@ -5,6 +5,9 @@ from django.utils.functional import wraps
 
 from mock import patch
 
+from django_browserid.auth import BrowserIDBackend
+from django_browserid.base import MockVerifier
+
 
 def fake_create_user(email):
     pass
@@ -12,8 +15,9 @@ def fake_create_user(email):
 
 class mock_browserid(object):
     """
-    Mocks django_browserid verification. Can be used as a context manager or
-    as a decorator:
+    Mock verification in :class:`django_browserid.auth.BrowserIDBackend`.
+
+    Can be used as a context manager or as a decorator:
 
     with mock_browserid('a@b.com'):
         django_browserid.verify('random-token')  # = {'status': 'okay',
@@ -24,20 +28,17 @@ class mock_browserid(object):
     def browserid_test():
         django_browserid.verify('random-token')  # = False
     """
-    def __init__(self, email=None, audience=None, unverified_email=None,
-                 pass_mock=False):
-        self.pass_mock = pass_mock
-        self.patcher = patch('django_browserid.base._verify_http_request')
-        self.return_value = {
-            u'audience': audience,
-            u'email': email,
-            u'issuer': u'login.persona.org:443',
-            u'status': u'okay' if email is not None else u'failure',
-            u'valid-until': 1311377222765
-        }
-        if unverified_email is not None:
-            self.return_value['unverified-email'] = unverified_email
-            del self.return_value['email']
+    def __init__(self, email, **kwargs):
+        """
+        :param email:
+            Email to return in the verification result. If None, the verification will fail.
+
+        :param kwargs:
+            Keyword arguments are passed on to :class:`django_browserid.base.MockVerifier`, which
+            updates the verification result with them.
+        """
+        self.patcher = patch.object(BrowserIDBackend, 'get_verifier')
+        self.return_value = MockVerifier(email, **kwargs)
 
     def __enter__(self):
         mock = self.patcher.start()
@@ -50,9 +51,7 @@ class mock_browserid(object):
     def __call__(self, func):
         @wraps(func)
         def inner(*args, **kwargs):
-            with self as mock:
-                if self.pass_mock:
-                    args += (mock,)
+            with self:
                 return func(*args, **kwargs)
         return inner
 

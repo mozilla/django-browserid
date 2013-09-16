@@ -125,6 +125,7 @@ def test_redirect_invalid_host():
 
 @patch_settings(DEBUG=True, SESSION_COOKIE_SECURE=True)
 @patch('django_browserid.views.logger.debug')
+@mock_browserid(None)
 def test_sanity_session_cookie(debug):
     # If DEBUG == True and SESSION_COOKIE_SECURE == True, log a debug message
     # warning about it.
@@ -134,6 +135,7 @@ def test_sanity_session_cookie(debug):
 
 @patch_settings(DEBUG=True, MIDDLEWARE_CLASSES=['csp.middleware.CSPMiddleware'])
 @patch('django_browserid.views.logger.debug')
+@mock_browserid(None)
 def test_sanity_csp(debug):
     # If DEBUG == True, the django-csp middleware is present, and Persona isn't
     # allowed by CSP, log a debug message warning about it.

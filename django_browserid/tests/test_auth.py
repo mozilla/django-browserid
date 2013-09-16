@@ -8,7 +8,8 @@ from django.test import TestCase
 
 from mock import ANY, Mock, patch
 
-from django_browserid.auth import BrowserIDBackend, default_username_algo, verify
+from django_browserid.auth import BrowserIDBackend, default_username_algo
+from django_browserid.base import MockVerifier
 from django_browserid.tests import mock_browserid
 
 try:
@@ -26,7 +27,7 @@ def new_user(email, username=None):
 
 
 class BrowserIDBackendTests(TestCase):
-    def auth(self, verified_email=None, browserid_extra=None):
+    def auth(self, verified_email=None, **kwargs):
         """
         Attempt to authenticate a user with BrowserIDBackend.
 
@@ -35,7 +36,7 @@ class BrowserIDBackendTests(TestCase):
         """
         with mock_browserid(verified_email):
             backend = BrowserIDBackend()
-            return backend.authenticate(assertion='asdf', audience='asdf', browserid_extra=browserid_extra)
+            return backend.authenticate(assertion='asdf', audience='asdf', **kwargs)
 
     def test_failed_verification(self):
         # If verification fails, return None.
@@ -93,11 +94,14 @@ class BrowserIDBackendTests(TestCase):
         user = self.auth('a@b.com')
         user_created.send.assert_called_with(ANY, user=user)
 
-    @patch('django_browserid.auth.verify', wraps=verify)
-    def test_verify_called_with_browserid_extra(self, user_verify):
-        dic = {'a': 'AlphaA'}
-        self.auth('a@b.com', browserid_extra=dic)
-        user_verify.assert_called_with('asdf', 'asdf', extra_params=dic)
+    def test_verify_called_with_extra_kwargs(self):
+        backend = BrowserIDBackend()
+        verifier = MockVerifier('a@example.com')
+        verifier.verify = Mock(wraps=verifier.verify)
+        backend.get_verifier = lambda: verifier
+
+        backend.authenticate(assertion='asdf', audience='http://testserver', foo='bar')
+        verifier.verify.assert_called_with('asdf', 'http://testserver', foo='bar')
 
     def test_get_user(self):
         # If a user is retrieved by the BrowserIDBackend, it should have
