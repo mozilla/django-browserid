@@ -1,5 +1,6 @@
 requests>=0.9.1
 fancy_tag==0.2.0
+six
 
 # Tests
 mock>=0.8.0
