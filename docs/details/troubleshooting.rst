@@ -12,7 +12,7 @@ To fix this, include https://persona.org in your script-src and frame-src
 directive. If you're using the `django-csp`_ library, the following settings
 will work::
 
-    CSP_SCRIPT_SRC = ("'self'", https://login.persona.org')
+    CSP_SCRIPT_SRC = ("'self'", 'https://login.persona.org')
     CSP_FRAME_SRC = ("'self'", 'https://login.persona.org')
 
 .. _Content Security Policy: https://developer.mozilla.org/en/Security/CSP
