@@ -1,9 +1,12 @@
 ``django-browserid`` is written and maintained by various contributors:
 
-Current Maintainer
-``````````````````
+Current Maintainers
+```````````````````
 
 - Michael Kelly <mkelly@mozilla.com>
+- Will Kahn-Greene <willkg@mozilla.com>
+- Peter Bengtsson <peterbe@mozilla.com>
+
 
 Previous Maintainers
 ````````````````````
@@ -45,3 +48,4 @@ Patches and Suggestions
 - Kalail (Kashif Malik)
 - Richard Mansfield
 - Francesco Pischedda
+- Edward Abraham
