@@ -17,6 +17,12 @@ Here is how to run the test suite::
 
     python runtests.py
 
+You can also run the tests in all the Python/Django environment
+combinations using tox::
+
+    pip install tox
+    tox
+
 Here is how to build the documentation::
 
     make -C docs/ html
