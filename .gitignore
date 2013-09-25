@@ -8,3 +8,4 @@ MANIFEST
 .DS_Store
 virtualenv/
 *.egg
+.tox
