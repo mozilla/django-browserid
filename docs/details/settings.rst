@@ -7,18 +7,22 @@ Settings
 Core Settings
 -------------
 
-.. data:: SITE_URL
+.. data:: BROWSERID_AUDIENCES
 
    **Default:** No default
 
-   Domain and protocol used to access your site. BrowserID uses this value to
-   determine if an assertion was meant for your site.
+   List of audiences that your site accepts. An audience is the protocol,
+   domain name, and (optionally) port that users access your site from. This
+   list is used to determine the audience a user is part of (how they are
+   accessing your site), which is used during verification to ensure that the
+   assertion given to you by the user was intended for your site.
 
-   Can be a string or an iterable of strings.
+   Without this, other sites that the user has authenticated with via Persona
+   could use their assertions to impersonate the user on your site.
 
    Note that this does not have to be a publicly accessible URL, so local URLs
-   like ``localhost:8000`` or ``127.0.0.1`` are acceptable as long as they match
-   what you are using to access your site.
+   like ``http://localhost:8000`` or ``http://127.0.0.1`` are acceptable as
+   long as they match what you are using to access your site.
 
 
 Redirect URLs
@@ -29,7 +33,7 @@ Redirect URLs
     **Default:** ``'/accounts/profile'``
 
     Path to redirect to on successful login. If you don't specify this, the
-    default_ Django value will be used.
+    default Django value will be used.
 
 .. data:: LOGIN_REDIRECT_URL_FAILURE
 
@@ -94,36 +98,8 @@ Customizing the Verify View
 Using a Different Identity Provider
 -----------------------------------
 
-.. data:: BROWSERID_VERIFICATION_URL
-
-    **Default:** ``'https://browserid.org/verify``
-
-    Defines the URL for the BrowserID verification service to use.
-
 .. data:: BROWSERID_SHIM
 
    **Default:** 'https://login.persona.org/include.js'
 
    The URL to use for the BrowserID JavaScript shim.
-
-
-Customizing Verification
-------------------------
-
-.. data:: BROWSERID_DISABLE_CERT_CHECK
-
-    **Default:** ``False``
-
-    Disables SSL certificate verification during BrowserID verification.
-    *Never disable this in production!*
-
-.. data:: BROWSERID_CACERT_FILE
-
-    **Default:** ``None``
-
-    CA cert file used during validation. If none is provided, the default file
-    included with requests_ is used.
-
-.. _requests: http://docs.python-requests.org/
-
-.. _default: https://docs.djangoproject.com/en/dev/ref/settings/#login-redirect-url

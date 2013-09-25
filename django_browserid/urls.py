@@ -11,13 +11,13 @@ except ImportError:
 from django.contrib.auth.views import logout
 from django.core.exceptions import ImproperlyConfigured
 
-from django_browserid.util import import_function_from_setting
+from django_browserid.util import import_from_setting
 
 logger = logging.getLogger(__name__)
 
 
 try:
-    Verify = import_function_from_setting('BROWSERID_VERIFY_CLASS')
+    Verify = import_from_setting('BROWSERID_VERIFY_CLASS')
 except ImproperlyConfigured as e:
     logger.info('Loading BROWSERID_VERIFY_CLASS failed: {0}.\nFalling back to '
                 'default.'.format(e))

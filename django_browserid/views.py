@@ -19,7 +19,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.views.generic.edit import BaseFormView
 
-from django_browserid.base import BrowserIDException, get_audience, sanity_checks
+from django_browserid.base import BrowserIDException, sanity_checks
 from django_browserid.forms import BrowserIDForm
 
 # Try to import funfactory's reverse and fall back to django's version.
@@ -118,13 +118,9 @@ class Verify(BaseFormView):
             Instance of BrowserIDForm that was submitted by the user.
         """
         self.assertion = form.cleaned_data['assertion']
-        self.audience = get_audience(self.request)
 
         try:
-            self.user = auth.authenticate(
-                assertion=self.assertion,
-                audience=self.audience
-            )
+            self.user = auth.authenticate(request=self.request, assertion=self.assertion)
         except BrowserIDException as e:
             return self.login_failure(e)
 

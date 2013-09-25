@@ -21,9 +21,9 @@ class LazyEncoder(json.JSONEncoder):
         return super(LazyEncoder, self).default(obj)
 
 
-def import_function_from_setting(setting):
+def import_from_setting(setting):
     """
-    Attempt to load a function from a module as specified by a setting.
+    Attempt to load a module attribute from a module as specified by a setting.
 
     :raises:
         ImproperlyConfigured if anything goes wrong.
@@ -42,13 +42,12 @@ def import_function_from_setting(setting):
     try:
         mod = import_module(module)
     except ImportError as e:
-        raise ImproperlyConfigured('Error importing `{0}` function: {1}'.format(path, e))
+        raise ImproperlyConfigured('Error importing `{0}`: {1}'.format(path, e))
 
     try:
         return getattr(mod, attr)
     except AttributeError as e:
-        raise ImproperlyConfigured('Module {0} does not define a {1} function.'
-                                   .format(module, attr))
+        raise ImproperlyConfigured('Module {0} does not define `{1}`.'.format(module, attr))
 
 
 # Attempt to use staticfiles_storage.url to retrieve static file URLs.
