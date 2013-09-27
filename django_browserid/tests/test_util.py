@@ -1,11 +1,12 @@
 import json
 
-from mock import Mock, patch
-from nose.tools import eq_
-
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 from django.utils.functional import lazy
+
+import six
+from mock import Mock, patch
+from nose.tools import eq_
 
 from django_browserid.tests import patch_settings
 from django_browserid.util import import_from_setting, LazyEncoder
@@ -13,7 +14,7 @@ from django_browserid.util import import_from_setting, LazyEncoder
 
 def _lazy_string():
     return 'blah'
-lazy_string = lazy(_lazy_string, unicode)()
+lazy_string = lazy(_lazy_string, six.text_type)()
 
 
 class TestLazyEncoder(TestCase):

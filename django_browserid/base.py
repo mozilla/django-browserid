@@ -9,6 +9,8 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.http import same_origin
 
+import six
+
 import requests
 
 
@@ -22,7 +24,10 @@ class BrowserIDException(Exception):
         self.exc = exc
 
     def __unicode__(self):
-        return unicode(self.exc)
+        return six.text_type(self.exc)
+
+    def __str__(self):
+        return str(self.__unicode__())
 
 
 def sanity_checks(request):
@@ -123,11 +128,17 @@ class VerificationResult(object):
     def __nonzero__(self):
         return self._response.get('status') == 'okay'
 
+    def __bool__(self):
+        return self.__nonzero__()
+
     def __unicode__(self):
-        result = u'Success' if self else u'Failure'
+        result = six.u('Success') if self else six.u('Failure')
         email = getattr(self, 'email', None)
-        email_string = u' email={0}'.format(email) if email else u''
-        return u'<VerificationResult {0}{1}>'.format(result, email_string)
+        email_string = six.u(' email={0}').format(email) if email else six.u('')
+        return six.u('<VerificationResult {0}{1}>').format(result, email_string)
+
+    def __str__(self):
+        return str(self.__unicode__())
 
 
 class RemoteVerifier(object):

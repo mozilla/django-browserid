@@ -8,6 +8,7 @@ from django.test import TestCase
 from django.test.client import RequestFactory
 
 import requests
+import six
 from mock import Mock, patch, PropertyMock
 from nose.tools import eq_, ok_
 
@@ -87,19 +88,19 @@ class VerificationResultTests(TestCase):
         # If the response status is 'okay', the result should be truthy.
         ok_(VerificationResult({'status': 'okay'}))
 
-    def test_unicode_success(self):
+    def test_str_success(self):
         # If the result is successful, include 'Success' and the email in the string.
         result = VerificationResult({'status': 'okay', 'email': 'a@example.com'})
-        eq_(unicode(result), u'<VerificationResult Success email=a@example.com>')
+        eq_(six.text_type(result), '<VerificationResult Success email=a@example.com>')
 
         # If the email is missing, don't include it.
         result = VerificationResult({'status': 'okay'})
-        eq_(unicode(result), u'<VerificationResult Success>')
+        eq_(six.text_type(result), '<VerificationResult Success>')
 
-    def test_unicode_failure(self):
+    def test_str_failure(self):
         # If the result is a failure, include 'Failure' in the string.
         result = VerificationResult({'status': 'failure'})
-        eq_(unicode(result), u'<VerificationResult Failure>')
+        eq_(six.text_type(result), '<VerificationResult Failure>')
 
 
 class RemoteVerifierTests(TestCase):

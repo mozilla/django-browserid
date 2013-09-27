@@ -6,8 +6,12 @@ import json
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.functional import Promise
-from django.utils.encoding import force_unicode
 from django.utils.importlib import import_module
+
+try:
+    from django.utils.encoding import force_unicode as force_text
+except ImportError:
+    from django.utils.encoding import force_text  # Python 3
 
 
 class LazyEncoder(json.JSONEncoder):
@@ -17,7 +21,7 @@ class LazyEncoder(json.JSONEncoder):
     """
     def default(self, obj):
         if isinstance(obj, Promise):
-            return force_unicode(obj)
+            return force_text(obj)
         return super(LazyEncoder, self).default(obj)
 
 
