@@ -39,7 +39,7 @@ def browserid_info(request):
     # Only pass an email to the JavaScript if the current user was authed with
     # our auth backend.
     backend_name = request.session.get(auth.BACKEND_SESSION_KEY)
-    backend = auth.load_backend(backend_name)
+    backend = auth.load_backend(backend_name) if backend_name else None
 
     if isinstance(backend, BrowserIDBackend):
         email = getattr(request.user, 'email', '')
