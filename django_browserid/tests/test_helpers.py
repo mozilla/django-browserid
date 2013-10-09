@@ -1,8 +1,9 @@
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import AnonymousUser, User
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.utils.functional import lazy
+from django.contrib.sessions.backends.cache import SessionStore
 
 from mock import patch
 from pyquery import PyQuery as pq
@@ -29,6 +30,7 @@ class BrowserIDJSTests(TestCase):
         self.assertTrue('src="static/test1.js"' in output)
         self.assertTrue('src="static/test2.js"' in output)
         self.assertTrue('src="https://example.com/test3.js"' not in output)
+
 
 @patch('django_browserid.helpers.FORM_CSS',
        ('test1.css', 'test2.css'))
@@ -93,6 +95,8 @@ class BrowserIDInfoTests(TestCase):
     def test_defaults(self):
         request = self.factory.get('/')
         request.user = AnonymousUser()
+        request.session = SessionStore()
+
         info = browserid_info(request)
         d = pq(info)
 
@@ -110,7 +114,11 @@ class BrowserIDInfoTests(TestCase):
         User.objects.create_user('asdf', 'a@example.com')
         with mock_browserid('a@example.com'):
             user = authenticate(assertion='asdf', audience='1234')
-            request.user = user
+
+        request.user = user
+        request.session = SessionStore()
+
+        login(request, user)
 
         info = browserid_info(request)
         d = pq(info)
@@ -133,8 +141,12 @@ class BrowserIDInfoTests(TestCase):
         User.objects.create_user('asdf', 'a@example.com', '1234')
         with mock_browserid(None):
             user = authenticate(username='asdf', password='1234')
-            self.assertTrue(user.is_authenticated())
-            request.user = user
+
+        self.assertTrue(user.is_authenticated())
+        request.user = user
+        request.session = SessionStore()
+
+        login(request, user)
 
         info = browserid_info(request)
         d = pq(info)
@@ -147,6 +159,8 @@ class BrowserIDInfoTests(TestCase):
         # Ensure that request_args can be a lazy-evaluated dictionary.
         request = self.factory.get('/')
         request.user = AnonymousUser()
+        request.session = SessionStore()
+
         info = browserid_info(request)
         d = pq(info)
 

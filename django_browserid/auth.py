@@ -154,7 +154,6 @@ class BrowserIDBackend(object):
     def get_user(self, user_id):
         try:
             user = self.User.objects.get(pk=user_id)
-            user.backend = 'django_browserid.auth.BrowserIDBackend'
             return user
         except self.User.DoesNotExist:
             return None
