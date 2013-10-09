@@ -4,6 +4,7 @@
 import json
 
 from django.conf import settings
+from django.contrib import auth
 from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
@@ -36,7 +37,7 @@ def browserid_info(request):
 
     # Only pass an email to the JavaScript if the current user was authed with
     # our auth backend.
-    backend = getattr(request.user, 'backend', None)
+    backend = request.session.get(auth.BACKEND_SESSION_KEY)
     if backend == 'django_browserid.auth.BrowserIDBackend':
         email = getattr(request.user, 'email', '')
     else:

@@ -104,12 +104,10 @@ class BrowserIDBackendTests(TestCase):
         verifier.verify.assert_called_with('asdf', 'http://testserver', foo='bar')
 
     def test_get_user(self):
-        # If a user is retrieved by the BrowserIDBackend, it should have
-        # 'django_browserid.auth.BrowserIDBackend' for the backend attribute.
+        # Check if user returned by BrowserIDBackend.get_user is correct
         user = new_user('a@example.com')
         backend = BrowserIDBackend()
-        self.assertEqual(backend.get_user(user.id).backend,
-                         'django_browserid.auth.BrowserIDBackend')
+        self.assertEqual(backend.get_user(user.pk), user)
 
     def test_overriding_valid_email(self):
         class PickyBackend(BrowserIDBackend):
