@@ -9,6 +9,7 @@ from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 
+from django_browserid.auth import BrowserIDBackend
 from django_browserid.forms import (BROWSERID_SHIM, BrowserIDForm,
                                     FORM_CSS, FORM_JAVASCRIPT)
 
@@ -37,8 +38,10 @@ def browserid_info(request):
 
     # Only pass an email to the JavaScript if the current user was authed with
     # our auth backend.
-    backend = request.session.get(auth.BACKEND_SESSION_KEY)
-    if backend == 'django_browserid.auth.BrowserIDBackend':
+    backend_name = request.session.get(auth.BACKEND_SESSION_KEY)
+    backend = auth.load_backend(backend_name)
+
+    if isinstance(backend, BrowserIDBackend):
         email = getattr(request.user, 'email', '')
     else:
         email = ''
