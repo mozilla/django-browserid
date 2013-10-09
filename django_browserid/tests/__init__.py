@@ -1,9 +1,14 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
+import json
+
+from django.test import TestCase as DjangoTestCase
+from django.utils.encoding import smart_text
 from django.utils.functional import wraps
 
 from mock import patch
+from nose.tools import eq_
 
 
 
@@ -57,3 +62,8 @@ class mock_browserid(object):
             with self:
                 return func(*args, **kwargs)
         return inner
+
+
+class TestCase(DjangoTestCase):
+    def assert_json_equals(self, json_str, value):
+        return eq_(json.loads(smart_text(json_str)), value)

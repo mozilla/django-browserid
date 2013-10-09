@@ -4,59 +4,15 @@
 import json
 
 from django.conf import settings
-from django.contrib import auth
 from django.contrib.staticfiles.storage import staticfiles_storage
-from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 from django.utils.six import string_types
 
-from django_browserid.auth import BrowserIDBackend
-from django_browserid.forms import (BROWSERID_SHIM, BrowserIDForm,
-                                    FORM_CSS, FORM_JAVASCRIPT)
-
-from django_browserid.util import LazyEncoder
+from django_browserid.compat import reverse
 
 
-# If funfactory is available, we want to use it's locale-aware reverse instead
-# of Django's reverse, so we try to import funfactory's first and fallback to
-# Django's if it is not found.
-try:
-    from funfactory.urlresolvers import reverse
-except ImportError:
-    from django.core.urlresolvers import reverse
-
-
-def browserid_info(request):
-    """
-    Output the HTML for the login form and the info tag. Should be called once
-    at the top of the page just below the <body> tag.
-    """
-    form = BrowserIDForm(auto_id=False)
-
-    # Force request_args to be a dictionary, in case it is lazily generated.
-    request_args = dict(getattr(settings, 'BROWSERID_REQUEST_ARGS', {}))
-
-    # Only pass an email to the JavaScript if the current user was authed with
-    # our auth backend.
-    backend_name = request.session.get(auth.BACKEND_SESSION_KEY)
-    backend = auth.load_backend(backend_name) if backend_name else None
-
-    if isinstance(backend, BrowserIDBackend):
-        email = getattr(request.user, 'email', '')
-    else:
-        email = ''
-
-    return render_to_string('browserid/info.html', {
-        'email': email,
-        'login_url': reverse('browserid_login'),
-        'request_args': json.dumps(request_args, cls=LazyEncoder),
-        'form': form,
-    }, RequestContext(request))
-
-
-def browserid_button(text=None, next=None, link_class=None,
-                     attrs=None, href='#'):
+def browserid_button(text=None, next=None, link_class=None, attrs=None, href='#'):
     """
     Output the HTML for a BrowserID link.
 
@@ -91,9 +47,8 @@ def browserid_button(text=None, next=None, link_class=None,
     })
 
 
-def browserid_login(text='Sign in', color=None, next=None,
-                    link_class='browserid-login', attrs=None,
-                    fallback_href='#'):
+def browserid_login(text='Sign in', color=None, next=None, link_class='browserid-login',
+                    attrs=None, fallback_href='#'):
     """
     Output the HTML for a BrowserID login link.
 
@@ -129,15 +84,13 @@ def browserid_login(text='Sign in', color=None, next=None,
     """
     if 'browserid-login' not in link_class:
         link_class += ' browserid-login'
-    next = next if next is not None else getattr(settings, 'LOGIN_REDIRECT_URL',
-                                                 '/')
+    next = next or getattr(settings, 'LOGIN_REDIRECT_URL', '/')
     if color:
         link_class += ' persona-button {0}'.format(color)
     return browserid_button(text, next, link_class, attrs, fallback_href)
 
 
-def browserid_logout(text='Sign out', link_class='browserid-logout',
-                     attrs=None):
+def browserid_logout(text='Sign out', next=None, link_class='browserid-logout', attrs=None):
     """
     Output the HTML for a BrowserID logout link.
 
@@ -157,13 +110,13 @@ def browserid_logout(text='Sign out', link_class='browserid-logout',
     """
     if 'browserid-logout' not in link_class:
         link_class += ' browserid-logout'
-    return browserid_button(text, None, link_class, attrs,
-                            reverse('browserid_logout'))
+    next = next or getattr(settings, 'LOGOUT_REDIRECT_URL', '/')
+    return browserid_button(text, next, link_class, attrs, reverse('browserid.logout'))
 
 
 def browserid_js(include_shim=True):
     """
-    Returns <script> tags for the JavaScript required by the BrowserID login
+    Return <script> tags for the JavaScript required by the BrowserID login
     button. Requires use of the staticfiles app.
 
     :param include_shim:
@@ -171,9 +124,10 @@ def browserid_js(include_shim=True):
         in the output. Useful if you want to minify the button JavaScript using
         a library like django-compressor that can't handle external JavaScript.
     """
-    files = [staticfiles_storage.url(path) for path in FORM_JAVASCRIPT]
+    files = []
     if include_shim:
-        files.append(BROWSERID_SHIM)
+        files.append(getattr(settings, 'BROWSERID_SHIM', 'https://login.persona.org/include.js'))
+    files.append(staticfiles_storage.url('browserid/browserid.js'))
 
     tags = ['<script type="text/javascript" src="{0}"></script>'.format(path)
             for path in files]
@@ -182,11 +136,8 @@ def browserid_js(include_shim=True):
 
 def browserid_css():
     """
-    Returns <link> tags for the optional CSS included with django-browserid.
+    Return <link> tag for the optional CSS included with django-browserid.
     Requires use of the staticfiles app.
     """
-    files = [staticfiles_storage.url(path) for path in FORM_CSS]
-
-    tags = ['<link rel="stylesheet" href="{0}" />'.format(path)
-            for path in files]
-    return mark_safe('\n'.join(tags))
+    url = staticfiles_storage.url('browserid/persona-buttons.css')
+    return mark_safe('<link rel="stylesheet" href="{0}" />'.format(url))

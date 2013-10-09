@@ -5,47 +5,48 @@ The JavaScript file that comes with django-browserid, ``browserid.js``,
 includes a a few public functions that are exposed through the
 ``django_browserid`` global object.
 
+Most functions return `jQuery Deferreds`_, which allow you to execute code
+asynchronously after the login or logout actions finish using a Promise
+interface.
 
-.. js:function:: django_browserid.login([next, requestArgs])
+.. note:: Most of the JavaScript API depends on the
+   :class:`django_browserid.views.Info` view to retrieve some information from
+   the backend. It assumes the Info view is available at ``/browserid/info/``
+   on your site. If you are having issues with the JavaScript, make sure the
+   Info view is available at that URL (typically by ensuring there is no regex
+   in front of the django-browserid include in your ``urls.py``).
 
-   Manually trigger BrowserID login.
+.. _`jQuery Deferreds`: https://api.jquery.com/jQuery.Deferred/
 
-   :param string next: URL to redirect the user to after login.
+
+.. js:function:: django_browserid.login([requestArgs])
+
+   Retrieve an assertion and use it to log the user into your site.
+
    :param object requestArgs: Options to pass to `navigator.id.request`_.
+   :returns: Deferred that resolves once the user has been logged in.
 
 .. _`navigator.id.request`: https://developer.mozilla.org/en-US/docs/DOM/navigator.id.request
 
 
-.. js:function:: django_browserid.logout([next])
+.. js:function:: django_browserid.logout()
 
-   Manually trigger BrowserID logout.
+   Log the user out of your site.
 
-   :param string next: URL to redirect the user to after logout.
-
-
-.. js:function:: django_browserid.isUserAuthenticated()
-
-   Check if the current user has authenticated via django_browserid. Note that
-   this relies on the ``#browserid-info`` element having been loaded into the
-   DOM already. If it hasn't, this will return false.
-
-   :returns: True if the user has authenticated, false otherwise.
+   :returns: Deferred that resolves once the user has been logged out.
 
 
-.. js:function:: django_browserid.getAssertion(callback)
+.. js:function:: django_browserid.getAssertion([requestArgs])
 
-   Retrieve an assertion from BrowserID and execute the given callback with the
-   assertion as the single argument.
+   Retrieve an assertion via BrowserID.
 
-   :param function callback: Callback to execute after the assertion has been
-                             retrieved.
+   :returns: Deferred that resolves with the assertion once it is retrieved.
 
 
-.. js:function:: django_browserid.verifyAssertion(assertion, [redirectTo])
+.. js:function:: django_browserid.verifyAssertion(assertion)
 
-   Verify an assertion, and redirect to a URL on success. Calling this method
-   submits a form to the server and changes the current page as if the user
-   was attempting to login.
+   Verify that the given assertion is valid, and log the user in.
 
    :param string assertion: Assertion to verify.
-   :param string redirectTo: URL to redirect to on success.
+   :returns: Deferred that resolves with the login view response once login is
+             complete.

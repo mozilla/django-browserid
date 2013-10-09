@@ -29,9 +29,18 @@ class BrowserIDException(Exception):
 
 
 def sanity_checks(request):
-    """Small checks for common errors."""
-    if not getattr(settings, 'BROWSERID_DISABLE_SANITY_CHECKS', False):
-        return
+    """
+    Small checks for common errors.
+
+    Checks are normally only enabled if DEBUG is True. You can
+    explicitly disable the checks using the
+    BROWSERID_DISABLE_SANITY_CHECKS.
+
+    :returns:
+        True if the checks were run, False if they were skipped.
+    """
+    if getattr(settings, 'BROWSERID_DISABLE_SANITY_CHECKS', not settings.DEBUG):
+        return False  # Return value helps us test if the checks ran.
 
     # SESSION_COOKIE_SECURE should be False in development unless you can
     # use https.
@@ -53,6 +62,8 @@ def sanity_checks(request):
                            'your CSP policies. Consider adding it to '
                            'CSP_SCRIPT_SRC and CSP_FRAME_SRC',
                            persona)
+
+    return True
 
 
 def get_audience(request):
