@@ -5,8 +5,6 @@ from django.utils.functional import wraps
 
 from mock import patch
 
-from django_browserid.auth import BrowserIDBackend
-from django_browserid.base import MockVerifier
 
 
 def fake_create_user(email):
@@ -37,6 +35,11 @@ class mock_browserid(object):
             Keyword arguments are passed on to :class:`django_browserid.base.MockVerifier`, which
             updates the verification result with them.
         """
+        # Need to import these here so that we can import
+        # django_browserid.tests.settings to build the docs.
+        from django_browserid.auth import BrowserIDBackend
+        from django_browserid.base import MockVerifier
+
         self.patcher = patch.object(BrowserIDBackend, 'get_verifier')
         self.return_value = MockVerifier(email, **kwargs)
 
