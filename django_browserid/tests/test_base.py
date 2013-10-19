@@ -6,6 +6,7 @@ from datetime import datetime
 from django.core.exceptions import ImproperlyConfigured
 from django.test import TestCase
 from django.test.client import RequestFactory
+from django.utils import six
 
 import requests
 from mock import Mock, patch, PropertyMock
@@ -13,7 +14,6 @@ from nose.tools import eq_, ok_
 
 from django_browserid.base import (BrowserIDException, get_audience, MockVerifier, RemoteVerifier,
                                    VerificationResult)
-from django_browserid.tests import patch_settings
 
 
 class GetAudienceTests(TestCase):
@@ -38,14 +38,14 @@ class GetAudienceTests(TestCase):
         request = self.factory.get('http://testserver')
 
         audiences = ['https://example.com', 'http://testserver']
-        with patch_settings(BROWSERID_AUDIENCES=audiences):
+        with self.settings(BROWSERID_AUDIENCES=audiences):
             eq_(get_audience(request), 'http://testserver')
 
     def test_no_audience(self):
         # If no matching audiences is found in BROWSERID_AUDIENCES, raise ImproperlyConfigured.
         request = self.factory.get('http://testserver')
 
-        with patch_settings(BROWSERID_AUDIENCES=['https://example.com']):
+        with self.settings(BROWSERID_AUDIENCES=['https://example.com']):
             with self.assertRaises(ImproperlyConfigured):
                 get_audience(request)
 
@@ -87,19 +87,24 @@ class VerificationResultTests(TestCase):
         # If the response status is 'okay', the result should be truthy.
         ok_(VerificationResult({'status': 'okay'}))
 
-    def test_unicode_success(self):
+    def test_str_success(self):
         # If the result is successful, include 'Success' and the email in the string.
         result = VerificationResult({'status': 'okay', 'email': 'a@example.com'})
-        eq_(unicode(result), u'<VerificationResult Success email=a@example.com>')
+        eq_(six.text_type(result), '<VerificationResult Success email=a@example.com>')
 
         # If the email is missing, don't include it.
         result = VerificationResult({'status': 'okay'})
-        eq_(unicode(result), u'<VerificationResult Success>')
+        eq_(six.text_type(result), '<VerificationResult Success>')
 
-    def test_unicode_failure(self):
+    def test_str_failure(self):
         # If the result is a failure, include 'Failure' in the string.
         result = VerificationResult({'status': 'failure'})
-        eq_(unicode(result), u'<VerificationResult Failure>')
+        eq_(six.text_type(result), '<VerificationResult Failure>')
+
+    def test_str_unicode(self):
+        # Ensure that __str__ can handle unicode values.
+        result = VerificationResult({'status': 'okay', 'email': six.u('\x80@example.com')})
+        eq_(six.text_type(result), six.u('<VerificationResult Success email=\x80@example.com>'))
 
 
 class RemoteVerifierTests(TestCase):

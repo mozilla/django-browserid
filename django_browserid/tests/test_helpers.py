@@ -2,6 +2,7 @@ from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import AnonymousUser, User
 from django.test import TestCase
 from django.test.client import RequestFactory
+from django.test.utils import override_settings
 from django.utils.functional import lazy
 from django.contrib.sessions.backends.cache import SessionStore
 
@@ -11,7 +12,7 @@ from pyquery import PyQuery as pq
 from django_browserid.helpers import (browserid_button, browserid_info,
                                       browserid_js, browserid_login,
                                       browserid_css, browserid_logout)
-from django_browserid.tests import mock_browserid, patch_settings
+from django_browserid.tests import mock_browserid
 
 
 @patch('django_browserid.helpers.FORM_JAVASCRIPT',
@@ -107,7 +108,7 @@ class BrowserIDInfoTests(TestCase):
         form = d('#browserid-form')
         self.assertEqual(form.attr('action'), '/browserid/login/')
 
-    @patch_settings(BROWSERID_REQUEST_ARGS={'siteName': 'asdf'})
+    @override_settings(BROWSERID_REQUEST_ARGS={'siteName': 'asdf'})
     def test_custom_values(self):
         request = self.factory.get('/')
 
@@ -154,7 +155,7 @@ class BrowserIDInfoTests(TestCase):
         info_div = d('#browserid-info')
         self.assertEqual(info_div.attr('data-user-email'), '')
 
-    @patch_settings(BROWSERID_REQUEST_ARGS=lazy_request_args())
+    @override_settings(BROWSERID_REQUEST_ARGS=lazy_request_args())
     def test_lazy_request_args(self):
         # Ensure that request_args can be a lazy-evaluated dictionary.
         request = self.factory.get('/')
