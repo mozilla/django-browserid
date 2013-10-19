@@ -57,35 +57,3 @@ class mock_browserid(object):
             with self:
                 return func(*args, **kwargs)
         return inner
-
-
-class patch_settings(object):
-    """
-    Convenient helper for patching settings. Can be used as both a context
-    manager and a decorator.
-
-    TODO: Remove when we drop support for Django 1.3 and use override_settings
-    instead.
-    """
-    def __init__(self, **kwargs):
-        # Load settings at runtime to get the lazy settings object, and patch
-        # the _wrapped settings to avoid deleting settings accidentally.
-        from django.conf import settings
-        wrapped = settings._wrapped
-        self.patches = [patch.object(wrapped, name, value, create=True) for
-                        name, value in kwargs.items()]
-
-    def __enter__(self):
-        for patcher in self.patches:
-            patcher.start()
-
-    def __exit__(self, exc_type, exc_value, traceback):
-        for patcher in self.patches:
-            patcher.stop()
-
-    def __call__(self, func):
-        @wraps(func)
-        def inner(*args, **kwargs):
-            with self:
-                return func(*args, **kwargs)
-        return inner

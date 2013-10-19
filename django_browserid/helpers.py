@@ -5,17 +5,18 @@ import json
 
 from django.conf import settings
 from django.contrib import auth
+from django.contrib.staticfiles.storage import staticfiles_storage
 from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
+from django.utils.six import string_types
 
 from django_browserid.auth import BrowserIDBackend
 from django_browserid.forms import (BROWSERID_SHIM, BrowserIDForm,
                                     FORM_CSS, FORM_JAVASCRIPT)
 
-from django_browserid.util import LazyEncoder, static_url
+from django_browserid.util import LazyEncoder
 
-from six import string_types
 
 # If funfactory is available, we want to use it's locale-aware reverse instead
 # of Django's reverse, so we try to import funfactory's first and fallback to
@@ -170,7 +171,7 @@ def browserid_js(include_shim=True):
         in the output. Useful if you want to minify the button JavaScript using
         a library like django-compressor that can't handle external JavaScript.
     """
-    files = [static_url(path) for path in FORM_JAVASCRIPT]
+    files = [staticfiles_storage.url(path) for path in FORM_JAVASCRIPT]
     if include_shim:
         files.append(BROWSERID_SHIM)
 
@@ -184,7 +185,7 @@ def browserid_css():
     Returns <link> tags for the optional CSS included with django-browserid.
     Requires use of the staticfiles app.
     """
-    files = [static_url(path) for path in FORM_CSS]
+    files = [staticfiles_storage.url(path) for path in FORM_CSS]
 
     tags = ['<link rel="stylesheet" href="{0}" />'.format(path)
             for path in files]

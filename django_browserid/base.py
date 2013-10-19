@@ -7,9 +7,9 @@ from datetime import datetime
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
+from django.utils import six
+from django.utils.encoding import python_2_unicode_compatible
 from django.utils.http import same_origin
-
-import six
 
 import requests
 
@@ -17,17 +17,15 @@ import requests
 logger = logging.getLogger(__name__)
 
 
+@python_2_unicode_compatible
 class BrowserIDException(Exception):
     """Raised when there is an issue verifying an assertion."""
     def __init__(self, exc):
         #: Original exception that caused this to be raised.
         self.exc = exc
 
-    def __unicode__(self):
-        return six.text_type(self.exc)
-
     def __str__(self):
-        return str(self.__unicode__())
+        return six.text_type(self.exc)
 
 
 def sanity_checks(request):
@@ -89,6 +87,7 @@ def get_audience(request):
                                .format(host))
 
 
+@python_2_unicode_compatible
 class VerificationResult(object):
     """
     Result of an attempt to verify an assertion.
@@ -131,14 +130,11 @@ class VerificationResult(object):
     def __bool__(self):
         return self.__nonzero__()
 
-    def __unicode__(self):
+    def __str__(self):
         result = six.u('Success') if self else six.u('Failure')
         email = getattr(self, 'email', None)
         email_string = six.u(' email={0}').format(email) if email else six.u('')
         return six.u('<VerificationResult {0}{1}>').format(result, email_string)
-
-    def __str__(self):
-        return str(self.__unicode__())
 
 
 class RemoteVerifier(object):

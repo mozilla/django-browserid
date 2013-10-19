@@ -3,20 +3,13 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 import logging
 
-import six
-
-if six.PY3:
-    from urllib import parse as urllib_parse
-else:
-    import urlparse as urllib_parse
-
-
 from django.conf import settings
 from django.contrib import auth
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import NoReverseMatch
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
+from django.utils import six
 from django.views.generic.edit import BaseFormView
 
 from django_browserid.base import BrowserIDException, sanity_checks
@@ -28,6 +21,10 @@ try:
 except ImportError:
     from django.core.urlresolvers import reverse
 
+if six.PY3:
+    from urllib import parse as urllib_parse
+else:
+    import urlparse as urllib_parse
 
 logger = logging.getLogger(__name__)
 
