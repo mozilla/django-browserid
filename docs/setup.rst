@@ -139,6 +139,50 @@ passed to your template by the context processor:
 .. _`Context Processor documentation`: https://docs.djangoproject.com/en/dev/ref/settings/#template-context-processors
 
 
+BrowserID in the Django Admin
+-----------------------------
+You can add support for logging in to the Django admin interface with BrowserID
+by using :data:`django_browserid.admin.site` instead of
+:data:`django.contrib.admin.site`. In your ``admin.py`` files, register
+ModelAdmin classes with the django-browserid site:
+
+.. code-block:: python
+
+    from django.contrib import admin
+
+    from django_browserid.admin import site as browserid_admin
+
+    from myapp.foo.models import Bar
+
+
+    class BarAdmin(admin.ModelAdmin):
+        pass
+    browserid_admin.register(Bar, BarAdmin)
+
+Then, use the django-browserid admin site in your ``urls.py`` as well:
+
+.. code-block:: python
+
+    from django.conf.urls import patterns, include, url
+
+    # Autodiscover admin.py files in your project.
+    from django.contrib import admin
+    admin.autodiscover()
+
+    # copy_registry copies ModelAdmins registered with the default site, like
+    # the built-in Django User model.
+    from django_browserid.admin import site as browserid_admin
+    browserid_admin.copy_registry(admin.site)
+
+    urlpatterns = patterns('',
+        # ...
+        url(r'^admin/', include(browserid_admin.urls)),
+    )
+
+See :class:`django_browserid.admin.BrowserIDAdminSite` for details on how to
+customize the login page, such as including a normal login form.
+
+
 Deploying to Production
 -----------------------
 There are a few changes you need to make when deploying your app to production:
