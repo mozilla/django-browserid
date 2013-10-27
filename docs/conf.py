@@ -22,7 +22,7 @@ import sys, os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
 # Set up Django so we can import django_browserid.
-os.environ['DJANGO_SETTINGS_MODULE'] = 'django_browserid.tests.settings'
+os.environ['DJANGO_SETTINGS_MODULE'] = 'docs.settings'
 
 # Now we can import django_browserid
 from django_browserid import __version__

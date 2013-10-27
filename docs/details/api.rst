@@ -19,15 +19,13 @@ Verification
 .. autoclass:: django_browserid.RemoteVerifier
    :members: verify
 
-.. autoclass:: django_browserid.base.MockVerifier
+.. autoclass:: django_browserid.MockVerifier
    :members: __init__, verify
 
-.. autoclass:: django_browserid.base.VerificationResult
+.. autoclass:: django_browserid.VerificationResult
    :members: expires
 
 .. autofunction:: django_browserid.get_audience
-
-.. autofunction:: django_browserid.sanity_checks
 
 
 Views
