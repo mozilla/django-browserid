@@ -29,23 +29,12 @@ To use ``django-browserid``, you'll need to make a few changes to your
        # ...
     )
 
-    # Add the django_browserid context processor.
-    TEMPLATE_CONTEXT_PROCESSORS = (
-       # ...
-       'django_browserid.context_processors.browserid',
-       # ...
-    )
-
     # Specify audiences (protocol, domain, port) that your site will handle.
     BROWSERID_AUDIENCES = ['http://example.com:8000', 'https://my.example.com']
 
 .. note:: For security reasons, it is *very important* that you set
    ``BROWSERID_AUDIENCES`` correctly. If it is incorrect, other sites could use
    assertions to impersonate users on your own site.
-
-.. note:: ``TEMPLATE_CONTEXT_PROCESSORS`` is not in the settings file by
-   default. You can find the default value in the `Context Processor
-   documentation`_.
 
 Next, edit your ``urls.py`` file and add the following::
 
