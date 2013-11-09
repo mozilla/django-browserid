@@ -26,6 +26,7 @@ Tested Under
 
   * 1.4.8
   * 1.5.4
+  * 1.6
 
 
 Documentation
