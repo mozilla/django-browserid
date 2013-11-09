@@ -2,17 +2,24 @@ language: python
 python:
   - 2.6
   - 2.7
+  
 env:
   - DJANGO_VERSION=1.4.8
   - DJANGO_VERSION=1.5.4
+  - DJANGO_VERSION=1.6
 matrix:
   include:
     - python: 3.2
       env: DJANGO_VERSION=1.5.4
     - python: 3.3
       env: DJANGO_VERSION=1.5.4
+  include:
+    - python: 3.2
+      env: DJANGO_VERSION=1.6
+    - python: 3.3
+      env: DJANGO_VERSION=1.6
 install:
-  - pip install -e git+git://github.com/sobotklp/django-nose@b3f485e914965e0a7b7012c309864d6a6dcac3ed#egg=django-nose
+  - pip install django-nose
   - pip install django==${DJANGO_VERSION}
   - pip install -r requirements.txt --use-mirrors
 script: python setup.py test
