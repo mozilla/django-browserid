@@ -11,6 +11,7 @@ from django_browserid.auth import BrowserIDBackend  # NOQA
 from django_browserid.base import (
     BrowserIDException,
     get_audience,
+    MockVerifier,
     RemoteVerifier,
     VerificationResult
 )  # NOQA
