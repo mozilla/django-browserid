@@ -1,7 +1,6 @@
 import json
 
 from django.core.exceptions import ImproperlyConfigured
-from django.test import TestCase
 from django.test.utils import override_settings
 from django.utils import six
 from django.utils.functional import lazy
@@ -9,6 +8,7 @@ from django.utils.functional import lazy
 from mock import Mock, patch
 from nose.tools import eq_
 
+from django_browserid.tests import TestCase
 from django_browserid.util import import_from_setting, LazyEncoder
 
 

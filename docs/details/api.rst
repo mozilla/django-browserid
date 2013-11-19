@@ -4,13 +4,13 @@ API
 Template Helpers
 ----------------
 
-.. autofunction:: django_browserid.helpers.browserid_info()
-
 .. autofunction:: django_browserid.helpers.browserid_login
 
 .. autofunction:: django_browserid.helpers.browserid_logout
 
 .. autofunction:: django_browserid.helpers.browserid_js
+
+.. autofunction:: django_browserid.helpers.browserid_css
 
 
 Verification
@@ -27,11 +27,21 @@ Verification
 
 .. autofunction:: django_browserid.get_audience
 
+.. autofunction:: django_browserid.sanity_checks
+
 
 Views
 -----
 
 .. autoclass:: django_browserid.views.Verify
+   :members:
+   :show-inheritance:
+
+.. autoclass:: django_browserid.views.Logout
+   :members:
+   :show-inheritance:
+
+.. autoclass:: django_browserid.views.Info
    :members:
    :show-inheritance:
 

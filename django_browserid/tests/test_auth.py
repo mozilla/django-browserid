@@ -4,13 +4,12 @@
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.db import IntegrityError
-from django.test import TestCase
 
 from mock import ANY, Mock, patch
 
 from django_browserid.auth import BrowserIDBackend, default_username_algo
 from django_browserid.base import MockVerifier
-from django_browserid.tests import mock_browserid
+from django_browserid.tests import mock_browserid, TestCase
 
 try:
     from django.contrib.auth import get_user_model
