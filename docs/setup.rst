@@ -143,13 +143,14 @@ Deploying to Production
 There are a few changes you need to make when deploying your app to production:
 
 - BrowserID uses an assertion and an audience to verify the user. The
-  ``SITE_URL`` setting is used to determine the audience. For security reasons,
-  it is *very important* that you set ``SITE_URL`` correctly.
+  ``BROWSERID_AUDIENCES`` setting is used to determine the audience. For
+  security reasons, it is *very important* that you set ``BROWSERID_AUDIENCES``
+  correctly.
 
-  ``SITE_URL`` should be set to the domain and protocol users will use to
-  access your site, such as ``https://affiliates.mozilla.org``. This URL does
-  not have to be publicly available, however, so sites limited to a certain
-  network can still use django-browserid.
+  ``BROWSERID_AUDIENCES`` should be set to the domains and protocols
+  users will use to access your site, such as``https://affiliates.mozilla.org``.
+  This URL does not have to be publicly available, however, so sites limited to
+  a certain network can still use django-browserid.
 
 
 Static Files
