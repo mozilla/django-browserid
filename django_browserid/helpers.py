@@ -9,7 +9,7 @@ from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 from django.utils.six import string_types
 
-from django_browserid.compat import reverse
+from django_browserid.compat import jingo_register, reverse
 
 
 def browserid_button(text=None, next=None, link_class=None, attrs=None, href='#'):
@@ -47,6 +47,7 @@ def browserid_button(text=None, next=None, link_class=None, attrs=None, href='#'
     })
 
 
+@jingo_register.function
 def browserid_login(text='Sign in', color=None, next=None, link_class='browserid-login',
                     attrs=None, fallback_href='#'):
     """
@@ -90,6 +91,7 @@ def browserid_login(text='Sign in', color=None, next=None, link_class='browserid
     return browserid_button(text, next, link_class, attrs, fallback_href)
 
 
+@jingo_register.function
 def browserid_logout(text='Sign out', next=None, link_class='browserid-logout', attrs=None):
     """
     Output the HTML for a BrowserID logout link.
@@ -114,6 +116,7 @@ def browserid_logout(text='Sign out', next=None, link_class='browserid-logout', 
     return browserid_button(text, next, link_class, attrs, reverse('browserid.logout'))
 
 
+@jingo_register.function
 def browserid_js(include_shim=True):
     """
     Return <script> tags for the JavaScript required by the BrowserID login
@@ -134,6 +137,7 @@ def browserid_js(include_shim=True):
     return mark_safe('\n'.join(tags))
 
 
+@jingo_register.function
 def browserid_css():
     """
     Return <link> tag for the optional CSS included with django-browserid.
