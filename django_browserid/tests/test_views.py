@@ -10,6 +10,7 @@ from mock import patch
 
 from django_browserid import BrowserIDException, views
 from django_browserid.tests import mock_browserid
+from django.core.urlresolvers import NoReverseMatch
 
 
 factory = RequestFactory()
@@ -162,5 +163,4 @@ class VerifyTests(TestCase):
                            CSP_SCRIPT_SRC=['https://login.persona.org'],
                            CSP_FRAME_SRC=[]):
             self.verify('post', assertion='asdf')
-            debug.called = True
-
+            debug.called = True    

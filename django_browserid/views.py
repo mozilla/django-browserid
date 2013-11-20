@@ -54,7 +54,14 @@ class Verify(BaseFormView):
         ``settings.LOGIN_REDIRECT_URL``, and defaults to ``'/'`` if the setting
         doesn't exist.
         """
-        return getattr(settings, 'LOGIN_REDIRECT_URL', '/')
+        redirect_url = getattr(settings, 'LOGIN_REDIRECT_URL', '/') 
+        
+        try:
+            redirect_url = reverse(redirect_url)
+        except NoReverseMatch:
+            pass
+        
+        return redirect_url 
 
     def login_success(self):
         """
@@ -71,11 +78,7 @@ class Verify(BaseFormView):
         if redirect_to:
             netloc = urllib_parse.urlparse(redirect_to).netloc
             if netloc and netloc != self.request.get_host():
-                redirect_to = None
-            try:
-                redirect_to = reverse(redirect_to)
-            except NoReverseMatch:
-                pass
+                redirect_to = None            
 
         return HttpResponseRedirect(redirect_to or self.get_success_url())
 
