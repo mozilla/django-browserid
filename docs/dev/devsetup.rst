@@ -1,4 +1,3 @@
-===============
 Developer Setup
 ===============
 
@@ -15,7 +14,7 @@ and install all development packages::
 
 Here is how to run the test suite::
 
-    python runtests.py
+    ./setup.py test
 
 You can also run the tests in all the Python/Django environment
 combinations using tox::
@@ -27,6 +26,24 @@ Here is how to build the documentation::
 
     make -C docs/ html
 
+
+JavaScript Tests
+----------------
+To run the JavaScript tests, you must have `node.js`_  installed. Then, use the
+npm command to install karma_ and `karma-mocha`_::
+
+    npm install -g karma
+    npm install -g karma-mocha
+
+After that, you can run the JavaScript tests with the following command from
+the repo root::
+
+    karma start js_tests/karma.conf.js
+
+
 .. _`github project`: https://github.com/mozilla/django-browserid
 .. _virtualenv: http://www.virtualenv.org/
 .. _virtualenvwrapper: http://virtualenvwrapper.readthedocs.org/
+.. _`node.js`: https://nodejs.org/
+.. _karma: https://karma-runner.github.io/
+.. _`karma-mocha`: https://github.com/karma-runner/karma-mocha

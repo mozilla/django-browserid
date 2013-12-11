@@ -7,12 +7,14 @@ class BrowserIDJSTests(TestCase):
         output = helpers.browserid_js()
         self.assertHTMLEqual(output, """
             <script type="text/javascript" src="https://login.persona.org/include.js"></script>
+            <script type="text/javascript" src="static/browserid/api.js"></script>
             <script type="text/javascript" src="static/browserid/browserid.js"></script>
         """)
 
     def test_no_shim(self):
         output = helpers.browserid_js(include_shim=False)
         self.assertHTMLEqual(output, """
+            <script type="text/javascript" src="static/browserid/api.js"></script>
             <script type="text/javascript" src="static/browserid/browserid.js"></script>
         """)
 
@@ -21,6 +23,7 @@ class BrowserIDJSTests(TestCase):
             output = helpers.browserid_js()
         self.assertHTMLEqual(output, """
             <script type="text/javascript" src="http://example.com/test.js"></script>
+            <script type="text/javascript" src="static/browserid/api.js"></script>
             <script type="text/javascript" src="static/browserid/browserid.js"></script>
         """)
 
