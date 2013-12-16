@@ -194,7 +194,7 @@ class RemoteVerifier(object):
             raise BrowserIDException(err)
 
         try:
-            return VerificationResult(json.loads(response.content))
+            return VerificationResult(response.json())
         except (ValueError, TypeError) as err:
             # If the returned JSON is invalid, log a warning and return a failure result.
             logger.warning('Failed to parse remote verifier response: `{0}`'

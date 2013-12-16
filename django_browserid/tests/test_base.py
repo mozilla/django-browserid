@@ -241,7 +241,9 @@ class RemoteVerifierTests(TestCase):
         verifier = base.RemoteVerifier()
 
         with patch('django_browserid.base.requests.post') as post:
-            post.return_value = self._response(content='{asg9=3{{{}}{')
+            response = self._response(content='{asg9=3{{{}}{')
+            response.json.side_effect = ValueError("Couldn't parse json")
+            post.return_value = response
             result = verifier.verify('asdf', 'http://testserver')
         ok_(not result)
         ok_(result.reason.startswith('Could not parse verifier response'))
@@ -253,8 +255,10 @@ class RemoteVerifierTests(TestCase):
         verifier = base.RemoteVerifier()
 
         with patch('django_browserid.base.requests.post') as post:
-            post.return_value = self._response(
+            response = self._response(
                 content='{"status": "okay", "email": "foo@example.com"}')
+            response.json.return_value = {"status": "okay", "email": "foo@example.com"}
+            post.return_value = response
             result = verifier.verify('asdf', 'http://testserver')
         ok_(result)
         eq_(result.email, 'foo@example.com')
