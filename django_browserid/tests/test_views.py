@@ -164,3 +164,10 @@ class VerifyTests(TestCase):
                            CSP_FRAME_SRC=[]):
             self.verify('post', assertion='asdf')
             debug.called = True    
+
+    @patch('django_browserid.views.reverse')
+    def test_reverse_redirect(self, reverse):
+        view = views.Verify()
+        with self.settings(LOGIN_REDIRECT_URL='main:home'):            
+            assert view.success_url == reverse('main:home')
+
