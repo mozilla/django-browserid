@@ -30,6 +30,7 @@ To use ``django-browserid``, you'll need to make a few changes to your
     )
 
     # Specify audiences (protocol, domain, port) that your site will handle.
+    # Note! This is only needed if DEBUG = False
     BROWSERID_AUDIENCES = ['http://example.com:8000', 'https://my.example.com']
 
 .. note:: For security reasons, it is *very important* that you set

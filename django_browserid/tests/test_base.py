@@ -105,6 +105,7 @@ class GetAudienceTests(TestCase):
         with patch('django_browserid.base.settings') as settings:
             mock_browserid_audiences = PropertyMock(side_effect=AttributeError)
             type(settings).BROWSERID_AUDIENCES = mock_browserid_audiences
+            settings.DEBUG = False
 
             with self.assertRaises(ImproperlyConfigured):
                 base.get_audience(request)
@@ -126,6 +127,26 @@ class GetAudienceTests(TestCase):
         with self.settings(BROWSERID_AUDIENCES=['https://example.com']):
             with self.assertRaises(ImproperlyConfigured):
                 base.get_audience(request)
+
+    def test_missing_setting_but_in_debug(self):
+        # If no BROWSERID_AUDIENCES is set but in DEBUG just use the
+        # current protocal and host
+        request = self.factory.get('/')
+
+        # Simulate that no BROWSERID_AUDIENCES has been set
+        with patch('django_browserid.base.settings') as settings:
+            del settings.BROWSERID_AUDIENCES
+            settings.DEBUG = True
+            eq_(base.get_audience(request), 'http://testserver')
+
+    def test_no_audience_but_in_debug(self):
+        # If no BROWSERID_AUDIENCES is set but in DEBUG just use the
+        # current protocal and host
+        request = self.factory.get('/')
+
+        # Simulate that no BROWSERID_AUDIENCES has been set
+        with self.settings(BROWSERID_AUDIENCES=[], DEBUG=True):
+            eq_(base.get_audience(request), 'http://testserver')
 
 
 class VerificationResultTests(TestCase):

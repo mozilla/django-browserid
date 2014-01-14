@@ -81,13 +81,17 @@ def get_audience(request):
         :class:`django.core.exceptions.ImproperlyConfigured`: If BROWSERID_AUDIENCES isn't
         defined, or if no matching audience could be found.
     """
-    try:
-        audiences = settings.BROWSERID_AUDIENCES
-    except AttributeError:
-        raise ImproperlyConfigured('Required setting BROWSERID_AUDIENCES not found!')
-
     protocol = 'https' if request.is_secure() else 'http'
     host = '{0}://{1}'.format(protocol, request.get_host())
+    try:
+        audiences = settings.BROWSERID_AUDIENCES
+        if not audiences and settings.DEBUG:
+            return host
+    except AttributeError:
+        if settings.DEBUG:
+            return host
+        raise ImproperlyConfigured('Required setting BROWSERID_AUDIENCES not found!')
+
     for audience in audiences:
         if same_origin(host, audience):
             return audience
