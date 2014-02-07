@@ -48,7 +48,7 @@ def browserid_button(text=None, next=None, link_class=None, attrs=None, href='#'
 
 
 @jingo_register.function
-def browserid_login(text='Sign in', color=None, next=None, link_class='browserid-login',
+def browserid_login(text='Sign in', color=None, next=None, link_class='persona-button',
                     attrs=None, fallback_href='#'):
     """
     Output the HTML for a BrowserID login link.
@@ -69,7 +69,7 @@ def browserid_login(text='Sign in', color=None, next=None, link_class='browserid
         the LOGIN_REDIRECT_URL setting will be used.
 
     :param link_class:
-        CSS class for the link. `browserid-login` will be added to this
+        CSS class for the link. `persona-button` will be added to this
         automatically.
 
     :param attrs:
@@ -83,8 +83,8 @@ def browserid_login(text='Sign in', color=None, next=None, link_class='browserid
         JavaScript, the login link will bring them to this page, which can be
         used as a non-JavaScript login fallback.
     """
-    if 'browserid-login' not in link_class:
-        link_class += ' browserid-login'
+    if 'persona-button' not in link_class:
+        link_class += ' persona-button'
     next = next or getattr(settings, 'LOGIN_REDIRECT_URL', '/')
     if color:
         link_class += ' persona-button {0}'.format(color)
@@ -92,7 +92,7 @@ def browserid_login(text='Sign in', color=None, next=None, link_class='browserid
 
 
 @jingo_register.function
-def browserid_logout(text='Sign out', next=None, link_class='browserid-logout', attrs=None):
+def browserid_logout(text='Sign out', next=None, link_class='persona-button', attrs=None):
     """
     Output the HTML for a BrowserID logout link.
 
@@ -101,7 +101,7 @@ def browserid_logout(text='Sign out', next=None, link_class='browserid-logout', 
         localized.
 
     :param link_class:
-        CSS class for the link. `browserid-logout` will be added to this
+        CSS class for the link. `persona-button` will be added to this
         automatically.
 
     :param attrs:
@@ -110,8 +110,8 @@ def browserid_logout(text='Sign out', next=None, link_class='browserid-logout', 
 
         If given a string, it is parsed as JSON and is expected to be an object.
     """
-    if 'browserid-logout' not in link_class:
-        link_class += ' browserid-logout'
+    if 'persona-button' not in link_class:
+        link_class += ' persona-button'
     next = next or getattr(settings, 'LOGOUT_REDIRECT_URL', '/')
     return browserid_button(text, next, link_class, attrs, reverse('browserid.logout'))
 
