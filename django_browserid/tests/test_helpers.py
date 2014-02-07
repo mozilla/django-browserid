@@ -65,10 +65,30 @@ class BrowserIDLoginTests(TestCase):
             </a>
         """)
 
+    def test_login_class(self):
+        # If no class is provided, it should default to
+        # 'browserid-login persona-button'
+        with self.settings(LOGIN_REDIRECT_URL='/'):
+            button = helpers.browserid_login()
+        self.assertHTMLEqual(button, """
+            <a href="#" class="persona-button browserid-login" data-next="/">
+                <span>Sign in</span>
+            </a>
+        """)
+
+    def test_color_class(self):
+        with self.settings(LOGIN_REDIRECT_URL='/'):
+            button = helpers.browserid_login(color='dark')
+        self.assertHTMLEqual(button, """
+            <a href="#" class="persona-button browserid-login dark" data-next="/">
+                <span>Sign in</span>
+            </a>
+        """)
+
     def test_next(self):
         button = helpers.browserid_login(next='/foo/bar')
         self.assertHTMLEqual(button, """
-            <a href="#" class="browserid-login" data-next="/foo/bar">
+            <a href="#" class="persona-button browserid-login" data-next="/foo/bar">
                 <span>Sign in</span>
             </a>
         """)
@@ -78,7 +98,7 @@ class BrowserIDLoginTests(TestCase):
         with self.settings(LOGIN_REDIRECT_URL='/foo/bar'):
             button = helpers.browserid_login()
         self.assertHTMLEqual(button, """
-            <a href="#" class="browserid-login" data-next="/foo/bar">
+            <a href="#" class="persona-button browserid-login" data-next="/foo/bar">
                 <span>Sign in</span>
             </a>
         """)

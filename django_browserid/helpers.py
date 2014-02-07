@@ -48,7 +48,7 @@ def browserid_button(text=None, next=None, link_class=None, attrs=None, href='#'
 
 
 @jingo_register.function
-def browserid_login(text='Sign in', color=None, next=None, link_class='browserid-login',
+def browserid_login(text='Sign in', color=None, next=None, link_class='persona-button',
                     attrs=None, fallback_href='#'):
     """
     Output the HTML for a BrowserID login link.
@@ -85,9 +85,12 @@ def browserid_login(text='Sign in', color=None, next=None, link_class='browserid
     """
     if 'browserid-login' not in link_class:
         link_class += ' browserid-login'
-    next = next or getattr(settings, 'LOGIN_REDIRECT_URL', '/')
     if color:
-        link_class += ' persona-button {0}'.format(color)
+        if 'persona-button' not in link_class:
+            link_class += ' persona-button {0}'.format(color)
+        else:
+            link_class += ' ' + color
+    next = next or getattr(settings, 'LOGIN_REDIRECT_URL', '/')
     return browserid_button(text, next, link_class, attrs, fallback_href)
 
 
