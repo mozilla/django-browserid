@@ -65,7 +65,7 @@ class BrowserIDLoginTests(TestCase):
             </a>
         """)
 
-    def test_login_class(self):
+    def test_default_class(self):
         # If no class is provided, it should default to
         # 'browserid-login persona-button'
         with self.settings(LOGIN_REDIRECT_URL='/'):
