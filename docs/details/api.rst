@@ -13,6 +13,16 @@ Template Helpers
 .. autofunction:: django_browserid.helpers.browserid_css
 
 
+Admin Site
+----------
+
+.. autoclass:: django_browserid.admin.BrowserIDAdminSite
+   :members: include_password_form, copy_registry
+
+.. autodata:: django_browserid.admin.site
+   :annotation:
+
+
 Verification
 ------------
 
