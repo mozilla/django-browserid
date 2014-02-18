@@ -64,3 +64,8 @@ class mock_browserid(object):
 class TestCase(DjangoTestCase):
     def assert_json_equals(self, json_str, value):
         return eq_(json.loads(smart_text(json_str)), value)
+
+    def shortDescription(self):
+        # Stop nose using the test docstring and instead the test method
+        # name.
+        pass

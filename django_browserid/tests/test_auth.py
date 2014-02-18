@@ -38,30 +38,38 @@ class BrowserIDBackendTests(TestCase):
             return backend.authenticate(assertion='asdf', audience='asdf', **kwargs)
 
     def test_failed_verification(self):
-        # If verification fails, return None.
+        """If verification fails, return None."""
         self.assertTrue(self.auth(None) is None)
 
     def test_duplicate_emails(self):
-        # If there are two users with the same email address, return None.
+        """
+        If there are two users with the same email address, return None.
+        """
         new_user('a@example.com', 'test1')
         new_user('a@example.com', 'test2')
         self.assertTrue(self.auth('a@example.com') is None)
 
     def test_auth_success(self):
-        # If a single user is found with the verified email, return an instance
-        # of their user object.
+        """
+        If a single user is found with the verified email, return an
+        instance of their user object.
+        """
         user = new_user('a@example.com')
         self.assertEqual(self.auth('a@example.com'), user)
 
     @patch.object(settings, 'BROWSERID_CREATE_USER', False)
     def test_no_create_user(self):
-        # If user creation is disabled and no user is found, return None.
+        """
+        If user creation is disabled and no user is found, return None.
+        """
         self.assertTrue(self.auth('a@example.com') is None)
 
     @patch.object(settings, 'BROWSERID_CREATE_USER', True)
     def test_create_user(self):
-        # If user creation is enabled and no user is found, return a new
-        # User.
+        """
+        If user creation is enabled and no user is found, return a new
+        User.
+        """
         user = self.auth('a@example.com')
         self.assertTrue(user is not None)
         self.assertTrue(isinstance(user, User))
@@ -71,8 +79,11 @@ class BrowserIDBackendTests(TestCase):
                   'django_browserid.tests.test_auth.new_user')
     @patch('django_browserid.tests.test_auth.new_user')
     def test_custom_create_user(self, create_user):
-        # If user creation is enabled with a custom create function and no user
-        # is found, return the new user created with the custom function.
+        """
+        If user creation is enabled with a custom create function and no
+        user is found, return the new user created with the custom
+        function.
+        """
         create_user.return_value = 'test'
         self.assertEqual(self.auth('a@example.com'), 'test')
         create_user.assert_called_with('a@example.com')
@@ -80,7 +91,7 @@ class BrowserIDBackendTests(TestCase):
     @patch.object(settings, 'BROWSERID_USERNAME_ALGO')
     @patch.object(settings, 'BROWSERID_CREATE_USER', True)
     def test_custom_username_algorithm(self, username_algo):
-        # If a custom username algorithm is specified, use it!
+        """If a custom username algorithm is specified, use it!"""
         username_algo.return_value = 'test'
         user = self.auth('a@b.com')
         self.assertEqual(user.username, 'test')
@@ -88,8 +99,10 @@ class BrowserIDBackendTests(TestCase):
     @patch('django_browserid.auth.user_created')
     @patch.object(settings, 'BROWSERID_CREATE_USER', True)
     def test_user_created_signal(self, user_created):
-        # Test that the user_created signal is called when a new user is
-        # created.
+        """
+        Test that the user_created signal is called when a new user is
+        created.
+        """
         user = self.auth('a@b.com')
         user_created.send.assert_called_with(ANY, user=user)
 
@@ -103,7 +116,9 @@ class BrowserIDBackendTests(TestCase):
         verifier.verify.assert_called_with('asdf', 'http://testserver', foo='bar')
 
     def test_get_user(self):
-        # Check if user returned by BrowserIDBackend.get_user is correct
+        """
+        Check if user returned by BrowserIDBackend.get_user is correct.
+        """
         user = new_user('a@example.com')
         backend = BrowserIDBackend()
         self.assertEqual(backend.get_user(user.pk), user)
@@ -128,8 +143,11 @@ class BrowserIDBackendTests(TestCase):
 
     @patch('django_browserid.auth.logger')
     def test_create_user_integrity_error(self, logger):
-        # If an IntegrityError is raised during user creation, attempt to re-fetch the user in case
-        # the user was created since we checked for the existing account.
+        """
+        If an IntegrityError is raised during user creation, attempt to
+        re-fetch the user in case the user was created since we checked
+        for the existing account.
+        """
         backend = BrowserIDBackend()
         backend.User = Mock()
         error = IntegrityError()

@@ -80,7 +80,7 @@ class VerifyTests(TestCase):
         return response
 
     def test_no_assertion(self):
-        # If no assertion is given, return a failure result.
+        """If no assertion is given, return a failure result."""
         with self.settings(LOGIN_REDIRECT_URL_FAILURE='/fail'):
             response = self.verify('post', blah='asdf')
         eq_(response.status_code, 403)
@@ -88,7 +88,7 @@ class VerifyTests(TestCase):
 
     @mock_browserid(None)
     def test_auth_fail(self):
-        # If authentication fails, redirect to the failure URL.
+        """If authentication fails, redirect to the failure URL."""
         with self.settings(LOGIN_REDIRECT_URL_FAILURE='/fail'):
             response = self.verify('post', assertion='asdf')
         eq_(response.status_code, 403)
@@ -96,7 +96,9 @@ class VerifyTests(TestCase):
 
     @mock_browserid(None)
     def test_auth_fail_url_parameters(self):
-        # Ensure that bid_login_failed=1 is appended to the failure url.
+        """
+        Ensure that bid_login_failed=1 is appended to the failure url.
+        """
         with self.settings(LOGIN_REDIRECT_URL_FAILURE='/fail?'):
             response = self.verify('post', assertion='asdf')
         self.assert_json_equals(response.content, {'redirect': '/fail?bid_login_failed=1'})
@@ -118,7 +120,10 @@ class VerifyTests(TestCase):
     @patch('django_browserid.views.logger.error')
     @patch('django_browserid.views.auth.authenticate')
     def test_authenticate_browserid_exception(self, authenticate, logger_error):
-        # If authenticate raises a BrowserIDException, return a failure response.
+        """
+        If authenticate raises a BrowserIDException, return a failure
+        response.
+        """
         excpt = BrowserIDException(Exception('hsakjw'))
         authenticate.side_effect = excpt
 
@@ -128,7 +133,7 @@ class VerifyTests(TestCase):
         mock_failure.assert_called_with(excpt)
 
     def test_login_failure_log_exception(self):
-        # If login_failure is passed an exception, it should log it.
+        """If login_failure is passed an exception, it should log it."""
         excpt = BrowserIDException(Exception('hsakjw'))
 
         with patch('django_browserid.views.logger.error') as logger_error:
@@ -137,7 +142,7 @@ class VerifyTests(TestCase):
 
     @mock_browserid('test@example.com')
     def test_auth_success_redirect_success(self):
-        # If authentication succeeds, redirect to the success URL.
+        """If authentication succeeds, redirect to the success URL."""
         user = auth.models.User.objects.create_user('asdf', 'test@example.com')
 
         request = self.factory.post('/browserid/verify', {'assertion': 'asdf'})
@@ -152,7 +157,7 @@ class VerifyTests(TestCase):
                                 {'email': 'test@example.com', 'redirect': '/success'})
 
     def test_sanity_checks(self):
-        # Run sanity checks on all incoming requests.
+        """Run sanity checks on all incoming requests."""
         with patch('django_browserid.views.sanity_checks') as sanity_checks:
             self.verify('post')
         ok_(sanity_checks.called)
@@ -200,15 +205,19 @@ class BrowserIDInfoTests(TestCase):
         eq_(response_data['requestArgs'], {'siteName': 'asdf'})
 
     def test_non_browserid_user(self):
-        # If the current user was not authenticated via
-        # django-browserid, userEmail should be empty.
+        """
+        If the current user was not authenticated via django-browserid,
+        userEmail should be empty.
+        """
         user = auth.models.User.objects.create_user('asdf', 'test@example.com')
         response = self.info(user, ModelBackend())
         response_data = json.loads(smart_text(response.content))
         eq_(response_data['userEmail'], '')
 
     def test_lazy_request_args(self):
-        # Ensure that request_args can be a lazy-evaluated dictionary.
+        """
+        Ensure that request_args can be a lazy-evaluated dictionary.
+        """
         def _lazy_request_args():
             return {'siteName': 'asdf'}
         lazy_request_args = lazy(_lazy_request_args, dict)
@@ -224,7 +233,7 @@ class LogoutTests(TestCase):
         self.factory = RequestFactory()
 
     def test_redirect(self):
-        # Include LOGOUT_REDIRECT_URL in the response.
+        """Include LOGOUT_REDIRECT_URL in the response."""
         request = self.factory.post('/')
         logout = views.Logout.as_view()
 

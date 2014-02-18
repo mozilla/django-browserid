@@ -67,8 +67,10 @@ class BrowserIDLoginTests(TestCase):
         """)
 
     def test_default_class(self):
-        # If no class is provided, it should default to
-        # 'browserid-login persona-button'
+        """
+        If no class is provided, it should default to
+        'browserid-login persona-button'.
+        """
         with self.settings(LOGIN_REDIRECT_URL='/'):
             button = helpers.browserid_login()
         self.assertHTMLEqual(button, """
@@ -87,8 +89,10 @@ class BrowserIDLoginTests(TestCase):
         """)
 
     def test_color_custom_class(self):
-        # If using a color and a custom link class, persona-button
-        # should be added to the link class.
+        """
+        If using a color and a custom link class, persona-button should
+        be added to the link class.
+        """
         with self.settings(LOGIN_REDIRECT_URL='/'):
             button = helpers.browserid_login(link_class='go button', color='dark')
         self.assertHTMLEqual(button, """
@@ -106,7 +110,7 @@ class BrowserIDLoginTests(TestCase):
         """)
 
     def test_next_default(self):
-        # next should default to LOGIN_REDIRECT_URL
+        """next should default to LOGIN_REDIRECT_URL"""
         with self.settings(LOGIN_REDIRECT_URL='/foo/bar'):
             button = helpers.browserid_login()
         self.assertHTMLEqual(button, """
@@ -135,7 +139,7 @@ class BrowserIDLogoutTests(TestCase):
         """)
 
     def test_next_default(self):
-        # next should default to LOGOUT_REDIRECT_URL
+        """next should default to LOGOUT_REDIRECT_URL"""
         with self.settings(LOGOUT_REDIRECT_URL='/foo/bar'):
             button = helpers.browserid_logout()
         self.assertHTMLEqual(button, """
