@@ -5,7 +5,6 @@ import logging
 
 from django.conf import settings
 from django.contrib import auth
-from django.core.urlresolvers import NoReverseMatch
 from django.template import RequestContext
 from django.views.generic import View
 
@@ -72,17 +71,9 @@ class Verify(JSONView):
         if error:
             logger.error(error)
 
-        failure_url = self.failure_url
-
-        # If this url is a view name, we need to reverse it first to
-        # get the url.
-        try:
-            failure_url = reverse(failure_url)
-        except NoReverseMatch:
-            pass
-
         # Append "?bid_login_failed=1" to the URL to notify the
         # JavaScript that the login failed.
+        failure_url = self.failure_url
         if not failure_url.endswith('?'):
             failure_url += '?' if not '?' in failure_url else '&'
         failure_url += 'bid_login_failed=1'

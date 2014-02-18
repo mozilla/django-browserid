@@ -28,6 +28,9 @@ Core Settings
 Redirect URLs
 -------------
 
+.. note:: If you want to use named URLs instead of directly including URLs into
+   your settings file, you can use `reverse_lazy`_ to do so.
+
 .. data:: LOGIN_REDIRECT_URL
 
     **Default:** ``'/accounts/profile'``
@@ -46,6 +49,8 @@ Redirect URLs
    **Default:** ``'/'``
 
    Path to redirect to on logout.
+
+.. _reverse_lazy: https://docs.djangoproject.com/en/dev/ref/urlresolvers/#reverse-lazy
 
 
 Customizing the Login Popup
