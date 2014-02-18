@@ -1,0 +1,22 @@
+{
+  "name": "django-browserid",
+  "version": "0.8.0",
+  "description": "Integrates BrowserID authentication into Django",
+  "private": true,
+  "scripts": {
+    "test": "node_modules/.bin/karma start js_tests/karma.conf.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/mozilla/django-browserid.git"
+  },
+  "author": "Mozilla Foundation",
+  "license": "MPL 2.0",
+  "bugs": {
+    "url": "https://github.com/mozilla/django-browserid/issues"
+  },
+  "devDependencies": {
+    "karma": "*",
+    "karma-mocha": "*"
+  }
+}
