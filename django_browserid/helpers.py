@@ -127,6 +127,7 @@ def browserid_js(include_shim=True):
     files = []
     if include_shim:
         files.append(getattr(settings, 'BROWSERID_SHIM', 'https://login.persona.org/include.js'))
+    files.append(staticfiles_storage.url('browserid/api.js'))
     files.append(staticfiles_storage.url('browserid/browserid.js'))
 
     tags = ['<script type="text/javascript" src="{0}"></script>'.format(path)

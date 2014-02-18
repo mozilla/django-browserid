@@ -10,3 +10,4 @@ virtualenv/
 *.egg
 .tox
 tmp
+node_modules

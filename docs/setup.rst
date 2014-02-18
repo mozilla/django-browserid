@@ -207,9 +207,9 @@ you use the ``browserid_button`` function.
 
 For ``browserid_js`` the files needed are the Persona JavaScript shim, which
 should be loaded from
-``https://login.persona.org/include.js`` in a script tag, and
-``django_browserid/static/browserid/browserid.js``, which is part of the
-django-browserid library.
+``https://login.persona.org/include.js`` in a script tag, the django_browserid
+API in ``django_browserid/static/browserid/api.js``, and
+``django_browserid/static/browserid/browserid.js``.
 
 For ``browserid_css`` the file needed is
 ``django_browserid/static/browserid/persona-buttons.css``, which is also part of
