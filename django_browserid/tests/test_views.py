@@ -10,7 +10,7 @@ from django.test.client import RequestFactory
 from django.utils.encoding import smart_text
 from django.utils.functional import lazy
 
-from mock import ANY, patch
+from mock import patch
 from nose.tools import eq_, ok_
 
 from django_browserid import BrowserIDException, views
@@ -134,14 +134,6 @@ class VerifyTests(TestCase):
         with patch('django_browserid.views.logger.error') as logger_error:
             views.Verify().login_failure(excpt)
         logger_error.assert_called_with(excpt)
-
-    def test_failure_url_reverse(self):
-        # If the failure URL is a view name, it should be reversed
-        # to get the real failure URL.
-        with self.settings(LOGIN_REDIRECT_URL_FAILURE='epic_fail'):
-            response = self.verify('post')
-        eq_(response.status_code, 403)
-        self.assert_json_equals(response.content, {'redirect': '/epic-fail/?bid_login_failed=1'})
 
     @mock_browserid('test@example.com')
     def test_auth_success_redirect_success(self):
