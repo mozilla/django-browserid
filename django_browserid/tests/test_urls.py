@@ -16,7 +16,9 @@ class UrlTests(TestCase):
         self.factory = RequestFactory()
 
     def test_override_verify_class(self):
-        # Reload so that the settings.BROWSERID_VERIFY_CLASS takes effect.
+        """
+        Reload so that the settings.BROWSERID_VERIFY_CLASS takes effect.
+        """
         path = 'django_browserid.tests.test_urls.MyVerifyClass'
         with self.settings(BROWSERID_VERIFY_CLASS=path):
             reload_module(urls)

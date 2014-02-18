@@ -9,8 +9,10 @@ from django_browserid.tests import TestCase
 
 class BrowserIDAdminSiteTests(TestCase):
     def test_copy_registry(self):
-        # copy_registry should register the ModelAdmins from the given
-        # site on the BrowserIDAdminSite.
+        """
+        copy_registry should register the ModelAdmins from the given
+        site on the BrowserIDAdminSite.
+        """
         django_site = admin.AdminSite()
         browserid_site = BrowserIDAdminSite()
 
