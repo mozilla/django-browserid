@@ -37,7 +37,7 @@ setup(
     author_email='mkelly@mozilla.com',
     url='https://github.com/mozilla/django-browserid',
     license='MPL v2.0',
-    install_requires=['requests>=0.9.1', 'fancy_tag==0.2.0'],
+    install_requires=['requests>=1.0.0', 'fancy_tag==0.2.0'],
     test_suite="runtests.runtests",
     include_package_data=True,
     zip_safe=False,  # because we rely on finding templates on the filesystem
