@@ -30,15 +30,14 @@ Here is how to build the documentation::
 JavaScript Tests
 ----------------
 To run the JavaScript tests, you must have `node.js`_  installed. Then, use the
-npm command to install karma_ and `karma-mocha`_::
+npm command to install the test dependencies::
 
-    npm install -g karma
-    npm install -g karma-mocha
+    npm install
 
 After that, you can run the JavaScript tests with the following command from
 the repo root::
 
-    karma start js_tests/karma.conf.js
+    npm test
 
 
 .. _`github project`: https://github.com/mozilla/django-browserid
