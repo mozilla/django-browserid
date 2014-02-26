@@ -6,25 +6,25 @@
     'use strict';
 
     $(function() {
-        django_browserid.registerWatchHandlers().then(function() {
-            // Trigger login whenever a login link is clicked, and redirect the user
-            // once it succeeds.
-            $(document).on('click', '.browserid-login', function(e) {
-                e.preventDefault();
-                var $link = $(this);
-                django_browserid.login().then(function(verifyResult) {
-                    window.location = $link.data('next') || verifyResult.redirect;
-                });
-            });
+        django_browserid.registerWatchHandlers();
 
-            // Trigger logout whenever a logout link is clicked, and redirect the
-            // user once it succeeds.
-            $(document).on('click', '.browserid-logout', function(e) {
-                e.preventDefault();
-                var $link = $(this);
-                django_browserid.logout().then(function(logoutResult) {
-                    window.location = $link.attr('next') || logoutResult.redirect;
-                });
+        // Trigger login whenever a login link is clicked, and redirect the user
+        // once it succeeds.
+        $(document).on('click', '.browserid-login', function(e) {
+            e.preventDefault();
+            var $link = $(this);
+            django_browserid.login().then(function(verifyResult) {
+                window.location = $link.data('next') || verifyResult.redirect;
+            });
+        });
+
+        // Trigger logout whenever a logout link is clicked, and redirect the
+        // user once it succeeds.
+        $(document).on('click', '.browserid-logout', function(e) {
+            e.preventDefault();
+            var $link = $(this);
+            django_browserid.logout().then(function(logoutResult) {
+                window.location = $link.attr('next') || logoutResult.redirect;
             });
         });
     });

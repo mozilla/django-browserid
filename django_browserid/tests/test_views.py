@@ -84,7 +84,7 @@ class VerifyTests(TestCase):
         with self.settings(LOGIN_REDIRECT_URL_FAILURE='/fail'):
             response = self.verify('post', blah='asdf')
         eq_(response.status_code, 403)
-        self.assert_json_equals(response.content, {'redirect': '/fail?bid_login_failed=1'})
+        self.assert_json_equals(response.content, {'redirect': '/fail'})
 
     @mock_browserid(None)
     def test_auth_fail(self):
@@ -92,29 +92,7 @@ class VerifyTests(TestCase):
         with self.settings(LOGIN_REDIRECT_URL_FAILURE='/fail'):
             response = self.verify('post', assertion='asdf')
         eq_(response.status_code, 403)
-        self.assert_json_equals(response.content, {'redirect': '/fail?bid_login_failed=1'})
-
-    @mock_browserid(None)
-    def test_auth_fail_url_parameters(self):
-        """
-        Ensure that bid_login_failed=1 is appended to the failure url.
-        """
-        with self.settings(LOGIN_REDIRECT_URL_FAILURE='/fail?'):
-            response = self.verify('post', assertion='asdf')
-        self.assert_json_equals(response.content, {'redirect': '/fail?bid_login_failed=1'})
-
-        with self.settings(LOGIN_REDIRECT_URL_FAILURE='/fail?asdf'):
-            response = self.verify('post', assertion='asdf')
-        self.assert_json_equals(response.content, {'redirect': '/fail?asdf&bid_login_failed=1'})
-
-        with self.settings(LOGIN_REDIRECT_URL_FAILURE='/fail?asdf=4'):
-            response = self.verify('post', assertion='asdf')
-        self.assert_json_equals(response.content, {'redirect': '/fail?asdf=4&bid_login_failed=1'})
-
-        with self.settings(LOGIN_REDIRECT_URL_FAILURE='/fail?asdf=4&bid_login_failed=1'):
-            response = self.verify('post', assertion='asdf')
-        self.assert_json_equals(response.content,
-                                {'redirect': '/fail?asdf=4&bid_login_failed=1&bid_login_failed=1'})
+        self.assert_json_equals(response.content, {'redirect': '/fail'})
 
     @mock_browserid(None)
     @patch('django_browserid.views.logger.error')

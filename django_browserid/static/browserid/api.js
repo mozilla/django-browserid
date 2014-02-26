@@ -9,9 +9,6 @@
     var requestDeferred = null;
     var logoutDeferred = null;
 
-    // Track if we've avoided the first auto-login.
-    var avoidedAutoLogin = false;
-
     // Public API
     var django_browserid = {
         /**
@@ -33,14 +30,9 @@
          */
         logout: function logout() {
             return django_browserid.getInfo().then(function(info) {
-                logoutDeferred = $.Deferred();
-                navigator.id.logout();
-
-                return logoutDeferred.then(function() {
-                    return $.ajax(info.logoutUrl, {
-                        type: 'POST',
-                        headers: {'X-CSRFToken': info.csrfToken},
-                    });
+                return $.ajax(info.logoutUrl, {
+                    type: 'POST',
+                    headers: {'X-CSRFToken': info.csrfToken},
                 });
             });
         },
@@ -94,45 +86,21 @@
         },
 
         /**
-         * Check for the querystring parameter used to signal a failed login.
-         * @param {Location} Location object containing URL to check. Defaults
-         *                   to window.location, used for testing.
-         * @return {Boolean} True if the parameter was found and login failed,
-         *                   False otherwise.
-         */
-        didLoginFail: function didLoginFail(location) {
-            location = location || window_location;
-            return location.search.indexOf('bid_login_failed=1') !== -1;
-        },
-
-        /**
          * Register callbacks with navigator.id.watch that make the API work.
          * This must be called before calling any other API methods.
-         * @return {jqXHR} Deferred that resolves after the handlers have been
-         *                 have been registered.
          */
         registerWatchHandlers: function registerWatchHandlers() {
-            return django_browserid.getInfo().then(function(info) {
-                navigator.id.watch({
-                    loggedInUser: info.userEmail,
-                    onlogin: function(assertion) {
-                        // Avoid auto-login on failure.
-                        if (!avoidedAutoLogin && django_browserid.didLoginFail()) {
-                            navigator.id.logout();
-                            avoidedAutoLogin = true;
-                            return;
-                        }
-
-                        if (requestDeferred) {
-                            requestDeferred.resolve(assertion);
-                        }
-                    },
-                    onlogout: function() {
-                        if (logoutDeferred) {
-                            logoutDeferred.resolve();
-                        }
+            var assertion = null;
+            navigator.id.watch({
+                onlogin: function(new_assertion) {
+                    assertion = new_assertion;
+                    navigator.id.logout();
+                },
+                onlogout: function() {
+                    if (requestDeferred && assertion) {
+                        requestDeferred.resolve(assertion);
                     }
-                });
+                }
             });
         }
     };

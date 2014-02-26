@@ -59,9 +59,7 @@ class Verify(JSONView):
 
     def login_failure(self, error=None):
         """
-        Redirect the user to a login-failed page, and add the
-        ``bid_login_failed`` parameter to the URL to signify that login
-        failed to the JavaScript.
+        Redirect the user to a login-failed page.
 
         :param error:
             If login failed due to an error raised during verification,
@@ -71,14 +69,7 @@ class Verify(JSONView):
         if error:
             logger.error(error)
 
-        # Append "?bid_login_failed=1" to the URL to notify the
-        # JavaScript that the login failed.
-        failure_url = self.failure_url
-        if not failure_url.endswith('?'):
-            failure_url += '?' if not '?' in failure_url else '&'
-        failure_url += 'bid_login_failed=1'
-
-        return JSONResponse({'redirect': failure_url}, status=403)
+        return JSONResponse({'redirect': self.failure_url}, status=403)
 
     def post(self, *args, **kwargs):
         """

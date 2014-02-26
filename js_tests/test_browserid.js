@@ -64,8 +64,7 @@ suite('api.js', function() {
         django_browserid.verifyAssertion.restore();
     });
 
-    test('logout() should call navigator.id.logout and send a POST to the ' +
-         'logout view once Persona logs the user out.', function(done) {
+    test('logout() should send a POST to the logout view to log the user out.', function(done) {
         setInfoResponse({
             logoutUrl: '/browserid/logout/',
             csrfToken: 'csrfToken'
@@ -77,7 +76,6 @@ suite('api.js', function() {
         });
 
         django_browserid.logout().then(function(logoutData) {
-            chai.assert.ok(navigator.id.logout.called);
             chai.assert.deepEqual(logoutData, {redirect: '/asdf/'});
             done();
         });
@@ -156,48 +154,5 @@ suite('api.js', function() {
         });
 
         server.respond();
-    });
-
-    test('didLoginFail() should return true of `bid_login_failed=1` is in the querystring.', function() {
-        var location = {search: 'foo=bar'};
-        chai.assert.notOk(django_browserid.didLoginFail(location));
-
-        location = {search: 'foo=bar&bid_login_failed=1&baz=biff'};
-        chai.assert.ok(django_browserid.didLoginFail(location));
-    });
-
-    test('registerWatchHandlers() should pass the userEmail from the info ' +
-         'response to navigator.id.watch.', function(done) {
-        setInfoResponse({
-            userEmail: 'test@example.com'
-        });
-        navigator.id.reset(); // Clear out the handlers registered in setup.
-
-        django_browserid.registerWatchHandlers().then(function() {
-            var watch_arg = navigator.id.watch.args[0][0];
-            chai.assert.equal(watch_arg.loggedInUser, 'test@example.com');
-            done();
-        });
-
-        server.respond();
-    });
-
-    test('If login failed, registerWatchHandlers() shouldlog the user out the ' +
-         'first time onlogin is called.', function(done) {
-        setInfoResponse({
-            userEmail: 'test@example.com'
-        });
-        navigator.id.reset(); // Clear out the handlers registered in setup.
-        sinon.stub(django_browserid, 'didLoginFail').returns(true);
-
-        django_browserid.registerWatchHandlers().then(function() {
-            var watch_arg = navigator.id.watch.args[0][0];
-            watch_arg.onlogin('assertion');
-            chai.assert.ok(navigator.id.logout.called);
-            done();
-        });
-
-        server.respond();
-        django_browserid.didLoginFail.restore();
     });
 });
