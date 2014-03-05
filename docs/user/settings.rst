@@ -1,15 +1,16 @@
 Settings
 ========
+.. currentmodule:: django.conf.settings
 
-.. module:: django.conf.settings
+This document describes the Django settings that can be used to customize the
+behavior of django-browserid.
 
 
 Core Settings
 -------------
+.. attribute:: BROWSERID_AUDIENCES
 
-.. data:: BROWSERID_AUDIENCES
-
-   **Default:** No default
+   :default: No default
 
    List of audiences that your site accepts. An audience is the protocol,
    domain name, and (optionally) port that users access your site from. This
@@ -27,26 +28,25 @@ Core Settings
 
 Redirect URLs
 -------------
-
 .. note:: If you want to use named URLs instead of directly including URLs into
    your settings file, you can use `reverse_lazy`_ to do so.
 
-.. data:: LOGIN_REDIRECT_URL
+.. attribute:: LOGIN_REDIRECT_URL
 
-    **Default:** ``'/accounts/profile'``
+    :default: ``'/accounts/profile'``
 
     Path to redirect to on successful login. If you don't specify this, the
     default Django value will be used.
 
-.. data:: LOGIN_REDIRECT_URL_FAILURE
+.. attribute:: LOGIN_REDIRECT_URL_FAILURE
 
-    **Default:** ``'/'``
+    :default: ``'/'``
 
     Path to redirect to on an unsuccessful login attempt.
 
-.. data:: LOGOUT_REDIRECT_URL
+.. attribute:: LOGOUT_REDIRECT_URL
 
-   **Default:** ``'/'``
+   :default: ``'/'``
 
    Path to redirect to on logout.
 
@@ -55,10 +55,9 @@ Redirect URLs
 
 Customizing the Login Popup
 ---------------------------
+.. attribute:: BROWSERID_REQUEST_ARGS
 
-.. data:: BROWSERID_REQUEST_ARGS
-
-   **Default:** ``{}``
+   :default: ``{}``
 
    Controls the arguments passed to ``navigator.id.request``, which are used to
    customize the login popup box. To see a list of valid keys and what they do,
@@ -69,10 +68,9 @@ Customizing the Login Popup
 
 Customizing the Verify View
 ---------------------------
+.. attribute:: BROWSERID_VERIFY_VIEW
 
-.. data:: BROWSERID_VERIFY_VIEW
-
-    **Default:** ``django_browserid.views.Verify``
+    :default: ``django_browserid.views.Verify``
 
     Allows you to substitute a custom class-based view for verifying assertions.
     For example, the string 'myapp.users.views.Verify' would import `Verify`
@@ -81,19 +79,17 @@ Customizing the Verify View
     When using a custom view, it is generally a good idea to subclass the
     default Verify and override the methods you want to change.
 
-.. data:: BROWSERID_CREATE_USER
+.. attribute:: BROWSERID_CREATE_USER
 
-    **Default:** ``True``
+    :default: ``True``
 
     If ``True`` or ``False``, enables or disables automatic user creation during
-    authentication.
+    authentication. If set to a string, it is treated as an import path
+    pointing to a custom user creation function.
 
-    If set to a string, it is treated as an import path pointing to a custom
-    user creation function. See :ref:`auto-user` for more information.
+.. attribute:: BROWSERID_DISABLE_SANITY_CHECKS
 
-.. data:: BROWSERID_DISABLE_SANITY_CHECKS
-
-    **Default:** False
+    :default: False
 
     Controls whether the ``Verify`` view performs some helpful checks for common
     mistakes. Useful if you're getting warnings for things you know aren't
@@ -102,9 +98,8 @@ Customizing the Verify View
 
 Using a Different Identity Provider
 -----------------------------------
+.. attribute:: BROWSERID_SHIM
 
-.. data:: BROWSERID_SHIM
-
-   **Default:** 'https://login.persona.org/include.js'
+   :default: 'https://login.persona.org/include.js'
 
    The URL to use for the BrowserID JavaScript shim.

@@ -49,7 +49,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'django-browserid'
-copyright = u'2012, Paul Osman, Michael Kelly'
+copyright = u'2014, Mozilla Foundation'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -200,7 +200,7 @@ htmlhelp_basename = 'django-browseriddoc'
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
   ('index', 'django-browserid.tex', u'django-browserid Documentation',
-   u'Paul Osman, Michael Kelly', 'manual'),
+   u'Mozilla Foundation', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -233,5 +233,5 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     ('index', 'django-browserid', u'django-browserid Documentation',
-     [u'Paul Osman, Michael Kelly'], 1)
+     [u'Mozilla Foundation'], 1)
 ]

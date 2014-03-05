@@ -36,7 +36,7 @@ History
 ++++++++++++++++
 
 - #97: Add BrowserIDException that is raised by verify when there are issues
-  connecting to the remote verification servie. Update the Verify view to handle
+  connecting to the remote verification service. Update the Verify view to handle
   these errors.
 
 - #125: Prevent the Verify view from running reverse on user input and add check
