@@ -10,7 +10,6 @@
 #
 # All configuration values have a default; values that are commented out
 # serve to show the default.
-
 import sys, os
 
 # If extensions (or modules to document with autodoc) are in another directory,
@@ -50,7 +49,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'django-browserid'
-copyright = u'2012, Paul Osman, Michael Kelly'
+copyright = u'2014, Mozilla Foundation'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -101,9 +100,19 @@ autodoc_member_order = 'bysource'
 
 # -- Options for HTML output ---------------------------------------------------
 
+# Use ReadTheDocs theme locally, but not when built on RTD itself. RTD
+# will be confused if we specify the custom theme there.
+on_rtd = os.environ.get('READTHEDOCS', None) == 'True'
+if not on_rtd:
+    import sphinx_rtd_theme
+    html_theme = 'sphinx_rtd_theme'
+    html_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
+else:
+    html_theme = 'default'
+
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
-html_theme = 'default'
+#html_theme = 'default'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -191,7 +200,7 @@ htmlhelp_basename = 'django-browseriddoc'
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
   ('index', 'django-browserid.tex', u'django-browserid Documentation',
-   u'Paul Osman, Michael Kelly', 'manual'),
+   u'Mozilla Foundation', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -224,5 +233,5 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     ('index', 'django-browserid', u'django-browserid Documentation',
-     [u'Paul Osman, Michael Kelly'], 1)
+     [u'Mozilla Foundation'], 1)
 ]

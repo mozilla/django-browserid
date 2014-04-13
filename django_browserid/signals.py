@@ -5,7 +5,7 @@ from django.dispatch import Signal
 
 
 user_created = Signal(providing_args=['user'])
-"""
+user_created.__doc__ = """
 Signal triggered when a user is automatically created during authentication.
 
 :param sender:
