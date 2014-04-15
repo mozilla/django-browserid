@@ -21,6 +21,18 @@
         }
     }
 
+    /**
+     * Compare the given URL to the current page's URL to see if they share the
+     * same origin.
+     */
+    function matchesCurrentOrigin(url) {
+        var a = document.createElement('a');
+        a.href = url;
+        var hostMatch = !a.host || window.location.host === a.host;
+        var protocolMatch = !a.protocol || window.location.protocol === a.protocol;
+        return hostMatch && protocolMatch;
+    }
+
     $(function() {
         django_browserid.registerWatchHandlers(onAutoLogin);
 
@@ -32,7 +44,10 @@
             window.sessionStorage.browseridLoginAttempt = 'true';
             django_browserid.login().then(function(verifyResult) {
                 window.sessionStorage.browseridLoginAttempt = 'false';
-                window.location = $link.data('next') || verifyResult.redirect;
+                var redirect = $link.data('next') || verifyResult.redirect;
+                if (matchesCurrentOrigin(redirect)) {
+                    window.location = redirect;
+                }
             });
         });
 
@@ -42,7 +57,10 @@
             e.preventDefault();
             var $link = $(this);
             django_browserid.logout().then(function(logoutResult) {
-                window.location = $link.attr('next') || logoutResult.redirect;
+                var redirect = $link.attr('next') || logoutResult.redirect;
+                if (matchesCurrentOrigin(redirect)) {
+                    window.location = redirect;
+                }
             });
         });
     });
