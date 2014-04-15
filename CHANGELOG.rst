@@ -3,6 +3,34 @@
 History
 -------
 
+0.10 (2014-04-15)
++++++++++++++++++
+- Massive documentation update, including upgrade instructions for older
+  versions.
+
+- Support and test on Python 3.2 and 3.3, and Django 1.6!
+
+- Disable automatic login and logout coming from Persona. This also fixes
+  logins being triggered in all open tabs on your site.
+
+- Replace in-page form for trigger logins with AJAX calls. Removes need for
+  {% browserid_info %} template tag.
+
+- Drop ``six`` from requirements.
+
+- Replace ``SITE_URL`` setting with ``BROWSERID_AUDIENCES`` and make it
+  optional when ``DEBUG`` is True.
+
+- Add support for logging-in to the admin interface with Persona.
+
+- Remove need to set custom context processor.
+
+- Replace ``verify`` function with the Verifier classes like
+  ``RemoteVerifier``.
+
+- And more!
+
+
 0.9 (2013-08-25)
 ++++++++++++++++
 - Add ``BROWSERID_VERIFY_CLASS`` to make it easier to customize the verification view.
