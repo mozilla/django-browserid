@@ -52,10 +52,19 @@ django-browserid views on your server.
    .. js:function:: getInfo()
 
       Fetch information from the
-      :attr:`Info view <django_browserid.views.Info>`, such as a CSRF token or
-      the parameters for the Persona popup.
+      :func:`browserid_info <django_browserid.helpers.browserid_info>` tag,
+      such as the parameters for the Persona popup.
 
-      :returns: Deferred that resolves with the results of the AJAX request.
+      :returns: Object containing the data from the info tag.
+
+
+   .. js:function:: getCsrfToken()
+
+      Fetch a CSRF token from the
+      :attr:`CsrfToken view <django_browserid.views.CsrfToken>` via an AJAX
+      request.
+
+      :returns: Deferred that resolves with the CSRF token.
 
 
    .. js:function:: didLoginFail([location])

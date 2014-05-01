@@ -5,11 +5,10 @@ import logging
 
 from django.conf import settings
 from django.contrib import auth
+from django.http import HttpResponse
 from django.template import RequestContext
 from django.views.generic import View
 
-from django_browserid.auth import BrowserIDBackend
-from django_browserid.compat import reverse
 from django_browserid.base import BrowserIDException, sanity_checks
 from django_browserid.http import JSONResponse
 
@@ -98,21 +97,9 @@ class Verify(JSONView):
         return super(Verify, self).dispatch(request, *args, **kwargs)
 
 
-class Info(JSONView):
-    """Fetch backend-defined data used by the frontend JavaScript."""
+class CsrfToken(JSONView):
+    """Fetch a CSRF token for the frontend JavaScript."""
     def get(self, request):
-        request_args = dict(getattr(settings, 'BROWSERID_REQUEST_ARGS', {}))
-
-        # Only pass an email to the JavaScript if the current user was
-        # authed with our auth backend.
-        backend_name = self.request.session.get(auth.BACKEND_SESSION_KEY)
-        backend = auth.load_backend(backend_name) if backend_name else None
-
-        if isinstance(backend, BrowserIDBackend):
-            email = getattr(request.user, 'email', '')
-        else:
-            email = ''
-
         # Different CSRF libraries (namely session_csrf) store the CSRF
         # token in different places. The only way to retrieve the token
         # that works with both the built-in CSRF and session_csrf is to
@@ -121,13 +108,7 @@ class Info(JSONView):
         context = RequestContext(request)
         csrf_token = context.get('csrf_token', None)
 
-        return JSONResponse({
-            'userEmail': email,
-            'loginUrl': reverse('browserid.login'),
-            'logoutUrl': reverse('browserid.logout'),
-            'requestArgs': request_args,
-            'csrfToken': csrf_token,
-        })
+        return HttpResponse(csrf_token)
 
 
 class Logout(JSONView):

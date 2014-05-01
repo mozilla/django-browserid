@@ -15,6 +15,8 @@ Template helpers are the functions used in your templates that output HTML for
 login and logout buttons, as well as the CSS and JS tags for making the buttons
 function and display correctly.
 
+.. autofunction:: browserid_info
+
 .. autofunction:: browserid_login
 
 .. autofunction:: browserid_logout
@@ -44,7 +46,7 @@ Views
 
 django-browserid works primarily through AJAX requests to the views below in
 order to log users in and out and to send information required for the login
-process, such as a CSRF token or customization options for the Persona popup.
+process, such as a CSRF token.
 
 .. autoclass:: Verify
    :members:
@@ -54,7 +56,7 @@ process, such as a CSRF token or customization options for the Persona popup.
    :members:
    :show-inheritance:
 
-.. autoclass:: Info
+.. autoclass:: CsrfToken
    :members:
    :show-inheritance:
 

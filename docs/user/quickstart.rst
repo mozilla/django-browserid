@@ -48,8 +48,8 @@ Next, edit your ``urls.py`` file and add the following:
 .. note:: The django-browserid urlconf *must not* have a regex with the
    include. Use a blank string, as shown above.
 
-Finally, you'll need to add the login button to your Django templates, along
-with the CSS and JS files necessary to make it work:
+Finally, you'll need to add the login button and info tag to your Django
+templates, along with the CSS and JS files necessary to make it work:
 
 .. code-block:: html+django
 
@@ -59,6 +59,7 @@ with the CSS and JS files necessary to make it work:
         <link rel="stylesheet" src="{% static 'browserid/persona-buttons.css' %}">
       </head>
       <body>
+        {% browserid_info %}
         {% if user.is_authenticated %}
           <p>Current user: {{ user.email }}</p>
           {% browserid_logout text='Logout' %}
@@ -74,6 +75,9 @@ with the CSS and JS files necessary to make it work:
     </html>
 
 .. note:: ``api.js`` and ``browserid.js`` require `jQuery`_ 1.7 or higher.
+
+.. note:: The ``browserid_info`` tag is required on any page that users can log
+   in from. It's recommended to put it just below the ``<body>`` tag.
 
 And that's it! You can now log into your site using Persona!
 
@@ -95,6 +99,7 @@ written in Jinja2:
         {{ browserid_css() }}
       </head>
       <body>
+        {{ browserid_info() }}
         {% if user.is_authenticated() %}
           <p>Current user: {{ user.email }}</p>
           {{ browserid_logout(text='Logout') }}
