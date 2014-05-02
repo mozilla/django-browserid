@@ -10,6 +10,29 @@ from django.utils.safestring import mark_safe
 from django.utils.six import string_types
 
 from django_browserid.compat import jingo_register, reverse
+from django_browserid.util import LazyEncoder
+
+
+@jingo_register.function
+def browserid_info():
+    """
+    Output the HTML for the info tag, which contains the arguments for
+    navigator.id.request from the BROWSERID_REQUEST_ARGS setting. Should
+    be called once at the top of the page just below the <body> tag.
+    """
+    # Force request_args to be a dictionary, in case it is lazily generated.
+    request_args = dict(getattr(settings, 'BROWSERID_REQUEST_ARGS', {}))
+
+    info = json.dumps({
+        'loginUrl': reverse('browserid.login'),
+        'logoutUrl': reverse('browserid.logout'),
+        'csrfUrl': reverse('browserid.csrf'),
+        'requestArgs': request_args,
+    }, cls=LazyEncoder)
+
+    return render_to_string('browserid/info.html', {
+        'info': info,
+    })
 
 
 def browserid_button(text=None, next=None, link_class=None, attrs=None, href='#'):

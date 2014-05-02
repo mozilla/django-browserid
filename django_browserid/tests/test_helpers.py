@@ -1,5 +1,48 @@
+from django.utils.functional import lazy
+
+from mock import patch
+from nose.tools import eq_
+
 from django_browserid import helpers
 from django_browserid.tests import TestCase
+
+
+def _lazy_request_args():
+    return {'siteName': 'asdf'}
+lazy_request_args = lazy(_lazy_request_args, dict)
+
+
+class BrowserIDInfoTests(TestCase):
+    def setUp(self):
+        patcher = patch('django_browserid.helpers.render_to_string')
+        self.addCleanup(patcher.stop)
+        self.render_to_string = patcher.start()
+
+    def test_defaults(self):
+        with self.settings(BROWSERID_REQUEST_ARGS={'foo': 'bar', 'baz': 1}):
+            output = helpers.browserid_info()
+
+        eq_(output, self.render_to_string.return_value)
+        expected_info = {
+            'loginUrl': '/browserid/login/',
+            'logoutUrl': '/browserid/logout/',
+            'csrfUrl': '/browserid/csrf/',
+            'requestArgs': {'foo': 'bar', 'baz': 1},
+        }
+        self.render_to_string.assertCalledWith('browserid/info.html', {'info': expected_info})
+
+    def test_lazy_request_args(self):
+        with self.settings(BROWSERID_REQUEST_ARGS=lazy_request_args()):
+            output = helpers.browserid_info()
+
+        eq_(output, self.render_to_string.return_value)
+        expected_info = {
+            'loginUrl': '/browserid/login/',
+            'logoutUrl': '/browserid/logout/',
+            'csrfUrl': '/browserid/csrf/',
+            'requestArgs': {'siteName': 'asdf'},
+        }
+        self.render_to_string.assertCalledWith('browserid/info.html', {'info': expected_info})
 
 
 class BrowserIDJSTests(TestCase):

@@ -9,11 +9,6 @@ function jsonResponse(obj) {
     return [200, {'Content-Type': 'application/json'}, JSON.stringify(obj)];
 }
 
-// Sets the response value for the info view.
-function setInfoResponse(obj) {
-    server.respondWith('GET', '/browserid/info/', jsonResponse(obj));
-}
-
 // Returns an already-resolved deferred with the given arguments.
 // Useful for returning deferreds that just call their callbacks immediately.
 function resolvedDeferred() {
@@ -28,15 +23,13 @@ suite('api.js', function() {
         navigator.id.reset();
 
         // Register handlers so mock Persona works.
-        django_browserid._infoXHR = null;
-        setInfoResponse({userEmail: 'test@example.com'});
         django_browserid.registerWatchHandlers();
-        server.respond();
 
-        // Reset info XHR and mock server so tests can use them.
-        django_browserid._infoXHR = null;
-        server.restore();
-        server = sinon.fakeServer.create();
+        // Reset requestDeferred in case someone set it.
+        django_browserid._requestDeferred = null;
+
+        // Mock our CSRF view to return 'csrfToken'.
+        server.respondWith('GET', '/browserid/csrf/', [200, {}, 'csrfToken']);
     });
 
     teardown(function() {
@@ -65,9 +58,8 @@ suite('api.js', function() {
     });
 
     test('logout() should send a POST to the logout view to log the user out.', function(done) {
-        setInfoResponse({
-            logoutUrl: '/browserid/logout/',
-            csrfToken: 'csrfToken'
+        sinon.stub(django_browserid, 'getInfo', function() {
+            return {csrfUrl: '/browserid/csrf/', logoutUrl: '/browserid/logout/'};
         });
 
         server.respondWith('POST', '/browserid/logout/', function(request) {
@@ -81,12 +73,13 @@ suite('api.js', function() {
         });
 
         server.respond();
+        django_browserid.getInfo.restore();
     });
 
     test('getAssertion() should call navigator.id.request and pass the given ' +
          'assertion to the Deferred once Persona finishes authing the user.', function(done) {
-        setInfoResponse({
-            requestArgs: {foo: 'bar'}
+        sinon.stub(django_browserid, 'getInfo', function() {
+            return {requestArgs: {foo: 'bar'}};
         });
         navigator.id.assertion = 'assertion';
 
@@ -97,12 +90,12 @@ suite('api.js', function() {
         });
 
         server.respond();
+        django_browserid.getInfo.restore();
     });
 
     test('verifyAssertion() should submit the given assertion to the login URL.', function(done) {
-        setInfoResponse({
-            loginUrl: '/browserid/login/',
-            csrfToken: 'csrfToken'
+        sinon.stub(django_browserid, 'getInfo', function() {
+            return {csrfUrl: '/browserid/csrf/', loginUrl: '/browserid/login/'};
         });
 
         server.respondWith('POST', '/browserid/login/', function(request) {
@@ -123,36 +116,32 @@ suite('api.js', function() {
         });
 
         server.respond();
+        django_browserid.getInfo.restore();
     });
 
-    test('getInfo() should return a jqXHR that returns the data from the info request.', function(done) {
-        setInfoResponse({
-            foo: 'bar'
+    test('getCsrfToken() should return a jqXHR that returns the csrf token.', function(done) {
+        sinon.stub(django_browserid, 'getInfo', function() {
+            return {csrfUrl: '/browserid/csrf/'};
         });
 
-        django_browserid.getInfo().then(function(info) {
-            chai.assert.deepEqual(info, {
-                foo: 'bar'
-            });
+        django_browserid.getCsrfToken().then(function(token) {
+            chai.assert.equal(token, 'csrfToken');
             done();
         });
 
         server.respond();
+        django_browserid.getInfo.restore();
     });
 
-    test('getInfo() should cache the response to the info request and only ' +
-         'send the request once.', function(done) {
-        setInfoResponse({
-            foo: 'bar'
-        });
+    test('registerWatchHandlers() should call onAutoLogin if onLogin is called ' +
+         'when getAssertion wasn\'t called.', function() {
+        navigator.id.reset();
+        var onAutoLogin = sinon.spy();
+        django_browserid.registerWatchHandlers(onAutoLogin);
 
-        django_browserid.getInfo().then(function(info) {
-            django_browserid.getInfo().then(function(info2) {
-                chai.assert.lengthOf(server.requests, 1);
-                done();
-            });
-        });
-
-        server.respond();
+        // Simulate automatically-triggered login by accessing watch data
+        // directly.
+        navigator.id.watch_data.onlogin('assertion');
+        chai.assert.ok(onAutoLogin.calledWith('assertion'));
     });
 });

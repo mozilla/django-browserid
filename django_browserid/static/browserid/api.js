@@ -5,10 +5,6 @@
 ;(function($, navigator, window_location) {
     'use strict';
 
-    // Deferred for post-watch-callback actions.
-    var requestDeferred = null;
-    var logoutDeferred = null;
-
     // Public API
     var django_browserid = {
         /**
@@ -29,10 +25,11 @@
          *                           been logged out.
          */
         logout: function logout() {
-            return django_browserid.getInfo().then(function(info) {
+            var info = this.getInfo();
+            return this.getCsrfToken().then(function(csrfToken) {
                 return $.ajax(info.logoutUrl, {
                     type: 'POST',
-                    headers: {'X-CSRFToken': info.csrfToken},
+                    headers: {'X-CSRFToken': csrfToken},
                 });
             });
         },
@@ -44,13 +41,11 @@
          *                           once it is retrieved.
          */
         getAssertion: function getAssertion(requestArgs) {
-            return django_browserid.getInfo().then(function(info) {
-                requestArgs = $.extend({}, info.requestArgs, requestArgs);
+            requestArgs = $.extend({}, this.getInfo().requestArgs, requestArgs);
 
-                requestDeferred = $.Deferred();
-                navigator.id.request(requestArgs);
-                return requestDeferred;
-            });
+            this._requestDeferred = $.Deferred();
+            navigator.id.request(requestArgs);
+            return this._requestDeferred;
         },
 
         /**
@@ -60,30 +55,42 @@
          *                           response once login is complete.
          */
         verifyAssertion: function verifyAssertion(assertion) {
-            return django_browserid.getInfo().then(function(info) {
+            var info = this.getInfo();
+            return this.getCsrfToken().then(function(csrfToken) {
                 return $.ajax(info.loginUrl, {
                     type: 'POST',
                     data: {assertion: assertion},
-                    headers: {'X-CSRFToken': info.csrfToken},
+                    headers: {'X-CSRFToken': csrfToken},
                 });
             });
         },
 
-        // Cache for the AJAX request created by django_browserid.getInfo().
-        // Stored on the public API so tests can reset it.
-        _infoXHR: null,
+        // Cache for the info fetched by django_browserid.getInfo().
+        _info: null,
 
         /**
          * Fetch the info for the Persona popup and login requests.
-         * @return {jqXHR} jQuery XmlHttpResponse that returns the data.
+         * @return {object} Data encoded in the browserid-info tag.
          */
         getInfo: function getInfo() {
-            if (django_browserid._infoXHR === null) {
-                django_browserid._infoXHR = $.get('/browserid/info/');
+            if (!this._info) {
+                this._info = $('#browserid-info').data('info');
             }
 
-            return django_browserid._infoXHR;
+            return this._info;
         },
+
+        /**
+         * Fetch a CSRF token from the backend.
+         * @return {jqXHR} jQuery XmlHttpResponse that returns the token.
+         */
+        getCsrfToken: function getCsrfToken() {
+            return $.get(this.getInfo().csrfUrl);
+        },
+
+        // Deferred for post-watch-callback actions.
+        // Stored on the public API so tests can reset it.
+        _requestDeferred: null,
 
         /**
          * Register callbacks with navigator.id.watch that make the API work.
@@ -94,6 +101,7 @@
          */
         registerWatchHandlers: function registerWatchHandlers(onAutoLogin) {
             var assertion = null;
+            var self = this;
 
             navigator.id.watch({
                 loggedInUser: null,
@@ -103,8 +111,8 @@
                 },
                 onlogout: function() {
                     if (assertion) {
-                        if (requestDeferred) {
-                            requestDeferred.resolve(assertion);
+                        if (self._requestDeferred) {
+                            self._requestDeferred.resolve(assertion);
                         } else if ($.isFunction(onAutoLogin)) {
                             onAutoLogin(assertion);
                         }

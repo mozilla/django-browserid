@@ -1,20 +1,13 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
-import json
-
 from django.contrib import auth
-from django.contrib.auth.backends import ModelBackend
-from django.contrib.sessions.backends.cache import SessionStore
 from django.test.client import RequestFactory
-from django.utils.encoding import smart_text
-from django.utils.functional import lazy
 
 from mock import patch
 from nose.tools import eq_, ok_
 
 from django_browserid import BrowserIDException, views
-from django_browserid.auth import BrowserIDBackend
 from django_browserid.tests import mock_browserid, TestCase
 
 
@@ -139,71 +132,6 @@ class VerifyTests(TestCase):
         with patch('django_browserid.views.sanity_checks') as sanity_checks:
             self.verify('post')
         ok_(sanity_checks.called)
-
-
-class BrowserIDInfoTests(TestCase):
-    def setUp(self):
-        self.factory = RequestFactory()
-
-    def info(self, user=None, backend=None):
-        request = self.factory.get('/')
-        request.session = SessionStore()
-        if user:
-            if backend:
-                user.backend = '{0}.{1}'.format(backend.__module__, backend.__class__.__name__)
-            auth.login(request, user)
-            request.user = user
-
-        info = views.Info.as_view()
-        return info(request)
-
-    def test_anonymous_user_no_request_args(self):
-        with patch('django_browserid.views.RequestContext') as RequestContext:
-            RequestContext.return_value.get.return_value = 'asdf'
-            response = self.info()
-        RequestContext.return_value.get.assert_called_with('csrf_token', None)
-        self.assert_json_equals(response.content, {
-            'userEmail': '',
-            'loginUrl': '/browserid/login/',
-            'logoutUrl': '/browserid/logout/',
-            'requestArgs': {},
-            'csrfToken': 'asdf',
-        })
-
-    def test_authenticated_user(self):
-        user = auth.models.User.objects.create_user('asdf', 'test@example.com')
-        response = self.info(user, BrowserIDBackend())
-        response_data = json.loads(smart_text(response.content))
-        eq_(response_data['userEmail'], 'test@example.com')
-
-    def test_request_args(self):
-        with self.settings(BROWSERID_REQUEST_ARGS={'siteName': 'asdf'}):
-            response = self.info()
-        response_data = json.loads(smart_text(response.content))
-        eq_(response_data['requestArgs'], {'siteName': 'asdf'})
-
-    def test_non_browserid_user(self):
-        """
-        If the current user was not authenticated via django-browserid,
-        userEmail should be empty.
-        """
-        user = auth.models.User.objects.create_user('asdf', 'test@example.com')
-        response = self.info(user, ModelBackend())
-        response_data = json.loads(smart_text(response.content))
-        eq_(response_data['userEmail'], '')
-
-    def test_lazy_request_args(self):
-        """
-        Ensure that request_args can be a lazy-evaluated dictionary.
-        """
-        def _lazy_request_args():
-            return {'siteName': 'asdf'}
-        lazy_request_args = lazy(_lazy_request_args, dict)
-
-        with self.settings(BROWSERID_REQUEST_ARGS=lazy_request_args()):
-            response = self.info()
-        response_data = json.loads(smart_text(response.content))
-        eq_(response_data['requestArgs'], {'siteName': 'asdf'})
 
 
 class LogoutTests(TestCase):
