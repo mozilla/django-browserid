@@ -3,6 +3,14 @@
 History
 -------
 
+0.10.1 (2014-05-02)
++++++++++++++++++++
+- Add ``browserid_info`` helper back in. The previous method of fetching the
+  Persona popup customization via AJAX caused browsers to trigger popup
+  warnings when users attempted to log in, so we switched back to the old
+  method of adding the info tag to pages.
+
+
 0.10 (2014-04-15)
 +++++++++++++++++
 - Massive documentation update, including upgrade instructions for older

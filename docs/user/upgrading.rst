@@ -5,8 +5,8 @@ in the right place. This document describes the major changes required to get
 your site up to the latest and greatest!
 
 
-0.9 to 0.10
------------
+0.9 to 0.10.1
+-------------
 - The minimum supported version of requests is now 1.0.0, and six has been
   removed from the requirements.
 
@@ -33,9 +33,6 @@ your site up to the latest and greatest!
           (r'', include('django_browserid.urls')),
           # ...
       )
-
-- Remove the ``browserid_info`` helper from your templates; it is no longer
-  necessary.
 
 - ``browserid.js`` has been split into ``api.js``, which contains just the
   JavaScript API, and ``browserid.js``, which contains the sample code for
