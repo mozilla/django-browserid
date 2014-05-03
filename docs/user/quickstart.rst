@@ -56,7 +56,7 @@ templates, along with the CSS and JS files necessary to make it work:
     {% load browserid %}
     <html>
       <head>
-        <link rel="stylesheet" src="{% static 'browserid/persona-buttons.css' %}">
+        <link rel="stylesheet" href="{% static 'browserid/persona-buttons.css' %}">
       </head>
       <body>
         {% browserid_info %}
