@@ -17,7 +17,7 @@ django-browserid depends on:
 
 - Requests_ >= 0.9.1
 - fancy_tag_ == 0.2.0
-- jQuery_ >= 1.7 (if you are using ``api.js`` and ``browserid.js``).
+- jQuery_ >= 1.8 (if you are using ``api.js`` and ``browserid.js``).
 
 django-browserid is a work in progress. Contributions are welcome. Feel free
 to fork_ and contribute!
