@@ -68,7 +68,7 @@ Customizing the Login Popup
 
 Customizing the Verify View
 ---------------------------
-.. attribute:: BROWSERID_VERIFY_VIEW
+.. attribute:: BROWSERID_VERIFY_CLASS
 
     :default: ``django_browserid.views.Verify``
 

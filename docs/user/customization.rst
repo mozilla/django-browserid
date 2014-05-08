@@ -11,12 +11,12 @@ Many common customizations involve overriding methods on the
 custom ``Verify`` subclass?
 
 You can substitute a custom verification view by setting
-:attr:`BROWSERID_VERIFY_VIEW <django.conf.settings.BROWSERID_VERIFY_VIEW>` to
+:attr:`BROWSERID_VERIFY_CLASS <django.conf.settings.BROWSERID_VERIFY_CLASS>` to
 the import path for your view:
 
 .. code-block:: python
 
-    BROWSERID_VERIFY_VIEW = 'project.application.views.MyCustomVerifyView'
+    BROWSERID_VERIFY_CLASS = 'project.application.views.MyCustomVerifyClass'
 
 
 Customizing the Authentication Backend
