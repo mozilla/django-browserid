@@ -74,7 +74,7 @@ templates, along with the CSS and JS files necessary to make it work:
       </body>
     </html>
 
-.. note:: ``api.js`` and ``browserid.js`` require `jQuery`_ 1.7 or higher.
+.. note:: ``api.js`` and ``browserid.js`` require `jQuery`_ 1.8 or higher.
 
 .. note:: The ``browserid_info`` tag is required on any page that users can log
    in from. It's recommended to put it just below the ``<body>`` tag.

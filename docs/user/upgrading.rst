@@ -40,6 +40,8 @@ your site up to the latest and greatest!
   include the JavaScript on the page, you probably need to update your project
   to either include both or just ``api.js``.
 
+- The included JavaScript requires jQuery 1.8 or higher instead of jQuery 1.7.
+
 
 0.8 to 0.9
 ----------
