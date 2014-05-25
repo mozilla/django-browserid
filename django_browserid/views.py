@@ -7,6 +7,7 @@ from django.conf import settings
 from django.contrib import auth
 from django.http import HttpResponse
 from django.template import RequestContext
+from django.utils import six
 from django.views.generic import View
 
 from django_browserid.base import BrowserIDException, sanity_checks
@@ -106,7 +107,10 @@ class CsrfToken(JSONView):
         # pull it from the template context processors via
         # RequestContext.
         context = RequestContext(request)
-        csrf_token = context.get('csrf_token', None)
+
+        # csrf_token might be a lazy value that triggers side-effects,
+        # so we need to force it to a string.
+        csrf_token = six.text_type(context.get('csrf_token', ''))
 
         return HttpResponse(csrf_token)
 

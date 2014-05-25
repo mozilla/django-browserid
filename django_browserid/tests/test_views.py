@@ -3,6 +3,8 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 from django.contrib import auth
 from django.test.client import RequestFactory
+from django.utils import six
+from django.utils.functional import lazy
 
 from mock import patch
 from nose.tools import eq_, ok_
@@ -150,3 +152,34 @@ class LogoutTests(TestCase):
         auth_logout.assert_called_with(request)
         eq_(response.status_code, 200)
         self.assert_json_equals(response.content, {'redirect': '/test/foo'})
+
+
+class CsrfTokenTests(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.view = views.CsrfToken()
+
+    def test_lazy_token_called(self):
+        """
+        If the csrf_token variable in the RequestContext is a lazy
+        callable, make sure it is called during the view.
+        """
+        global _lazy_csrf_token_called
+        _lazy_csrf_token_called = False
+
+        # I'd love to use a Mock here instead, but lazy doesn't behave
+        # well with Mocks for some reason.
+        def _lazy_csrf_token():
+            global _lazy_csrf_token_called
+            _lazy_csrf_token_called = True
+            return 'asdf'
+        csrf_token = lazy(_lazy_csrf_token, six.text_type)()
+
+        request = self.factory.get('/browserid/csrf/')
+        with patch('django_browserid.views.RequestContext') as RequestContext:
+            RequestContext.return_value = {'csrf_token': csrf_token}
+            response = self.view.get(request)
+
+        eq_(response.status_code, 200)
+        eq_(response.content, b'asdf')
+        ok_(_lazy_csrf_token_called)
