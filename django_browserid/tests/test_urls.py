@@ -5,10 +5,12 @@ from django.utils.six.moves import reload_module
 from mock import Mock
 
 from django_browserid import urls
+from django_browserid.views import Verify
 from django_browserid.tests import TestCase
 
 
-MyVerifyClass = Mock()
+class MyVerifyClass(Verify):
+    as_view = Mock()
 
 
 class UrlTests(TestCase):
@@ -24,7 +26,7 @@ class UrlTests(TestCase):
             reload_module(urls)
 
         view = resolve('/browserid/login/', urls).func
-        self.assertEqual(view, MyVerifyClass.as_view())
+        self.assertEqual(view, MyVerifyClass.as_view.return_value)
 
         # Reset urls back to normal.
         reload_module(urls)

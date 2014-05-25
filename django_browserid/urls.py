@@ -2,7 +2,6 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 import logging
-import traceback
 
 from django.conf.urls import patterns, url
 from django.core.exceptions import ImproperlyConfigured
@@ -16,10 +15,10 @@ logger = logging.getLogger(__name__)
 
 try:
     Verify = import_from_setting('BROWSERID_VERIFY_CLASS')
+    logger.debug('django_browserid using custom Verify view ' +
+                 '.'.join([Verify.__module__, Verify.__name__]))
 except ImproperlyConfigured as e:
-    logger.info('Loading BROWSERID_VERIFY_CLASS failed: {0}'.format(e))
-    logger.info(traceback.format_exc())
-    logger.info('Falling back to default verify class.')
+    logger.debug('django_browserid using default Verify view.')
     Verify = views.Verify
 
 
