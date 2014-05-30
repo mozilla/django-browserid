@@ -48,8 +48,8 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'django-browserid'
-copyright = u'2014, Mozilla Foundation'
+project = 'django-browserid'
+copyright = '2014, Mozilla Foundation'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -199,8 +199,8 @@ htmlhelp_basename = 'django-browseriddoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'django-browserid.tex', u'django-browserid Documentation',
-   u'Mozilla Foundation', 'manual'),
+  ('index', 'django-browserid.tex', 'django-browserid Documentation',
+   'Mozilla Foundation', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -232,6 +232,6 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'django-browserid', u'django-browserid Documentation',
-     [u'Mozilla Foundation'], 1)
+    ('index', 'django-browserid', 'django-browserid Documentation',
+     ['Mozilla Foundation'], 1)
 ]
