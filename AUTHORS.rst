@@ -52,3 +52,4 @@ Patches and Suggestions
 - Eric Holscher
 - mvasilkov
 - Mounir Messelmeni
+- Tomo Krajina
