@@ -82,7 +82,7 @@ class Verify(JSONView):
 
         try:
             self.user = auth.authenticate(request=self.request, assertion=assertion)
-        except BrowserIDException as e:
+        except Exception as e:
             return self.login_failure(e)
 
         if self.user and self.user.is_active:
