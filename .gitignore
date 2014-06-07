@@ -11,3 +11,4 @@ virtualenv/
 .tox
 tmp
 node_modules
+tags
