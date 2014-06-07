@@ -76,12 +76,15 @@ class Verify(JSONView):
 
     def login_failure(self, error=None):
         """
-        Redirect the user to a login-failed page.
+        Redirect the user to a login-failed page. This method can be
+        overridden to handle different exceptions (for example different
+        http status code for BrowserIDException and/or django exceptions).
+        By default a 403 is returned for any exception.
 
         :param error:
             If login failed due to an error raised during verification,
-            this will be the BrowserIDException instance that was
-            raised.
+            this will be the Exception or BrowserIDException instance that
+            was raised.
         """
         if error:
             logger.error(error)
@@ -99,7 +102,7 @@ class Verify(JSONView):
 
         try:
             self.user = auth.authenticate(request=self.request, assertion=assertion)
-        except BrowserIDException as e:
+        except Exception as e:
             return self.login_failure(e)
 
         if self.user and self.user.is_active:
