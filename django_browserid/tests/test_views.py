@@ -183,3 +183,8 @@ class CsrfTokenTests(TestCase):
         eq_(response.status_code, 200)
         eq_(response.content, b'asdf')
         ok_(_lazy_csrf_token_called)
+
+    def test_never_cache(self):
+        request = self.factory.get('/browserid/csrf/')
+        response = self.view.get(request)
+        eq_(response['Cache-Control'], 'max-age=0')

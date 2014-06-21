@@ -8,6 +8,7 @@ from django.contrib import auth
 from django.http import HttpResponse
 from django.template import RequestContext
 from django.utils import six
+from django.views.decorators.cache import never_cache
 from django.views.generic import View
 
 from django_browserid.base import BrowserIDException, sanity_checks
@@ -100,6 +101,7 @@ class Verify(JSONView):
 
 class CsrfToken(JSONView):
     """Fetch a CSRF token for the frontend JavaScript."""
+    @never_cache
     def get(self, request):
         # Different CSRF libraries (namely session_csrf) store the CSRF
         # token in different places. The only way to retrieve the token
