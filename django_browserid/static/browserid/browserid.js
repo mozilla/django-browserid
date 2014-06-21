@@ -5,33 +5,15 @@
 ;(function($, window) {
     'use strict';
 
-    // Some platforms (Windows Phone and Chrome for iOS thusfar) require Persona
-    // to use redirects instead of popups. Thus, while I'd like to ignore all
-    // onlogin calls that don't happen after the user clicks a login link, we
-    // have to for login to work on those platforms.
-    // Solution? Store state in sessionStorage, which persists per-tab. Then we
-    // can still support user-triggered logins across the redirect flow without
-    // having other open tabs trigger auto-login.
-    function onAutoLogin(assertion) {
-        if (window.sessionStorage.browseridLoginAttempt === 'true') {
-            window.sessionStorage.browseridLoginAttempt = 'false';
-            django_browserid.verifyAssertion(assertion).then(function(verifyResult) {
-                window.location = verifyResult.redirect;
-            });
-        }
-    }
-
     $(function() {
-        django_browserid.registerWatchHandlers(onAutoLogin);
+        django_browserid.registerWatchHandlers();
 
         // Trigger login whenever a login link is clicked, and redirect the user
         // once it succeeds.
         $(document).on('click', '.browserid-login', function(e) {
             e.preventDefault();
             var $link = $(this);
-            window.sessionStorage.browseridLoginAttempt = 'true';
             django_browserid.login($link.data('next')).then(function(verifyResult) {
-                window.sessionStorage.browseridLoginAttempt = 'false';
                 window.location = verifyResult.redirect;
             }, function(jqXHR) {
                 try {

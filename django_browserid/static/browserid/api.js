@@ -107,27 +107,15 @@
         /**
          * Register callbacks with navigator.id.watch that make the API work.
          * This must be called before calling any other API methods.
-         * @param {function} Function to run on automatically-triggered logins.
-         * @return {jqXHR} Deferred that resolves after the handlers have been
-         *                 have been registered.
          */
-        registerWatchHandlers: function registerWatchHandlers(onAutoLogin) {
+        registerWatchHandlers: function registerWatchHandlers() {
             var assertion = null;
             var self = this;
 
             navigator.id.watch({
-                loggedInUser: null,
-                onlogin: function(new_assertion) {
-                    assertion = new_assertion;
-                    navigator.id.logout();
-                },
-                onlogout: function() {
-                    if (assertion) {
-                        if (self._requestDeferred) {
-                            self._requestDeferred.resolve(assertion);
-                        } else if ($.isFunction(onAutoLogin)) {
-                            onAutoLogin(assertion);
-                        }
+                onlogin: function(assertion) {
+                    if (self._requestDeferred) {
+                        self._requestDeferred.resolve(assertion);
                     }
                 }
             });

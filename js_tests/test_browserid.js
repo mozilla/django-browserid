@@ -154,16 +154,4 @@ suite('api.js', function() {
         server.respond();
         django_browserid.getInfo.restore();
     });
-
-    test('registerWatchHandlers() should call onAutoLogin if onLogin is called ' +
-         'when getAssertion wasn\'t called.', function() {
-        navigator.id.reset();
-        var onAutoLogin = sinon.spy();
-        django_browserid.registerWatchHandlers(onAutoLogin);
-
-        // Simulate automatically-triggered login by accessing watch data
-        // directly.
-        navigator.id.watch_data.onlogin('assertion');
-        chai.assert.ok(onAutoLogin.calledWith('assertion'));
-    });
 });

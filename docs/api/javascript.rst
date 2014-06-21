@@ -85,11 +85,7 @@ This part of the documentation describes the JavaScript API defined in
       :returns: Deferred that resolves with the CSRF token.
 
 
-   .. js:function:: didLoginFail([location])
+   .. js:function:: registerWatchHandlers()
 
-      Check for the query string parameter used to signal a failed login.
-
-      :param string location: Location object containing the URL to check.
-                              Defaults to ``window.location``.
-      :returns: True if the parameter was found and login failed, false
-                otherwise.
+      Register callbacks with navigator.id.watch that make the API work. This
+      must be called before calling any other API methods.
