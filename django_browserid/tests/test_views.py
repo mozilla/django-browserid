@@ -6,7 +6,7 @@ from django.test.client import RequestFactory
 from django.utils import six
 from django.utils.functional import lazy
 
-from mock import patch
+from mock import Mock, patch, PropertyMock
 from nose.tools import eq_, ok_
 
 from django_browserid import BrowserIDException, views
@@ -52,6 +52,34 @@ class JSONViewTests(TestCase):
         expected_methods = set(['GET', 'POST', 'PUT', 'DELETE', 'HEAD'])
         actual_methods = set(response['Allow'].split(', '))
         ok_(expected_methods.issubset(actual_methods))
+
+
+class GetNextTests(TestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+
+    def test_no_param(self):
+        """If next isn't in the POST params, return None."""
+        request = self.factory.post('/')
+        eq_(views._get_next(request), None)
+
+    def test_is_safe(self):
+        """Return the value of next if it is considered safe."""
+        request = self.factory.post('/', {'next': '/asdf'})
+        request.get_host = lambda: 'myhost'
+
+        with patch.object(views, 'is_safe_url', return_value=True) as is_safe_url:
+            eq_(views._get_next(request), '/asdf')
+            is_safe_url.assert_called_with('/asdf', host='myhost')
+
+    def test_isnt_safe(self):
+        """If next isn't safe, return None."""
+        request = self.factory.post('/', {'next': '/asdf'})
+        request.get_host = lambda: 'myhost'
+
+        with patch.object(views, 'is_safe_url', return_value=False) as is_safe_url:
+            eq_(views._get_next(request), None)
+            is_safe_url.assert_called_with('/asdf', host='myhost')
 
 
 class VerifyTests(TestCase):
@@ -135,23 +163,75 @@ class VerifyTests(TestCase):
             self.verify('post')
         ok_(sanity_checks.called)
 
+    @patch('django_browserid.views.auth.login')
+    def test_login_success_no_next(self, *args):
+        """
+        If _get_next returns None, use success_url for the redirect
+        parameter.
+        """
+        view = views.Verify()
+        view.request = self.factory.post('/')
+        view.user = Mock(email='a@b.com')
+
+        with patch('django_browserid.views._get_next', return_value=None) as _get_next:
+            with patch.object(views.Verify, 'success_url', '/?asdf'):
+                response = view.login_success()
+
+        self.assert_json_equals(response.content, {'email': 'a@b.com', 'redirect': '/?asdf'})
+        _get_next.assert_called_with(view.request)
+
+    @patch('django_browserid.views.auth.login')
+    def test_login_success_next(self, *args):
+        """
+        If _get_next returns a URL, use it for the redirect parameter.
+        """
+        view = views.Verify()
+        view.request = self.factory.post('/')
+        view.user = Mock(email='a@b.com')
+
+        with patch('django_browserid.views._get_next', return_value='/?qwer') as _get_next:
+            with patch.object(views.Verify, 'success_url', '/?asdf'):
+                response = view.login_success()
+
+        self.assert_json_equals(response.content, {'email': 'a@b.com', 'redirect': '/?qwer'})
+        _get_next.assert_called_with(view.request)
+
 
 class LogoutTests(TestCase):
     def setUp(self):
         self.factory = RequestFactory()
 
+        _get_next_patch = patch('django_browserid.views._get_next')
+        self._get_next = _get_next_patch.start()
+        self.addCleanup(_get_next_patch.stop)
+
     def test_redirect(self):
         """Include LOGOUT_REDIRECT_URL in the response."""
         request = self.factory.post('/')
         logout = views.Logout.as_view()
+        self._get_next.return_value = None
 
-        with self.settings(LOGOUT_REDIRECT_URL='/test/foo'):
+        with patch.object(views.Logout, 'redirect_url', '/test/foo'):
             with patch('django_browserid.views.auth.logout') as auth_logout:
                 response = logout(request)
 
         auth_logout.assert_called_with(request)
         eq_(response.status_code, 200)
         self.assert_json_equals(response.content, {'redirect': '/test/foo'})
+
+    def test_redirect_next(self):
+        """
+        If _get_next returns a URL, use it for the redirect parameter.
+        """
+        request = self.factory.post('/')
+        logout = views.Logout.as_view()
+        self._get_next.return_value = '/test/bar'
+
+        with patch.object(views.Logout, 'redirect_url', '/test/foo'):
+            with patch('django_browserid.views.auth.logout'):
+                response = logout(request)
+
+        self.assert_json_equals(response.content, {'redirect': '/test/bar'})
 
 
 class CsrfTokenTests(TestCase):

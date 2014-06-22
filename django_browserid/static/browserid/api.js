@@ -10,25 +10,35 @@
         /**
          * Retrieve an assertion and use it to log the user into your site.
          * @param {object} requestArgs Options to pass to navigator.id.request.
+         * @param {string} next URL to redirect the user to if login is
+         *                      successful.
          * @return {jQuery.Deferred} Deferred that resolves once the user has
          *                           been logged in.
          */
-        login: function login(requestArgs) {
+        login: function login(requestArgs, next) {
+            if (typeof requestArgs === 'string') {
+                next = requestArgs;
+                requestArgs = undefined;
+            }
+
             return django_browserid.getAssertion(requestArgs).then(function(assertion) {
-                return django_browserid.verifyAssertion(assertion);
+                return django_browserid.verifyAssertion(assertion, next);
             });
         },
 
         /**
          * Log the user out of your site.
+         * @param {string} next URL to redirect the user to if logout is
+         *                      successful.
          * @return {jQuery.Deferred} Deferred that resolves once the user has
          *                           been logged out.
          */
-        logout: function logout() {
+        logout: function logout(next) {
             var info = this.getInfo();
             return this.getCsrfToken().then(function(csrfToken) {
                 return $.ajax(info.logoutUrl, {
                     type: 'POST',
+                    data: {next: next},
                     headers: {'X-CSRFToken': csrfToken},
                 });
             });
@@ -50,16 +60,18 @@
 
         /**
          * Verify that the given assertion is valid, and log the user in.
-         * @param {string} Assertion to verify.
+         * @param {string} assertion Assertion to verify.
+         * @param {string} next URL to redirect the user to if the assertion is
+         *                      valid.
          * @return {jQuery.Deferred} Deferred that resolves with the login view
          *                           response once login is complete.
          */
-        verifyAssertion: function verifyAssertion(assertion) {
+        verifyAssertion: function verifyAssertion(assertion, next) {
             var info = this.getInfo();
             return this.getCsrfToken().then(function(csrfToken) {
                 return $.ajax(info.loginUrl, {
                     type: 'POST',
-                    data: {assertion: assertion},
+                    data: {assertion: assertion, next: next},
                     headers: {'X-CSRFToken': csrfToken},
                 });
             });

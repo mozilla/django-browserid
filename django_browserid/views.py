@@ -8,6 +8,7 @@ from django.contrib import auth
 from django.http import HttpResponse
 from django.template import RequestContext
 from django.utils import six
+from django.utils.http import is_safe_url
 from django.views.decorators.cache import never_cache
 from django.views.generic import View
 
@@ -24,6 +25,21 @@ class JSONView(View):
         allowed_methods = [m.upper() for m in self.http_method_names if hasattr(self, m)]
         response['Allow'] = ', '.join(allowed_methods)
         return response
+
+
+def _get_next(request):
+    """
+    Get the next parameter from the request's POST arguments and
+    validate it.
+
+    :returns:
+        The next parameter or None if it was not found or invalid.
+    """
+    next = request.POST.get('next')
+    if is_safe_url(next, host=request.get_host()):
+        return next
+    else:
+        return None
 
 
 class Verify(JSONView):
@@ -55,7 +71,7 @@ class Verify(JSONView):
 
         return JSONResponse({
             'email': self.user.email,
-            'redirect': self.success_url
+            'redirect': _get_next(self.request) or self.success_url
         })
 
     def login_failure(self, error=None):
@@ -132,5 +148,5 @@ class Logout(JSONView):
         auth.logout(request)
 
         return JSONResponse({
-            'redirect': self.redirect_url
+            'redirect': _get_next(self.request) or self.redirect_url
         })

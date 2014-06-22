@@ -44,9 +44,30 @@ suite('api.js', function() {
             return resolvedDeferred('verifyResult');
         });
 
-        django_browserid.login({baz: 'biff'}).then(function(verifyResult) {
+        django_browserid.login({baz: 'biff'}, 'nextUrl').then(function(verifyResult) {
             sinon.assert.calledWith(django_browserid.getAssertion, {baz: 'biff'});
-            sinon.assert.calledWith(django_browserid.verifyAssertion, 'assertion');
+            sinon.assert.calledWith(django_browserid.verifyAssertion, 'assertion', 'nextUrl');
+            chai.assert.equal(verifyResult, 'verifyResult');
+            done();
+        });
+
+        server.respond();
+
+        django_browserid.getAssertion.restore();
+        django_browserid.verifyAssertion.restore();
+    });
+
+    test('If the first argument to login() is a string, treat it as the next parameter.', function(done) {
+        sinon.stub(django_browserid, 'getAssertion', function() {
+            return resolvedDeferred('assertion');
+        });
+        sinon.stub(django_browserid, 'verifyAssertion', function() {
+            return resolvedDeferred('verifyResult');
+        });
+
+        django_browserid.login('nextUrl').then(function(verifyResult) {
+            sinon.assert.calledWith(django_browserid.getAssertion, undefined);
+            sinon.assert.calledWith(django_browserid.verifyAssertion, 'assertion', 'nextUrl');
             chai.assert.equal(verifyResult, 'verifyResult');
             done();
         });
@@ -64,10 +85,11 @@ suite('api.js', function() {
 
         server.respondWith('POST', '/browserid/logout/', function(request) {
             chai.assert.equal(request.requestHeaders['X-CSRFToken'], 'csrfToken');
+            chai.assert.equal(request.requestBody, 'next=nextUrl');
             request.respond.apply(request, jsonResponse({redirect: '/asdf/'}));
         });
 
-        django_browserid.logout().then(function(logoutData) {
+        django_browserid.logout('nextUrl').then(function(logoutData) {
             chai.assert.deepEqual(logoutData, {redirect: '/asdf/'});
             done();
         });
@@ -99,7 +121,7 @@ suite('api.js', function() {
         });
 
         server.respondWith('POST', '/browserid/login/', function(request) {
-            chai.assert.equal(request.requestBody, 'assertion=assertion');
+            chai.assert.equal(request.requestBody, 'assertion=assertion&next=nextUrl');
             chai.assert.equal(request.requestHeaders['X-CSRFToken'], 'csrfToken');
             request.respond.apply(request, jsonResponse({
                 redirect: '/asdf/',
@@ -107,7 +129,7 @@ suite('api.js', function() {
             }));
         });
 
-        django_browserid.verifyAssertion('assertion').then(function(verifyResult) {
+        django_browserid.verifyAssertion('assertion', 'nextUrl').then(function(verifyResult) {
             chai.assert.deepEqual(verifyResult, {
                 redirect: '/asdf/',
                 email: 'a@test.com'
