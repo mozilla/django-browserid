@@ -33,6 +33,17 @@
             django_browserid.login($link.data('next')).then(function(verifyResult) {
                 window.sessionStorage.browseridLoginAttempt = 'false';
                 window.location = verifyResult.redirect;
+            }, function(jqXHR) {
+                try {
+                    var response = JSON.parse(jqXHR.responseText);
+                    if (response.redirect) {
+                        window.location = response.redirect;
+                    } else {
+                        console.error('Unable to redirect after login failure: No redirect provided.');
+                    }
+                } catch(err) {
+                    console.error('Unable to redirect after login failure: %o', err);
+                }
             });
         });
 
@@ -43,6 +54,8 @@
             var $link = $(this);
             django_browserid.logout($link.data('next')).then(function(logoutResult) {
                 window.location = logoutResult.redirect;
+            }, function(jqXHR) {
+                console.error('Unable to redirect after logout failure: No redirect provided.');
             });
         });
     });

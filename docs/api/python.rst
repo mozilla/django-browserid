@@ -6,6 +6,7 @@ django-browserid.
 
 .. py:module:: django_browserid
 
+.. _template-helpers:
 
 Template Helpers
 ----------------
