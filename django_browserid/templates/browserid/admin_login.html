@@ -55,6 +55,7 @@
 {% endblock %}
 
 {% block content %}
+  {% browserid_info %}
   {% if include_password_form %}
     {{ block.super }}
     <div class="seperator">
