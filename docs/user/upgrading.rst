@@ -34,6 +34,10 @@ your site up to the latest and greatest!
           # ...
       )
 
+- Remove ``django_browserid.context_processors.browserid`` from your
+  ``TEMPLATE_CONTEXT_PROCESSORS`` setting, as the context processor no longer
+  exists.
+
 - ``browserid.js`` has been split into ``api.js``, which contains just the
   JavaScript API, and ``browserid.js``, which contains the sample code for
   hooking up login buttons. If you aren't using the ``browserid_js`` helper to

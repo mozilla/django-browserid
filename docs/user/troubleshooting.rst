@@ -29,6 +29,14 @@ a sample config that will log messages from django-browserid to the console:
     }
 
 
+If you recently updated...
+--------------------------
+If you are hitting problems after updating django-browserid, check to make sure
+your installed copy matches the tagged version on Github. In particular,
+leftover ``*.pyc`` files may cause unintended side effects. This is common when
+installing without using a package manager like ``pip``.
+
+
 Nothing happens when clicking the login button
 ----------------------------------------------
 If nothing happens when you click the login button on your website, check that
