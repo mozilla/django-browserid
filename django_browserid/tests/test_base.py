@@ -3,6 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 from datetime import datetime
 
+from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
@@ -99,6 +100,40 @@ class SanityCheckTests(TestCase):
                            CSP_FRAME_SRC=[]):
             base.sanity_checks(request)
         ok_(warning.called)
+
+    @override_settings(BROWSERID_DISABLE_SANITY_CHECKS=False,
+                       MIDDLEWARE_CLASSES=['csp.middleware.CSPMiddleware'])
+    @patch('django_browserid.base.logger.warning')
+    def test_unset_csp(self, warning):
+        """Check for errors when CSP settings aren't specified."""
+        request = self.factory.get('/')
+        correct = ['https://login.persona.org']
+        setting_kwargs = {
+            'CSP_DEFAULT_SRC': correct,
+            'CSP_SCRIPT_SRC': correct,
+            'CSP_FRAME_SRC': correct
+        }
+
+        # There's no easy way to use a variable for deleting the
+        # attribute on the settings object, so we can't easily turn this
+        # into a function, sadly.
+        with self.settings(**setting_kwargs):
+            del settings.CSP_DEFAULT_SRC
+            base.sanity_checks(request)
+        ok_(not warning.called)
+        warning.reset_mock()
+
+        with self.settings(**setting_kwargs):
+            del settings.CSP_FRAME_SRC
+            base.sanity_checks(request)
+        ok_(not warning.called)
+        warning.reset_mock()
+
+        with self.settings(**setting_kwargs):
+            del settings.CSP_SCRIPT_SRC
+            base.sanity_checks(request)
+        ok_(not warning.called)
+        warning.reset_mock()
 
 
 class GetAudienceTests(TestCase):

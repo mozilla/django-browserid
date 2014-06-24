@@ -1,7 +1,6 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
-import json
 import logging
 from datetime import datetime
 
@@ -53,9 +52,9 @@ def sanity_checks(request):
     # If you're using django-csp, you should include persona.
     if 'csp.middleware.CSPMiddleware' in settings.MIDDLEWARE_CLASSES:
         persona = 'https://login.persona.org'
-        in_default = persona in getattr(settings, 'CSP_DEFAULT_SRC', None)
-        in_script = persona in getattr(settings, 'CSP_SCRIPT_SRC', None)
-        in_frame = persona in getattr(settings, 'CSP_FRAME_SRC', None)
+        in_default = persona in getattr(settings, 'CSP_DEFAULT_SRC', ())
+        in_script = persona in getattr(settings, 'CSP_SCRIPT_SRC', ())
+        in_frame = persona in getattr(settings, 'CSP_FRAME_SRC', ())
 
         if (not in_script or not in_frame) and not in_default:
             logger.warning('django-csp detected, but %s was not found in '
