@@ -85,31 +85,10 @@ class BrowserIDBackend(object):
         # This method is basically for your overriding pleasures.
         return True
 
-    def authenticate(self, assertion=None, audience=None, request=None, **kwargs):
+    def verify(self, assertion=None, audience=None, request=None, **kwargs):
         """
-        Authenticate a user by verifying a BrowserID assertion. Defers to the verifier returned by
-        :func:`BrowserIDBackend.get_verifier` for verification.
-
-        You may either pass the ``request`` parameter to determine the audience from the request,
-        or pass the ``audience`` parameter explicitly.
-
-        :param assertion:
-            Assertion submitted by the user. This asserts that the user controls a specific email
-            address.
-
-        :param audience:
-            The audience to use when verifying the assertion; this prevents another site using
-            an assertion for their site to login to yours. This value takes precedence over the
-            audience pulled from the request parameter, if given.
-
-        :param request:
-            The request that generated this authentication attempt. This is used to determine the
-            audience to use during verification, using the
-            :func:`django_browserid.base.get_audience` function. If the audience parameter is also
-            passed, it will be used instead of the audience from the request.
-
-        :param kwargs:
-            All remaining keyword arguments are passed to the ``verify`` function on the verifier.
+        Verify the given assertion and audience. See ``authenticate``
+        for accepted arguments.
         """
         if audience is None and request:
             audience = get_audience(request)
@@ -128,9 +107,43 @@ class BrowserIDBackend(object):
 
         if not result:
             return None
+        else:
+            return result.email
 
-        email = result.email
-        if not self.is_valid_email(email):
+    def authenticate(self, assertion=None, audience=None, request=None, **kwargs):
+        """
+        Authenticate a user by verifying a BrowserID assertion. Defers
+        to the verifier returned by
+        :func:`BrowserIDBackend.get_verifier` for verification.
+
+        You may either pass the ``request`` parameter to determine the
+        audience from the request, or pass the ``audience`` parameter
+        explicitly.
+
+        :param assertion:
+            Assertion submitted by the user. This asserts that the user
+            controls a specific email address.
+
+        :param audience:
+            The audience to use when verifying the assertion; this
+            prevents another site using an assertion for their site to
+            login to yours. This value takes precedence over the
+            audience pulled from the request parameter, if given.
+
+        :param request:
+            The request that generated this authentication attempt. This
+            is used to determine the audience to use during
+            verification, using the
+            :func:`django_browserid.base.get_audience` function. If the
+            audience parameter is also passed, it will be used instead
+            of the audience from the request.
+
+        :param kwargs:
+            All remaining keyword arguments are passed to the ``verify``
+            function on the verifier.
+        """
+        email = self.verify(assertion, audience, request, **kwargs)
+        if not email or not self.is_valid_email(email):
             return None
 
         # In the rare case that two user accounts have the same email address,
@@ -173,3 +186,21 @@ class LocalBrowserIDBackend(BrowserIDBackend):
     """
     def get_verifier(self):
         return LocalVerifier()
+
+
+class AutoLoginBackend(BrowserIDBackend):
+    """
+    Auto-auths everyone as the user with an email matching the
+    BROWSERID_AUTOLOGIN_EMAIL setting. If BROWSERID_AUTOLOGIN_ENABLED
+    is False (the default value), auth-auth is disabled.
+
+    .. warning:: Use of this backend creates an insecure site. Do not
+                 use on a publicly-visible server!
+    """
+    def verify(self, *args, **kwargs):
+        autologin_enabled = getattr(settings, 'BROWSERID_AUTOLOGIN_ENABLED', False)
+        email = getattr(settings, 'BROWSERID_AUTOLOGIN_EMAIL', None)
+        if autologin_enabled and email:
+            return email
+        else:
+            return None

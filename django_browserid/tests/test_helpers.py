@@ -70,6 +70,19 @@ class BrowserIDJSTests(TestCase):
             <script type="text/javascript" src="static/browserid/browserid.js"></script>
         """)
 
+    def test_autologin_email(self):
+        """
+        If BROWSERID_AUTOLOGIN_ENABLED is True, do not include the shim
+        and include the autologin mock script.
+        """
+        with self.settings(BROWSERID_AUTOLOGIN_ENABLED=True):
+            output = helpers.browserid_js()
+            self.assertHTMLEqual(output, """
+                <script type="text/javascript" src="static/browserid/api.js"></script>
+                <script type="text/javascript" src="static/browserid/autologin.js"></script>
+                <script type="text/javascript" src="static/browserid/browserid.js"></script>
+            """)
+
 
 class BrowserIDCSSTests(TestCase):
     def test_basic(self):

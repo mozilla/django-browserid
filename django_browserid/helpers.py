@@ -142,15 +142,31 @@ def browserid_js(include_shim=True):
     Return <script> tags for the JavaScript required by the BrowserID login
     button. Requires use of the staticfiles app.
 
+    If the BROWSERID_AUTOLOGIN_ENABLED setting is True, an extra JavaScript
+    file for mocking out Persona will be included, and the shim won't
+    be included regardless of the value of the ``include_shim`` setting.
+
     :param include_shim:
         A boolean that determines if the persona.org JavaScript shim is included
         in the output. Useful if you want to minify the button JavaScript using
         a library like django-compressor that can't handle external JavaScript.
     """
     files = []
-    if include_shim:
+    autologin_enabled = getattr(settings, 'BROWSERID_AUTOLOGIN_ENABLED', False)
+
+    # Include navigator.id shim only if we're not doing autologin.
+    if include_shim and not autologin_enabled:
         files.append(getattr(settings, 'BROWSERID_SHIM', 'https://login.persona.org/include.js'))
+
+    # Include django-browserid API
     files.append(staticfiles_storage.url('browserid/api.js'))
+
+    # If we're doing autologin, include the JS to mock out certain parts
+    # of the API.
+    if autologin_enabled:
+        files.append(staticfiles_storage.url('browserid/autologin.js'))
+
+    # Include the JS to bind to login buttons.
     files.append(staticfiles_storage.url('browserid/browserid.js'))
 
     tags = ['<script type="text/javascript" src="{0}"></script>'.format(path)

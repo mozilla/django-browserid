@@ -7,7 +7,7 @@ from django.db import IntegrityError
 
 from mock import ANY, Mock, patch
 
-from django_browserid.auth import BrowserIDBackend, default_username_algo
+from django_browserid.auth import AutoLoginBackend, BrowserIDBackend, default_username_algo
 from django_browserid.base import MockVerifier
 from django_browserid.tests import mock_browserid, TestCase
 
@@ -26,6 +26,53 @@ def new_user(email, username=None):
 
 
 class BrowserIDBackendTests(TestCase):
+    def setUp(self):
+        self.backend = BrowserIDBackend()
+        self.verifier = Mock()
+        self.backend.get_verifier = lambda: self.verifier
+
+    def test_verify_failure(self):
+        """If verification fails, return None."""
+        self.verifier.verify.return_value = False
+        self.assertEqual(self.backend.verify('asdf', 'qwer'), None)
+        self.verifier.verify.assert_called_with('asdf', 'qwer')
+
+    def test_verify_success(self):
+        """
+        If verification succeeds, return the email address from the
+        verification result.
+        """
+        self.verifier.verify.return_value = Mock(email='bob@example.com')
+        self.assertEqual(self.backend.verify('asdf', 'qwer'), 'bob@example.com')
+        self.verifier.verify.assert_called_with('asdf', 'qwer')
+
+    def test_verify_no_audience_request(self):
+        """
+        If no audience is provided but a request is, retrieve the
+        audience from the request using get_audience.
+        """
+        request = Mock()
+        with patch('django_browserid.auth.get_audience') as get_audience:
+            self.backend.verify('asdf', request=request)
+            get_audience.assert_called_with(request)
+            self.verifier.verify.assert_called_with('asdf', get_audience.return_value)
+
+    def test_verify_no_audience_no_assertion_no_service(self):
+        """
+        If the assertion isn't provided, or the audience and request
+        aren't provided, return None.
+        """
+        self.assertEqual(self.backend.verify(audience='asdf'), None)
+        self.assertEqual(self.backend.verify(assertion='asdf'), None)
+        with patch('django_browserid.auth.get_audience') as get_audience:
+            get_audience.return_value = None
+            self.assertEqual(self.backend.verify('asdf', request=Mock()), None)
+
+    def test_verify_kwargs(self):
+        """Any extra kwargs should be passed to the verifier."""
+        self.backend.verify('asdf', 'asdf', request='blah', foo='bar', baz=1)
+        self.verifier.verify.assert_called_with('asdf', 'asdf', foo='bar', baz=1)
+
     def auth(self, verified_email=None, **kwargs):
         """
         Attempt to authenticate a user with BrowserIDBackend.
@@ -33,13 +80,8 @@ class BrowserIDBackendTests(TestCase):
         If verified_email is None, verification will fail, otherwise it will
         pass and return the specified email.
         """
-        with mock_browserid(verified_email):
-            backend = BrowserIDBackend()
-            return backend.authenticate(assertion='asdf', audience='asdf', **kwargs)
-
-    def test_failed_verification(self):
-        """If verification fails, return None."""
-        self.assertTrue(self.auth(None) is None)
+        self.backend.verify = Mock(return_value=verified_email)
+        return self.backend.authenticate(assertion='asdf', audience='asdf', **kwargs)
 
     def test_duplicate_emails(self):
         """
@@ -105,15 +147,6 @@ class BrowserIDBackendTests(TestCase):
         """
         user = self.auth('a@b.com')
         user_created.send.assert_called_with(ANY, user=user)
-
-    def test_verify_called_with_extra_kwargs(self):
-        backend = BrowserIDBackend()
-        verifier = MockVerifier('a@example.com')
-        verifier.verify = Mock(wraps=verifier.verify)
-        backend.get_verifier = lambda: verifier
-
-        backend.authenticate(assertion='asdf', audience='http://testserver', foo='bar')
-        verifier.verify.assert_called_with('asdf', 'http://testserver', foo='bar')
 
     def test_get_user(self):
         """
@@ -212,3 +245,37 @@ if get_user_model:
                               verified_email='b@test.com')
             self.assertTrue(isinstance(user, CustomUser))
             self.assertEqual(user.email, 'b@test.com')
+
+
+class AutoLoginBackendTests(TestCase):
+    def setUp(self):
+        self.backend = AutoLoginBackend()
+
+    def test_verify_with_email(self):
+        """
+        If BROWSERID_AUTOLOGIN_EMAIL is set, use it to auth the user.
+        """
+        with self.settings(BROWSERID_AUTOLOGIN_EMAIL='bob@example.com',
+                           BROWSERID_AUTOLOGIN_ENABLED=True):
+            self.assertEqual(self.backend.verify(), 'bob@example.com')
+
+    def test_verify_without_email(self):
+        """
+        If BROWSERID_AUTOLOGIN_EMAIL is not set, do not auth the user.
+        """
+        with self.settings(BROWSERID_AUTOLOGIN_EMAIL='', BROWSERID_AUTOLOGIN_ENABLED=True):
+            del settings.BROWSERID_AUTOLOGIN_EMAIL
+            self.assertEqual(self.backend.verify(), None)
+
+    def test_verify_disabled(self):
+        """
+        If BROWSERID_AUTOLOGIN_ENABLED is False, do not auth the user
+        in any case.
+        """
+        with self.settings(BROWSERID_AUTOLOGIN_EMAIL='', BROWSERID_AUTOLOGIN_ENABLED=False):
+            del settings.BROWSERID_AUTOLOGIN_EMAIL
+            self.assertEqual(self.backend.verify(), None)
+
+        with self.settings(BROWSERID_AUTOLOGIN_EMAIL='bob@example.com',
+                           BROWSERID_AUTOLOGIN_ENABLED=False):
+            self.assertEqual(self.backend.verify(), None)

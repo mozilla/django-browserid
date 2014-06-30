@@ -103,3 +103,22 @@ Using a Different Identity Provider
    :default: 'https://login.persona.org/include.js'
 
    The URL to use for the BrowserID JavaScript shim.
+
+
+Extras
+------
+.. attribute:: BROWSERID_AUTOLOGIN_ENABLED
+
+   :default: ``False``
+
+   If ``True``, enables auto-login. You must also set the auto-login email and
+   authentication backend for auto-login to function. See the documentation on
+   :ref:`offline development <offline-development>` for more info.
+
+.. attribute:: BROWSERID_AUTOLOGIN_EMAIL
+
+   :default: Not set
+
+   The email to log users in as when auto-login is enabled. See the
+   documentation on :ref:`offline development <offline-development>` for more
+   info.

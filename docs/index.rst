@@ -40,6 +40,7 @@ User Guide
    user/intro
    user/quickstart
    user/customization
+   user/extras
    user/settings
    user/deploying
    user/upgrading

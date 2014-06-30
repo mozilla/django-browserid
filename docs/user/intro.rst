@@ -33,6 +33,8 @@ A `detailed explanation of the BrowserID protocol`_ is available on MDN.
 .. _`Remote Verification Service`: https://developer.mozilla.org/Persona/Remote_Verification_API
 
 
+.. _persona-dependence:
+
 Persona
 -------
 By default, django-browserid relies on Persona, which is a set of
