@@ -64,7 +64,7 @@ This part of the documentation describes the JavaScript API defined in
 
       :param string assertion: Assertion to verify.
       :returns: Deferred that resolves with the login view response once login
-                is complete.
+          is complete.
 
 
    .. js:function:: getInfo()
@@ -85,7 +85,13 @@ This part of the documentation describes the JavaScript API defined in
       :returns: Deferred that resolves with the CSRF token.
 
 
-   .. js:function:: registerWatchHandlers()
+   .. js:function:: registerWatchHandlers([onReady])
 
       Register callbacks with navigator.id.watch that make the API work. This
       must be called before calling any other API methods.
+
+      :param function onReady: Callback that will be executed after the user
+          agent is ready to process login requests. This is passed as the
+          ``onready`` argument to `navigator.id.watch`_
+
+      .. _`navigator.id.watch`: https://developer.mozilla.org/docs/Web/API/navigator.id.watch

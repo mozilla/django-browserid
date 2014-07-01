@@ -107,8 +107,10 @@
         /**
          * Register callbacks with navigator.id.watch that make the API work.
          * This must be called before calling any other API methods.
+         * @param {function} Function to run once the user agent is ready to
+         *                   process login requests.
          */
-        registerWatchHandlers: function registerWatchHandlers() {
+        registerWatchHandlers: function registerWatchHandlers(onReady) {
             var assertion = null;
             var self = this;
 
@@ -117,7 +119,8 @@
                     if (self._requestDeferred) {
                         self._requestDeferred.resolve(assertion);
                     }
-                }
+                },
+                onready: onReady,
             });
         }
     };
