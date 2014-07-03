@@ -11,9 +11,11 @@ from django.utils import six
 
 import requests
 from mock import Mock, patch
+from nose.plugins.skip import SkipTest
 from nose.tools import eq_, ok_
 
 from django_browserid import base
+from django_browserid.compat import pybrowserid_found
 from django_browserid.tests import TestCase
 
 
@@ -392,3 +394,42 @@ class MockVerifierTests(TestCase):
         result = verifier.verify('asdf', 'http://testserver')
         eq_(result.foo, 'bar')
         eq_(result.baz, 5)
+
+
+class LocalVerifierTests(TestCase):
+    def setUp(self):
+        # Skip tests if PyBrowserID is not installed.
+        if not pybrowserid_found:
+            raise SkipTest
+
+        self.verifier = base.LocalVerifier()
+
+    def test_verify_error(self):
+        """
+        If verify raises a PyBrowserIDError, return a failure
+        result.
+        """
+        from browserid.errors import Error as PyBrowserIDError
+
+        pybid_verifier = Mock()
+        error = PyBrowserIDError()
+        self.verifier.pybid_verifier = pybid_verifier
+
+        pybid_verifier.verify.side_effect = error
+
+        result = self.verifier.verify('asdf', 'qwer')
+        pybid_verifier.verify.assert_called_with('asdf', 'qwer')
+        self.assertFalse(result)
+        self.assertEqual(result.reason, error)
+
+    def test_verify_success(self):
+        pybid_verifier = Mock()
+        self.verifier.pybid_verifier = pybid_verifier
+
+        response = {'status': 'okay'}
+        pybid_verifier.verify.return_value = response
+
+        result = self.verifier.verify('asdf', 'qwer')
+        pybid_verifier.verify.assert_called_with('asdf', 'qwer')
+        self.assertTrue(result)
+        self.assertEqual(result._response, response)

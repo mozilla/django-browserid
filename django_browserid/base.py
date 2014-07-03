@@ -12,6 +12,8 @@ from django.utils.http import same_origin
 
 import requests
 
+from django_browserid.compat import pybrowserid_found
+
 
 logger = logging.getLogger(__name__)
 
@@ -244,3 +246,49 @@ class MockVerifier(object):
             }
             result.update(self.result_attributes)
             return VerificationResult(result)
+
+
+if pybrowserid_found:
+    from browserid.errors import Error as PyBrowserIDError
+    from browserid.verifiers.local import LocalVerifier as PyBrowserIDLocalVerifier
+
+    class LocalVerifier(object):
+        """
+        Verifies BrowserID assertions locally instead of using the remote
+        verification service.
+        """
+        def __init__(self, *args, **kwargs):
+            super(LocalVerifier, self).__init__(*args, **kwargs)
+            self.pybid_verifier = PyBrowserIDLocalVerifier()
+
+        def verify(self, assertion, audience, **kwargs):
+            """
+            Verify an assertion locally.
+
+            :param assertion:
+                BrowserID assertion to verify.
+
+            :param audience:
+                The protocol, hostname and port of your website. Used to confirm that the assertion was
+                meant for your site and not for another site.
+
+            :returns:
+                :class:`.VerificationResult`
+            """
+            try:
+                result = self.pybid_verifier.verify(assertion, audience)
+            except PyBrowserIDError as error:
+                return VerificationResult({
+                    'status': 'failure',
+                    'reason': error
+                })
+
+            return VerificationResult(result)
+else:
+    # If someone tries to use LocalVerifier, let's show a helpful error
+    # instead of just raising an ImportError.
+    class LocalVerifier(object):
+        def __init__(self, *args, **kwargs):
+            raise RuntimeError('You\'re attempting to use local assertion verification without '
+                               'PyBrowserID installed. Please install PyBrowserID in order to '
+                               'enable local assertion verification.')

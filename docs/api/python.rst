@@ -41,6 +41,20 @@ Django built-in admin interface.
    :annotation:
 
 
+Authentication Backends
+-----------------------
+.. py:module:: django_browserid.auth
+
+There are a few different authentication backends to choose from depending on
+how you want to authenticate users.
+
+.. autoclass:: BrowserIDBackend
+   :members:
+
+.. autoclass:: LocalBrowserIDBackend
+   :show-inheritance:
+
+
 Views
 -----
 .. py:module:: django_browserid.views
@@ -86,6 +100,9 @@ Generally you don't have to use these directly, but they are available for
 sites with complex authentication needs.
 
 .. autoclass:: django_browserid.RemoteVerifier
+   :members: verify
+
+.. autoclass:: django_browserid.LocalVerifier
    :members: verify
 
 .. autoclass:: django_browserid.MockVerifier

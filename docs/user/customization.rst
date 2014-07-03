@@ -4,6 +4,36 @@ Now that you've got django-browserid installed and configured, it's time to see
 how to customize it to your needs.
 
 
+Local Assertion Verification
+----------------------------
+When a user authenticates via django-browserid, they do so by sending your site
+an assertion, which, when verified, gives you an email address for the user.
+Normally, this verification is handled by sending the assertion to a
+`verification service hosted by Mozilla`_.
+
+However, you can also verify assertions locally and avoid relying on the
+verification service. To do so, you must install PyBrowserID_. django-browserid
+checks for PyBrowserID, and if it is found, it enables the use of the
+:class:`LocalVerifier <django_browserid.LocalVerifier>` class.
+
+Once you've installed PyBrowserID, add the
+:class:`LocalBrowserIDBackend <django_browserid.auth.LocalBrowserIDBackend>`
+class to your ``AUTHENTICATION_BACKENDS`` setting:
+
+.. code-block:: python
+
+    AUTHENTICATION_BACKENDS = (
+        'django_browserid.auth.LocalBrowserIDBackend',
+    )
+
+.. note:: Because the BrowserID certificate format has not been finalized,
+          PyBrowserID may fail to verify a valid assertion if the format
+          changes. Be aware of the risks before enabling local verification.
+
+.. _`verification service hosted by Mozilla`: https://developer.mozilla.org/en-US/Persona/Remote_Verification_API
+.. _PyBrowserID: https://pypi.python.org/pypi/PyBrowserID/
+
+
 Customizing the Verify View
 ---------------------------
 Many common customizations involve overriding methods on the

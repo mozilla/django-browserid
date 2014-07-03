@@ -27,3 +27,11 @@ try:
     from jingo import register as jingo_register
 except ImportError:
     jingo_register = JingoRegister()
+
+
+# If PyBrowserID is installed, we can support local verification.
+try:
+    import browserid
+    pybrowserid_found = True
+except ImportError:
+    pybrowserid_found = False

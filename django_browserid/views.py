@@ -12,7 +12,7 @@ from django.utils.http import is_safe_url
 from django.views.decorators.cache import never_cache
 from django.views.generic import View
 
-from django_browserid.base import BrowserIDException, sanity_checks
+from django_browserid.base import sanity_checks
 from django_browserid.http import JSONResponse
 
 
@@ -74,21 +74,11 @@ class Verify(JSONView):
             'redirect': _get_next(self.request) or self.success_url
         })
 
-    def login_failure(self, error=None):
+    def login_failure(self):
         """
-        Redirect the user to a login-failed page. This method can be
-        overridden to handle different exceptions (for example different
-        http status code for BrowserIDException and/or django exceptions).
-        By default a 403 is returned for any exception.
-
-        :param error:
-            If login failed due to an error raised during verification,
-            this will be the Exception or BrowserIDException instance that
-            was raised.
+        Redirect the user to a login-failed page. By default a 403 is
+        returned.
         """
-        if error:
-            logger.error(error)
-
         return JSONResponse({'redirect': self.failure_url}, status=403)
 
     def post(self, *args, **kwargs):
@@ -100,11 +90,7 @@ class Verify(JSONView):
         if not assertion:
             return self.login_failure()
 
-        try:
-            self.user = auth.authenticate(request=self.request, assertion=assertion)
-        except Exception as e:
-            return self.login_failure(e)
-
+        self.user = auth.authenticate(request=self.request, assertion=assertion)
         if self.user and self.user.is_active:
             return self.login_success()
 

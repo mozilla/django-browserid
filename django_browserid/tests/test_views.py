@@ -117,46 +117,6 @@ class VerifyTests(TestCase):
         eq_(response.status_code, 403)
         self.assert_json_equals(response.content, {'redirect': '/fail'})
 
-    @mock_browserid(None)
-    @patch('django_browserid.views.logger.error')
-    @patch('django_browserid.views.auth.authenticate')
-    def test_authenticate_browserid_exception(self, authenticate, logger_error):
-        """
-        If authenticate raises a BrowserIDException, return a failure
-        response.
-        """
-        excpt = BrowserIDException(Exception('hsakjw'))
-        authenticate.side_effect = excpt
-
-        with patch.object(views.Verify, 'login_failure') as mock_failure:
-            response = self.verify('post', assertion='asdf')
-        eq_(response, mock_failure.return_value)
-        mock_failure.assert_called_with(excpt)
-
-    def test_login_failure_log_exception(self):
-        """If login_failure is passed an exception, it should log it."""
-        excpt = BrowserIDException(Exception('hsakjw'))
-
-        with patch('django_browserid.views.logger.error') as logger_error:
-            views.Verify().login_failure(excpt)
-        logger_error.assert_called_with(excpt)
-
-    @mock_browserid(None)
-    @patch('django_browserid.views.logger.error')
-    @patch('django_browserid.views.auth.authenticate')
-    def test_authenticate_any_exception(self, authenticate, logger_error):
-        """
-        If authenticate raises any Exception, return a failure
-        response.
-        """
-        excpt = Exception('hsakjw')
-        authenticate.side_effect = excpt
-
-        with patch.object(views.Verify, 'login_failure') as mock_failure:
-            response = self.verify('post', assertion='asdf')
-        eq_(response, mock_failure.return_value)
-        mock_failure.assert_called_with(excpt)
-
     @mock_browserid('test@example.com')
     def test_auth_success_redirect_success(self):
         """If authentication succeeds, redirect to the success URL."""

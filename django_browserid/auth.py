@@ -12,7 +12,7 @@ try:
 except ImportError:
     from django.utils.encoding import smart_str as smart_bytes
 
-from django_browserid.base import get_audience, RemoteVerifier
+from django_browserid.base import get_audience, LocalVerifier, RemoteVerifier
 from django_browserid.signals import user_created
 from django_browserid.util import import_from_setting
 
@@ -118,7 +118,14 @@ class BrowserIDBackend(object):
             return None
 
         verifier = self.get_verifier()
-        result = verifier.verify(assertion, audience, **kwargs)
+        try:
+            result = verifier.verify(assertion, audience, **kwargs)
+        except Exception as e:
+            result = None
+            logger.warn('Error while verifying assertion %s with audience %s.', assertion,
+                        audience)
+            logger.warn(e)
+
         if not result:
             return None
 
@@ -157,3 +164,12 @@ class BrowserIDBackend(object):
             return user
         except self.User.DoesNotExist:
             return None
+
+
+class LocalBrowserIDBackend(BrowserIDBackend):
+    """
+    BrowserID authentication backend that uses local verification
+    instead of remote verification.
+    """
+    def get_verifier(self):
+        return LocalVerifier()

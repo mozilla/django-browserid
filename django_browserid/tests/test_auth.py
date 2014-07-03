@@ -163,6 +163,23 @@ class BrowserIDBackendTests(TestCase):
             backend.create_user('a@example.com')
         self.assertEqual(e.exception, error)
 
+    def test_authenticate_verify_exception(self):
+        """
+        If the verifier raises an exception, log it as a warning and
+        return None.
+        """
+        backend = BrowserIDBackend()
+        verifier = Mock()
+        exception = Exception()
+
+        backend.get_verifier = lambda: verifier
+        verifier.verify.side_effect = exception
+
+        with patch('django_browserid.auth.logger') as logger:
+            self.assertEqual(backend.authenticate('asdf', 'asdf'), None)
+            logger.warn.assert_called_with(exception)
+
+
 
 if get_user_model:
     # Only run custom user model tests if we're using a version of Django that
