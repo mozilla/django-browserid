@@ -181,7 +181,7 @@ class BrowserIDLogoutTests(TestCase):
         with self.settings(LOGOUT_REDIRECT_URL='/'):
             button = helpers.browserid_logout(link_class='go button')
         self.assertHTMLEqual(button, """
-            <a href="/browserid/logout/" class="go button" data-next="/">
+            <a href="/browserid/logout/" class="browserid-logout go button" data-next="/">
                 <span>Sign out</span>
             </a>
         """)
