@@ -134,7 +134,11 @@ def browserid_logout(text='Sign out', next=None, link_class='', attrs=None):
         If given a string, it is parsed as JSON and is expected to be an object.
     """
     next = next or getattr(settings, 'LOGOUT_REDIRECT_URL', '/')
-    link_class_with_default = 'browserid-logout {}'.format(link_class).strip()
+    default_link_class = 'browserid-logout'
+    if link_class:
+        link_class_with_default = ' '.join((default_link_class, link_class))
+    else:
+        link_class_with_default = default_link_class
     return browserid_button(text, next, link_class_with_default,
                             attrs, reverse('browserid.logout'))
 
