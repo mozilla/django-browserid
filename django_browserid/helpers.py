@@ -115,7 +115,7 @@ def browserid_login(text='Sign in', color=None, next=None,
 
 
 @jingo_register.function
-def browserid_logout(text='Sign out', next=None, link_class='browserid-logout', attrs=None):
+def browserid_logout(text='Sign out', next=None, link_class='', attrs=None):
     """
     Output the HTML for a BrowserID logout link.
 
@@ -124,7 +124,8 @@ def browserid_logout(text='Sign out', next=None, link_class='browserid-logout', 
         localized.
 
     :param link_class:
-        CSS class for the link. Defaults to `browserid-logout`.
+        CSS classes for the link. The classes will be appended to the
+        default class `browserid-logout`.
 
     :param attrs:
         Dictionary of attributes to add to the link. Values here override those
@@ -133,7 +134,9 @@ def browserid_logout(text='Sign out', next=None, link_class='browserid-logout', 
         If given a string, it is parsed as JSON and is expected to be an object.
     """
     next = next or getattr(settings, 'LOGOUT_REDIRECT_URL', '/')
-    return browserid_button(text, next, link_class, attrs, reverse('browserid.logout'))
+    link_class_with_default = 'browserid-logout {}'.format(link_class).strip()
+    return browserid_button(text, next, link_class_with_default,
+                            attrs, reverse('browserid.logout'))
 
 
 @jingo_register.function
