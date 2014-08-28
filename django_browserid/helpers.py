@@ -12,6 +12,11 @@ from django.utils.six import string_types
 from django_browserid.compat import jingo_register, reverse
 from django_browserid.util import LazyEncoder
 
+MANDATORY_LINK_CLASS_LOGIN = 'browserid-login'
+DEFAULT_LINK_CLASS_LOGIN = MANDATORY_LINK_CLASS_LOGIN + ' persona-button'
+MANDATORY_LINK_CLASS_LOGOUT = 'browserid-logout'
+DEFAULT_LINK_CLASS_LOGOUT = MANDATORY_LINK_CLASS_LOGOUT
+
 
 @jingo_register.function
 def browserid_info():
@@ -72,7 +77,8 @@ def browserid_button(text=None, next=None, link_class=None, attrs=None, href='#'
 
 @jingo_register.function
 def browserid_login(text='Sign in', color=None, next=None,
-                    link_class='browserid-login persona-button', attrs=None, fallback_href='#'):
+                    link_class=DEFAULT_LINK_CLASS_LOGIN,
+                    attrs=None, fallback_href='#'):
     """
     Output the HTML for a BrowserID login link.
 
@@ -105,17 +111,22 @@ def browserid_login(text='Sign in', color=None, next=None,
         JavaScript, the login link will bring them to this page, which can be
         used as a non-JavaScript login fallback.
     """
+    if MANDATORY_LINK_CLASS_LOGIN not in link_class.split(' '):
+        link_class += ' ' + MANDATORY_LINK_CLASS_LOGIN
+
     if color:
-        if 'persona-button' not in link_class:
+        if 'persona-button' not in link_class.split(' '):
             link_class += ' persona-button {0}'.format(color)
         else:
             link_class += ' ' + color
+
     next = next or getattr(settings, 'LOGIN_REDIRECT_URL', '/')
     return browserid_button(text, next, link_class, attrs, fallback_href)
 
 
 @jingo_register.function
-def browserid_logout(text='Sign out', next=None, link_class='browserid-logout', attrs=None):
+def browserid_logout(text='Sign out', next=None,
+                     link_class=DEFAULT_LINK_CLASS_LOGOUT, attrs=None):
     """
     Output the HTML for a BrowserID logout link.
 
@@ -134,8 +145,10 @@ def browserid_logout(text='Sign out', next=None, link_class='browserid-logout', 
         If given a string, it is parsed as JSON and is expected to be an object.
     """
     next = next or getattr(settings, 'LOGOUT_REDIRECT_URL', '/')
-    if 'browserid-logout' not in link_class:
-        link_class = 'browserid-logout ' + link_class
+
+    if MANDATORY_LINK_CLASS_LOGOUT not in link_class.split(' '):
+        link_class += ' ' + MANDATORY_LINK_CLASS_LOGOUT
+
     return browserid_button(text, next, link_class,
                             attrs, reverse('browserid.logout'))
 

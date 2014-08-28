@@ -69,8 +69,10 @@
   <div id="persona-error">There was a problem signing you in. Please try again.</div>
 
   <script src="{% static 'browserid/jquery-1.10.2.min.js' %}"></script>
-  {% browserid_js %}
+  <script type="text/javascript" src="https://login.persona.org/include.js"></script>
+  <script src="{% static 'browserid/api.js' %}"></script>
   <script>
+      django_browserid.registerWatchHandlers();
       $(document).on('click', '.admin-browserid-login', function(e) {
           e.preventDefault();
           var $link = $(this);
