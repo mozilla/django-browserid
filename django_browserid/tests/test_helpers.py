@@ -152,7 +152,7 @@ class BrowserIDLoginTests(TestCase):
         with self.settings(LOGIN_REDIRECT_URL='/'):
             button = helpers.browserid_login(link_class='go button', color='dark')
         self.assertHTMLEqual(button, """
-            <a href="#" class="browserid-login go button persona-button dark" data-next="/">
+            <a href="#" class="go button browserid-login persona-button dark" data-next="/">
                 <span>Sign in</span>
             </a>
         """)
@@ -181,7 +181,7 @@ class BrowserIDLogoutTests(TestCase):
         with self.settings(LOGOUT_REDIRECT_URL='/'):
             button = helpers.browserid_logout(link_class='go button')
         self.assertHTMLEqual(button, """
-            <a href="/browserid/logout/" class="browserid-logout go button" data-next="/">
+            <a href="/browserid/logout/" class="go button browserid-logout" data-next="/">
                 <span>Sign out</span>
             </a>
         """)
