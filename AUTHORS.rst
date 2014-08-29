@@ -53,3 +53,4 @@ Patches and Suggestions
 - mvasilkov
 - Mounir Messelmeni
 - Tomo Krajina
+- Sergio Oliveira
