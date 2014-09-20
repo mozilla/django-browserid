@@ -9,13 +9,21 @@ os.environ['REUSE_DB'] = '0'
 test_dir = os.path.join(os.path.dirname(__file__), 'django_browserid/tests')
 sys.path.insert(0, test_dir)
 
+import django
+
 from django.test.utils import get_runner
 from django.conf import settings
 from django.core.management import call_command
 
 
 def runtests():
-    call_command('syncdb', interactive=False)
+    if django.VERSION >= (1, 7, 0):
+        django.setup()
+        call_command('migrate', interactive=False)
+
+    else:
+        call_command('syncdb', interactive=False)
+
     call_command('flush', interactive=False)
     test_runner = get_runner(settings)
     failures = test_runner(interactive=False, failfast=False).run_tests([])

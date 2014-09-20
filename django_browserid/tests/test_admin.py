@@ -31,7 +31,7 @@ class BrowserIDAdminSiteTests(TestCase):
         django_site = admin.AdminSite()
         browserid_site = BrowserIDAdminSite()
 
-        class TestModel(models.Model):
+        class TestModel1(models.Model):
             pass
         class TestModel2(models.Model):
             pass
@@ -43,11 +43,11 @@ class BrowserIDAdminSiteTests(TestCase):
             pass
 
         browserid_site.register = Mock()
-        django_site.register(TestModel, TestModelAdmin)
+        django_site.register(TestModel1, TestModelAdmin)
         django_site.register(TestModel2, TestModel2Admin)
         django_site.register(TestModel3, TestModelAdmin)
 
         browserid_site.copy_registry(django_site)
-        browserid_site.register.assert_any_call(TestModel, TestModelAdmin)
+        browserid_site.register.assert_any_call(TestModel1, TestModelAdmin)
         browserid_site.register.assert_any_call(TestModel2, TestModel2Admin)
         browserid_site.register.assert_any_call(TestModel3, TestModelAdmin)
