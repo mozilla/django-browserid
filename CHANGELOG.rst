@@ -3,6 +3,32 @@
 History
 -------
 
+0.11 (2014-09-25)
++++++++++++++++++++
+- Add support for local assertion verification instead of relying on the remote
+  verification service if PyBrowserID is installed.
+
+- Add an auto-login backend to support offline local development when the
+  Persona service isn't available.
+
+- Run automated tests for Django 1.7.
+
+- Use the stateless Persona API, removing the need to work around issues
+  involving Persona attempting to auto-login or auto-logout users.
+
+- Add support for setting an `on_ready` handler to be executed when the Persona
+  API is ready to fetch assertions.
+
+- Fix broken Django admin integration.
+
+- Fix some issues around CSRF tokens used during the login process.
+
+- Improve logging when using the default verify view so that it doesn't look
+  like an error.
+
+- Various documentation updates.
+
+
 0.10.1 (2014-05-02)
 +++++++++++++++++++
 - Add ``browserid_info`` helper back in. The previous method of fetching the
