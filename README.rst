@@ -32,7 +32,7 @@ covers solutions to several common problems.
 If that doesn't help, questions can be sent to the #webdev channel on
 irc.mozilla.org, or by email to the `current maintainer`_.
 
-.. _troubleshooting: http://django-browserid.readthedocs.org/en/latest/details/troubleshooting.html
+.. _troubleshooting: http://django-browserid.readthedocs.org/en/latest/user/troubleshooting.html
 .. _current maintainer: mailto:mkelly@mozilla.org
 
 
