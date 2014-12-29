@@ -70,15 +70,15 @@ change where they are redirected to.
    URL for these settings from a URL pattern name or function name.
 
 You can also override the
-:attr:`success_url <django_browserid.views.Verify.success_url` and
-:attr:`failure_url <django_browserid.views.Verify.failure_url` properties on
+:attr:`success_url <django_browserid.views.Verify.success_url>` and
+:attr:`failure_url <django_browserid.views.Verify.failure_url>` properties on
 the ``Verify`` view if you need more control over how the redirect URLs are
 retrieved.
 
 If you need to control the entire response to the ``Verify`` view, such as when
 you're :ref:`using custom JavaScript <customjs>`, you'll want to override
-:attr:`login_success <django_browserid.views.Verify.login_success`
-and :attr:`login_failure <django_browserid.views.Verify.login_failure`.
+:attr:`login_success <django_browserid.views.Verify.login_success>`
+and :attr:`login_failure <django_browserid.views.Verify.login_failure>`.
 
 
 Automatic User Creation
@@ -116,7 +116,7 @@ certain email addresses, or filtering the queryset that emails are compared to.
 
 filter_users_by_email
 ~~~~~~~~~~~~~~~~~~~~~
-:attr:`filter_users_by_email <django_browserid.auth.BrowserIDBackend.filter_users_by_email`
+:attr:`filter_users_by_email <django_browserid.auth.BrowserIDBackend.filter_users_by_email>`
 returns the queryset that is searched when looking for a user account that
 matches a user's email. Overriding this allows you to limit the set of users
 that are searched:
@@ -136,7 +136,7 @@ that are searched:
 
 is_valid_email
 ~~~~~~~~~~~~~~
-:attr:`is_valid_email <django_browserid.auth.BrowserIDBackend.is_valid_email`
+:attr:`is_valid_email <django_browserid.auth.BrowserIDBackend.is_valid_email>`
 determines if the email a user attempts to log in with is considered valid.
 Override this to exclude users with certain emails:
 
@@ -151,13 +151,13 @@ Override this to exclude users with certain emails:
 Custom User Models
 ------------------
 Django allows you to `use a custom User model for authentication
-<custom_user_model>`. If you are using a custom User model, and the model has
+<https://docs.djangoproject.com/en/dev/topics/auth/customizing/#specifying-a-custom-user-model>`_. If you are using a custom User model, and the model has
 an ``email`` attribute that can store email addresses, django-browserid should
 work out-of-the-box for you.
 
 If this isn't the case, then you will probably have to override the
-:attr:`is_valid_email <django_browserid.auth.BrowserIDBackend.is_valid_email`,
-:attr:`filter_users_by_email <django_browserid.auth.BrowserIDBackend.filter_users_by_email`,
+:attr:`is_valid_email <django_browserid.auth.BrowserIDBackend.is_valid_email>`,
+:attr:`filter_users_by_email <django_browserid.auth.BrowserIDBackend.filter_users_by_email>`,
 and :attr:`create_user <django_browserid.auth.BrowserIDBackend.create_user>`
 methods to work with your custom User class.
 
