@@ -13,22 +13,6 @@ except ImportError:
     from django.core.urlresolvers import reverse
 
 
-# Use no-op shims for registering template helpers for jingo if it isn't
-# found.
-class JingoRegister(object):
-    def filter(self, func, *args, **kwargs):
-        return func
-
-    def function(self, func, *args, **kwargs):
-        return func
-
-
-try:
-    from jingo import register as jingo_register
-except ImportError:
-    jingo_register = JingoRegister()
-
-
 # If PyBrowserID is installed, we can support local verification.
 try:
     import browserid
