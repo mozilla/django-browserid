@@ -5,9 +5,9 @@ in the right place. This document describes the major changes required to get
 your site up to the latest and greatest!
 
 
-0.10.1 to 0.11
---------------
-No changes are necessary to switch from 0.10.1 to 0.11.
+0.10.1 to 0.11.1
+---------------
+No changes are necessary to switch from 0.10.1 to 0.11.1.
 
 
 0.9 to 0.10.1

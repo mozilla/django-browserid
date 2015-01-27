@@ -3,6 +3,12 @@
 History
 -------
 
+0.11.1 (2015-01-27)
++++++++++++++++++++
+- Fix circular import bug with jingo that was blocking people from upgrading
+  who were using jingo.
+
+
 0.11 (2014-09-25)
 +++++++++++++++++++
 - Add support for local assertion verification instead of relying on the remote
