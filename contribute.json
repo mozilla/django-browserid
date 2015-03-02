@@ -1,0 +1,25 @@
+{
+    "name": "django-browserid",
+    "description": "django-browserid is a library that integrates BrowserID authentication into Django.",
+    "repository": {
+        "url": "https://github.com/mozilla/django-browserid",
+        "license": "MPL 2.0",
+        "tests": "https://travis-ci.org/mozilla/django-browserid"
+    },
+    "participate": {
+        "home": "https://github.com/mozilla/django-browserid",
+        "docs": "http://django-browserid.readthedocs.org/en/latest/",
+        "irc": "irc://irc.mozilla.org/#webdev",
+        "irc-contacts": ["Osmose", "peterbe", "willkg"]
+    },
+    "bugs": {
+        "list": "https://github.com/mozilla/django-browserid/issues",
+        "report": "https://github.com/mozilla/django-browserid/issues/new"
+    },
+    "keywords": [
+        "django",
+        "python",
+        "persona",
+        "browserid"
+    ]
+}
