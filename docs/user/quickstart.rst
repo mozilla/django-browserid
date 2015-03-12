@@ -56,7 +56,7 @@ templates, along with the CSS and JS files necessary to make it work:
     {% load browserid %}
     <html>
       <head>
-        <link rel="stylesheet" href="{% static 'browserid/persona-buttons.css' %}">
+        {% browserid_css %}
       </head>
       <body>
         {% browserid_info %}
@@ -69,8 +69,7 @@ templates, along with the CSS and JS files necessary to make it work:
 
         <script src="https://code.jquery.com/jquery-1.9.1.min.js"></script>
         <script src="https://login.persona.org/include.js"></script>
-        <script src="{% static 'browserid/api.js' %}"></script>
-        <script src="{% static 'browserid/browserid.js' %}"></script>
+        {% browserid_js %}
       </body>
     </html>
 
