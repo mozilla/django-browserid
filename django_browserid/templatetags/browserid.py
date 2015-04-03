@@ -1,32 +1,30 @@
 from django import template
 
-from fancy_tag import fancy_tag
-
 from django_browserid import helpers
 
 
 register = template.Library()
 
 
-@fancy_tag(register, takes_context=True)
-def browserid_info(context, **kwargs):
+@register.simple_tag
+def browserid_info(**kwargs):
     return helpers.browserid_info(**kwargs)
 
 
-@fancy_tag(register, takes_context=True)
-def browserid_login(context, **kwargs):
+@register.simple_tag
+def browserid_login(**kwargs):
     return helpers.browserid_login(**kwargs)
 
 
-@fancy_tag(register, takes_context=True)
-def browserid_logout(context, **kwargs):
+@register.simple_tag
+def browserid_logout(**kwargs):
     return helpers.browserid_logout(**kwargs)
 
 
-@fancy_tag(register, takes_context=True)
-def browserid_js(context, **kwargs):
+@register.simple_tag
+def browserid_js(**kwargs):
     return helpers.browserid_js(**kwargs)
 
-@fancy_tag(register, takes_context=True)
-def browserid_css(context, **kwargs):
+@register.simple_tag
+def browserid_css(**kwargs):
     return helpers.browserid_css(**kwargs)
