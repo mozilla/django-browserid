@@ -3,6 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 from django.contrib import auth
 from django.test.client import RequestFactory
+from django.template import Context
 from django.utils import six
 from django.utils.functional import lazy
 
@@ -233,7 +234,7 @@ class CsrfTokenTests(TestCase):
 
         request = self.factory.get('/browserid/csrf/')
         with patch('django_browserid.views.RequestContext') as RequestContext:
-            RequestContext.return_value = {'csrf_token': csrf_token}
+            RequestContext.return_value = Context({'csrf_token': csrf_token})
             response = self.view.get(request)
 
         eq_(response.status_code, 200)
