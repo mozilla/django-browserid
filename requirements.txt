@@ -1,5 +1,4 @@
 requests>=0.9.1
-fancy_tag==0.2.0
 PyBrowserID>=0.9.2 # Optional, required for building documentation.
 
 # Tests

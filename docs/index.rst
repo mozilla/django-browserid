@@ -16,7 +16,6 @@ django-browserid is tested on Python 2.6 to 3.3 and Django 1.4 to 1.6. See
 django-browserid depends on:
 
 - Requests_ >= 1.0.0
-- fancy_tag_ == 0.2.0
 - jQuery_ >= 1.8 (if you are using ``api.js`` and ``browserid.js``).
 
 django-browserid is a work in progress. Contributions are welcome. Feel free
@@ -27,7 +26,6 @@ to fork_ and contribute!
 .. _Persona: https://persona.org
 .. _tox.ini: https://github.com/mozilla/django-browserid/blob/master/tox.ini
 .. _Requests: http://docs.python-requests.org/
-.. _fancy_tag: https://github.com/trapeze/fancy_tag
 .. _jQuery: http://jquery.com/
 .. _fork: https://github.com/mozilla/django-browserid
 
