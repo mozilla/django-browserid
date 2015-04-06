@@ -108,11 +108,26 @@ class CsrfToken(JSONView):
     """Fetch a CSRF token for the frontend JavaScript."""
     @never_cache
     def get(self, request):
-        # In Django 1.8+, the RequestContext only runs the context processors
-        # when it is bound to a template, so we use a template even if we only
-        # need one context variable.
-        t = Template("{{ csrf_token }}")
-        return HttpResponse(t.render(RequestContext(request)))
+        # Different CSRF libraries (namely session_csrf) store the CSRF
+        # token in different places. The only way to retrieve the token
+        # that works with both the built-in CSRF and session_csrf is to
+        # pull it from the template context processors via
+        # RequestContext.
+        context = RequestContext(request)
+
+        try:
+            # In Django 1.8+, the RequestContext only runs the context processors
+            # when it is bound to a template.
+            with context.bind_template(Template('')):
+                csrf_token = context.get('csrf_token', '')
+        except AttributeError:
+            csrf_token = context.get('csrf_token', '')
+
+        # csrf_token might be a lazy value that triggers side-effects,
+        # so we need to force it to a string.
+        csrf_token = six.text_type(csrf_token)
+
+        return HttpResponse(csrf_token)
 
 
 class Logout(JSONView):
