@@ -55,3 +55,4 @@ Patches and Suggestions
 - Tomo Krajina
 - Sergio Oliveira
 - pythonik
+- Aurélien Bompard
