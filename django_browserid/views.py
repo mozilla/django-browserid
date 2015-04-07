@@ -6,7 +6,7 @@ import logging
 from django.conf import settings
 from django.contrib import auth
 from django.http import HttpResponse
-from django.template import RequestContext, Template
+from django.template import RequestContext
 from django.utils import six
 from django.utils.http import is_safe_url
 from django.views.decorators.cache import never_cache
@@ -118,9 +118,12 @@ class CsrfToken(JSONView):
         try:
             # In Django 1.8+, the RequestContext only runs the context processors
             # when it is bound to a template.
-            with context.bind_template(Template('')):
+            from django.template import engines
+            # Create an empty template from the first configured template engine.
+            template_wrapper = engines.all()[0].from_string("")
+            with context.bind_template(template_wrapper.template):
                 csrf_token = context.get('csrf_token', '')
-        except AttributeError:
+        except ImportError:
             csrf_token = context.get('csrf_token', '')
 
         # csrf_token might be a lazy value that triggers side-effects,
