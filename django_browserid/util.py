@@ -2,11 +2,11 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 import json
+import sys
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.functional import Promise
-from django.utils.importlib import import_module
 
 try:
     from django.utils.encoding import force_unicode as force_text
@@ -44,7 +44,8 @@ def import_from_setting(setting):
         raise ImproperlyConfigured('Setting {0} should be an import path.'.format(setting))
 
     try:
-        mod = import_module(module)
+        __import__(module)
+        mod = sys.modules[module]
     except ImportError as e:
         raise ImproperlyConfigured('Error importing `{0}`: {1}'.format(path, e))
 

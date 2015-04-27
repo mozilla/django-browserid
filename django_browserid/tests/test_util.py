@@ -5,7 +5,6 @@ from django.test.utils import override_settings
 from django.utils import six
 from django.utils.functional import lazy
 
-from mock import Mock, patch
 from nose.tools import eq_
 
 from django_browserid.tests import TestCase
@@ -24,6 +23,9 @@ class TestLazyEncoder(TestCase):
         eq_('["foo", "blah"]', thing_json)
 
 
+import_value = 1
+
+
 class ImportFromSettingTests(TestCase):
     def test_no_setting(self):
         """If the setting doesn't exist, raise ImproperlyConfigured."""
@@ -39,49 +41,28 @@ class ImportFromSettingTests(TestCase):
         with self.assertRaises(ImproperlyConfigured):
             import_from_setting('TEST_SETTING')
 
-    @patch('django_browserid.util.import_module')
-    @override_settings(TEST_SETTING='foo.bar.baz')
-    def test_failed_import(self, import_module):
+    @override_settings(TEST_SETTING='does.not.exist')
+    def test_error_importing(self):
         """
         If there is an error importing the module, raise
         ImproperlyConfigured.
         """
-        import_module.side_effect = ImportError
         with self.assertRaises(ImproperlyConfigured):
             import_from_setting('TEST_SETTING')
-        import_module.assert_called_with('foo.bar')
 
-    @patch('django_browserid.util.import_module')
-    @override_settings(TEST_SETTING='foo.bar.baz')
-    def test_error_importing(self, import_module):
-        """
-        If there is an error importing the module, raise
-        ImproperlyConfigured.
-        """
-        import_module.side_effect = ImportError
-        with self.assertRaises(ImproperlyConfigured):
-            import_from_setting('TEST_SETTING')
-        import_module.assert_called_with('foo.bar')
-
-    @patch('django_browserid.util.import_module')
-    @override_settings(TEST_SETTING='foo.bar.baz')
-    def test_missing_attribute(self, import_module):
+    @override_settings(TEST_SETTING='django_browserid.tests.test_util.missing_value')
+    def test_missing_attribute(self):
         """
         If the module is imported, but the function isn't found, raise
         ImproperlyConfigured.
         """
-        import_module.return_value = Mock(spec=[])
         with self.assertRaises(ImproperlyConfigured):
             import_from_setting('TEST_SETTING')
 
-    @patch('django_browserid.util.import_module')
-    @override_settings(TEST_SETTING='foo.bar.baz')
-    def test_existing_attribute(self, import_module):
+    @override_settings(TEST_SETTING='django_browserid.tests.test_util.import_value')
+    def test_existing_attribute(self):
         """
         If the module is imported and has the requested function,
         return it.
         """
-        module = Mock(spec=['baz'])
-        import_module.return_value = module
-        self.assertEqual(import_from_setting('TEST_SETTING'), module.baz)
-
+        self.assertEqual(import_from_setting('TEST_SETTING'), 1)
