@@ -56,3 +56,4 @@ Patches and Suggestions
 - Sergio Oliveira
 - pythonik
 - Aurélien Bompard
+- Ed Morley
