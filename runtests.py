@@ -1,33 +1,24 @@
-# This file mainly exists to allow python setup.py test to work.
-# http://ericholscher.com/blog/2009/jun/29/enable-setuppy-test-your-django-apps/
 import os
 import sys
 
-os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
-os.environ['REUSE_DB'] = '0'
-
-test_dir = os.path.join(os.path.dirname(__file__), 'django_browserid/tests')
-sys.path.insert(0, test_dir)
-
 import django
-
 from django.test.utils import get_runner
 from django.conf import settings
-from django.core.management import call_command
 
 
 def runtests():
-    if django.VERSION >= (1, 7, 0):
-        django.setup()
-        call_command('migrate', interactive=False)
+    test_dir = os.path.join(os.path.dirname(__file__), 'django_browserid/tests')
+    sys.path.insert(0, test_dir)
 
-    else:
-        call_command('syncdb', interactive=False)
+    os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
+    os.environ['REUSE_DB'] = '0'
+    django.setup()
 
-    call_command('flush', interactive=False)
-    test_runner = get_runner(settings)
-    failures = test_runner(interactive=False, failfast=False).run_tests([])
-    sys.exit(failures)
+    TestRunner = get_runner(settings)
+    test_runner = TestRunner(interactive=False, failfast=False)
+    failures = test_runner.run_tests(['django_browserid.tests'])
+
+    sys.exit(bool(failures))
 
 if __name__ == '__main__':
     runtests()

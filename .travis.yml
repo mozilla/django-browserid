@@ -1,33 +1,16 @@
 language: python
 python:
-  - 2.6
   - 2.7
 env:
-  - 'DJANGO_VERSION=">= 1.4, <1.5"'
-  - 'DJANGO_VERSION=">= 1.5, <1.6"'
-  - 'DJANGO_VERSION=">= 1.6, <1.7"'
-  - 'DJANGO_VERSION=">= 1.7, <1.8"'
-matrix:
-  include:
-    - python: 3.2
-      env: 'DJANGO_VERSION=">= 1.5, <1.6"'
-    - python: 3.3
-      env: 'DJANGO_VERSION=">= 1.5, <1.6"'
-    - python: 3.2
-      env: 'DJANGO_VERSION=">= 1.6, <1.7"'
-    - python: 3.3
-      env: 'DJANGO_VERSION=">= 1.6, <1.7"'
-    - python: 3.2
-      env: 'DJANGO_VERSION=">= 1.7, <1.8"'
-    - python: 3.3
-      env: 'DJANGO_VERSION=">= 1.7, <1.8"'
-    - python: 3.4
-      env: 'DJANGO_VERSION=">= 1.7, <1.8"'
-  exclude:
-    - python: 2.6
-      env: 'DJANGO_VERSION=">= 1.7, <1.8"'
+  - TOX_ENV=py27_dj17
+  - TOX_ENV=py32_dj17
+  - TOX_ENV=py33_dj17
+  - TOX_ENV=py34_dj17
+  - TOX_ENV=py27_dj18
+  - TOX_ENV=py32_dj18
+  - TOX_ENV=py33_dj18
+  - TOX_ENV=py34_dj18
 install:
-  - pip install django-nose
-  - pip install "django${DJANGO_VERSION}"
-  - pip install -r requirements.txt --use-mirrors
-script: python setup.py test
+  - pip install tox
+script:
+  - tox -e $TOX_ENV

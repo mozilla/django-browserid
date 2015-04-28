@@ -10,8 +10,8 @@ email addresses. django-browserid provides the necessary hooks to get Django
 to authenticate users via BrowserID. By default, django-browserid relies on
 Persona_ for the client-side JavaScript shim and for assertion verification.
 
-django-browserid is tested on Python 2.6 to 3.3 and Django 1.4 to 1.6. See
-`tox.ini`_ for more details.
+django-browserid is tested on Python 2.7 and 3.2 onward, and supports Django
+1.7 and up. See `tox.ini`_ for more details.
 
 django-browserid depends on:
 
