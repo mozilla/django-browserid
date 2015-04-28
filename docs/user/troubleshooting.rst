@@ -157,5 +157,5 @@ you can try asking for help from:
 - The `dev-webdev@lists.mozilla.org`_ mailing list,
 - or by emailing :doc:`the maintainers </contributor/authors>` directly.
 
-.. _irc.mozilla.org: http://irc.mozilla.org
+.. _irc.mozilla.org: https://wiki.mozilla.org/IRC
 .. _dev-webdev@lists.mozilla.org: https://lists.mozilla.org/listinfo/dev-webdev

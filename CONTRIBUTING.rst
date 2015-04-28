@@ -24,9 +24,9 @@ Development Guidelines
     72-characters-per-line for documentation/comments. Feel free to break these
     guidelines for readability if necessary.
 
-.. _general Webdev guidelines: http://mozweb.readthedocs.org/en/latest/coding.html#python
-.. _JavaScript guidelines: http://mozweb.readthedocs.org/en/latest/js-style.html#js-style
-.. _CSS guidelines: http://mozweb.readthedocs.org/en/latest/css-style.html
+.. _general Webdev guidelines: http://mozweb.readthedocs.org/en/latest/reference/python-style.html
+.. _JavaScript guidelines: http://mozweb.readthedocs.org/en/latest/reference/js-style.html
+.. _CSS guidelines: http://mozweb.readthedocs.org/en/latest/reference/css-style.html
 
 
 Submitting a Pull Request
@@ -65,5 +65,5 @@ Additional Resources
 
 - Mailing list: `dev-webdev@lists.mozilla.org`_.
 
-.. _irc.mozilla.org: http://irc.mozilla.org
+.. _irc.mozilla.org: https://wiki.mozilla.org/IRC
 .. _dev-webdev@lists.mozilla.org: https://lists.mozilla.org/listinfo/dev-webdev

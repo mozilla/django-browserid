@@ -21,7 +21,7 @@ django-browserid depends on:
 django-browserid is a work in progress. Contributions are welcome. Feel free
 to fork_ and contribute!
 
-.. _Django: http://www.djangoproject.com/
+.. _Django: https://www.djangoproject.com/
 .. _BrowserID: https://github.com/mozilla/id-specs/blob/prod/browserid/index.md
 .. _Persona: https://persona.org
 .. _tox.ini: https://github.com/mozilla/django-browserid/blob/master/tox.ini
