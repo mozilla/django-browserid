@@ -5,8 +5,6 @@ from django.test.utils import override_settings
 from django.utils import six
 from django.utils.functional import lazy
 
-from nose.tools import eq_
-
 from django_browserid.tests import TestCase
 from django_browserid.util import import_from_setting, LazyEncoder
 
@@ -20,7 +18,7 @@ class TestLazyEncoder(TestCase):
     def test_lazy(self):
         thing = ['foo', lazy_string]
         thing_json = json.dumps(thing, cls=LazyEncoder)
-        eq_('["foo", "blah"]', thing_json)
+        self.assertEqual('["foo", "blah"]', thing_json)
 
 
 import_value = 1

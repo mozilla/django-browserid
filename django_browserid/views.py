@@ -6,8 +6,7 @@ import logging
 from django.conf import settings
 from django.contrib import auth
 from django.http import HttpResponse
-from django.template import RequestContext
-from django.utils import six
+from django.middleware.csrf import get_token
 from django.utils.http import is_safe_url
 from django.views.decorators.cache import never_cache
 from django.views.generic import View
@@ -108,27 +107,13 @@ class CsrfToken(JSONView):
     """Fetch a CSRF token for the frontend JavaScript."""
     @never_cache
     def get(self, request):
-        # Different CSRF libraries (namely session_csrf) store the CSRF
-        # token in different places. The only way to retrieve the token
-        # that works with both the built-in CSRF and session_csrf is to
-        # pull it from the template context processors via
-        # RequestContext.
-        context = RequestContext(request)
-
-        try:
-            # In Django 1.8+, the RequestContext only runs the context processors
-            # when it is bound to a template.
-            from django.template import engines
-            # Create an empty template from the first configured template engine.
-            template_wrapper = engines.all()[0].from_string("")
-            with context.bind_template(template_wrapper.template):
-                csrf_token = context.get('csrf_token', '')
-        except ImportError:
-            csrf_token = context.get('csrf_token', '')
-
-        # csrf_token might be a lazy value that triggers side-effects,
-        # so we need to force it to a string.
-        csrf_token = six.text_type(csrf_token)
+        # Different CSRF libraries store the CSRF token in different
+        # places. Here we support both standard Django CSRF and the
+        # django-session-csrf library.
+        if hasattr(request, 'csrf_token'):
+            csrf_token = request.csrf_token
+        else:
+            csrf_token = get_token(request)
 
         return HttpResponse(csrf_token)
 

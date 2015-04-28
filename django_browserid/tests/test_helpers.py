@@ -1,7 +1,6 @@
 from django.utils.functional import lazy
 
 from mock import patch
-from nose.tools import eq_
 
 from django_browserid import helpers
 from django_browserid.tests import TestCase
@@ -22,7 +21,7 @@ class BrowserIDInfoTests(TestCase):
         with self.settings(BROWSERID_REQUEST_ARGS={'foo': 'bar', 'baz': 1}):
             output = helpers.browserid_info()
 
-        eq_(output, self.render_to_string.return_value)
+        self.assertEqual(output, self.render_to_string.return_value)
         expected_info = {
             'loginUrl': '/browserid/login/',
             'logoutUrl': '/browserid/logout/',
@@ -35,7 +34,7 @@ class BrowserIDInfoTests(TestCase):
         with self.settings(BROWSERID_REQUEST_ARGS=lazy_request_args()):
             output = helpers.browserid_info()
 
-        eq_(output, self.render_to_string.return_value)
+        self.assertEqual(output, self.render_to_string.return_value)
         expected_info = {
             'loginUrl': '/browserid/login/',
             'logoutUrl': '/browserid/logout/',

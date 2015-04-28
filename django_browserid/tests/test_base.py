@@ -11,8 +11,6 @@ from django.utils import six
 
 import requests
 from mock import Mock, patch
-from nose.plugins.skip import SkipTest
-from nose.tools import eq_, ok_
 
 from django_browserid import base
 from django_browserid.compat import pybrowserid_found
@@ -30,7 +28,7 @@ class SanityCheckTests(TestCase):
         run the checks.
         """
         request = self.factory.get('/')
-        ok_(base.sanity_checks(request))
+        self.assertTrue(base.sanity_checks(request))
 
     @override_settings(DEBUG=False)
     def test_debug_false(self):
@@ -39,7 +37,7 @@ class SanityCheckTests(TestCase):
         run the checks.
         """
         request = self.factory.get('/')
-        ok_(not base.sanity_checks(request))
+        self.assertTrue(not base.sanity_checks(request))
 
     @override_settings(BROWSERID_DISABLE_SANITY_CHECKS=True)
     def test_disable_sanity_checks(self):
@@ -48,7 +46,7 @@ class SanityCheckTests(TestCase):
         checks.
         """
         request = self.factory.get('/')
-        ok_(not base.sanity_checks(request))
+        self.assertTrue(not base.sanity_checks(request))
 
     @override_settings(BROWSERID_DISABLE_SANITY_CHECKS=False, SESSION_COOKIE_SECURE=True)
     def test_sanity_session_cookie(self):
@@ -60,7 +58,7 @@ class SanityCheckTests(TestCase):
         request.is_secure = Mock(return_value=False)
         with patch('django_browserid.base.logger.warning') as warning:
             base.sanity_checks(request)
-        ok_(warning.called)
+        self.assertTrue(warning.called)
 
     @override_settings(BROWSERID_DISABLE_SANITY_CHECKS=False,
                        MIDDLEWARE_CLASSES=['csp.middleware.CSPMiddleware'])
@@ -77,7 +75,7 @@ class SanityCheckTests(TestCase):
                            CSP_SCRIPT_SRC=['https://login.persona.org'],
                            CSP_FRAME_SRC=['https://login.persona.org']):
             base.sanity_checks(request)
-        ok_(not warning.called)
+        self.assertTrue(not warning.called)
         warning.reset_mock()
 
         # Test fallback to default-src.
@@ -85,7 +83,7 @@ class SanityCheckTests(TestCase):
                            CSP_SCRIPT_SRC=[],
                            CSP_FRAME_SRC=[]):
             base.sanity_checks(request)
-        ok_(not warning.called)
+        self.assertTrue(not warning.called)
         warning.reset_mock()
 
         # Test incorrect csp.
@@ -93,7 +91,7 @@ class SanityCheckTests(TestCase):
                            CSP_SCRIPT_SRC=[],
                            CSP_FRAME_SRC=[]):
             base.sanity_checks(request)
-        ok_(warning.called)
+        self.assertTrue(warning.called)
         warning.reset_mock()
 
         # Test partial incorrectness.
@@ -101,7 +99,7 @@ class SanityCheckTests(TestCase):
                            CSP_SCRIPT_SRC=['https://login.persona.org'],
                            CSP_FRAME_SRC=[]):
             base.sanity_checks(request)
-        ok_(warning.called)
+        self.assertTrue(warning.called)
 
     @override_settings(BROWSERID_DISABLE_SANITY_CHECKS=False,
                        MIDDLEWARE_CLASSES=['csp.middleware.CSPMiddleware'])
@@ -122,19 +120,19 @@ class SanityCheckTests(TestCase):
         with self.settings(**setting_kwargs):
             del settings.CSP_DEFAULT_SRC
             base.sanity_checks(request)
-        ok_(not warning.called)
+        self.assertTrue(not warning.called)
         warning.reset_mock()
 
         with self.settings(**setting_kwargs):
             del settings.CSP_FRAME_SRC
             base.sanity_checks(request)
-        ok_(not warning.called)
+        self.assertTrue(not warning.called)
         warning.reset_mock()
 
         with self.settings(**setting_kwargs):
             del settings.CSP_SCRIPT_SRC
             base.sanity_checks(request)
-        ok_(not warning.called)
+        self.assertTrue(not warning.called)
         warning.reset_mock()
 
 
@@ -165,7 +163,7 @@ class GetAudienceTests(TestCase):
 
         audiences = ['https://example.com', 'http://testserver']
         with self.settings(BROWSERID_AUDIENCES=audiences, DEBUG=False):
-            eq_(base.get_audience(request), 'http://testserver')
+            self.assertEqual(base.get_audience(request), 'http://testserver')
 
     def test_no_audience(self):
         """
@@ -189,7 +187,7 @@ class GetAudienceTests(TestCase):
         with patch('django_browserid.base.settings') as settings:
             del settings.BROWSERID_AUDIENCES
             settings.DEBUG = True
-            eq_(base.get_audience(request), 'http://testserver')
+            self.assertEqual(base.get_audience(request), 'http://testserver')
 
     def test_no_audience_but_in_debug(self):
         """
@@ -200,7 +198,7 @@ class GetAudienceTests(TestCase):
 
         # Simulate that no BROWSERID_AUDIENCES has been set
         with self.settings(BROWSERID_AUDIENCES=[], DEBUG=True):
-            eq_(base.get_audience(request), 'http://testserver')
+            self.assertEqual(base.get_audience(request), 'http://testserver')
 
 
 class VerificationResultTests(TestCase):
@@ -210,7 +208,7 @@ class VerificationResultTests(TestCase):
         attribute on the result.
         """
         result = base.VerificationResult({'myattr': 'foo'})
-        eq_(result.myattr, 'foo')
+        self.assertEqual(result.myattr, 'foo')
 
     def test_getattr_attribute_doesnt_exist(self):
         """
@@ -236,7 +234,7 @@ class VerificationResultTests(TestCase):
         the raw string instead.
         """
         result = base.VerificationResult({'expires': 'foasdfhas'})
-        eq_(result.expires, 'foasdfhas')
+        self.assertEqual(result.expires, 'foasdfhas')
 
     def test_expires_valid_timestamp(self):
         """
@@ -244,20 +242,20 @@ class VerificationResultTests(TestCase):
         corresponding datetime.
         """
         result = base.VerificationResult({'expires': '1379307128000'})
-        eq_(datetime(2013, 9, 16, 4, 52, 8), result.expires)
+        self.assertEqual(datetime(2013, 9, 16, 4, 52, 8), result.expires)
 
     def test_nonzero_failure(self):
         """
         If the response status is not 'okay', the result should be
         falsy.
         """
-        ok_(not base.VerificationResult({'status': 'failure'}))
+        self.assertTrue(not base.VerificationResult({'status': 'failure'}))
 
     def test_nonzero_okay(self):
         """
         If the response status is 'okay', the result should be truthy.
         """
-        ok_(base.VerificationResult({'status': 'okay'}))
+        self.assertTrue(base.VerificationResult({'status': 'okay'}))
 
     def test_str_success(self):
         """
@@ -265,23 +263,23 @@ class VerificationResultTests(TestCase):
         the string.
         """
         result = base.VerificationResult({'status': 'okay', 'email': 'a@example.com'})
-        eq_(six.text_type(result), '<VerificationResult Success email=a@example.com>')
+        self.assertEqual(six.text_type(result), '<VerificationResult Success email=a@example.com>')
 
         # If the email is missing, don't include it.
         result = base.VerificationResult({'status': 'okay'})
-        eq_(six.text_type(result), '<VerificationResult Success>')
+        self.assertEqual(six.text_type(result), '<VerificationResult Success>')
 
     def test_str_failure(self):
         """
         If the result is a failure, include 'Failure' in the string.
         """
         result = base.VerificationResult({'status': 'failure'})
-        eq_(six.text_type(result), '<VerificationResult Failure>')
+        self.assertEqual(six.text_type(result), '<VerificationResult Failure>')
 
     def test_str_unicode(self):
         """Ensure that __str__ can handle unicode values."""
         result = base.VerificationResult({'status': 'okay', 'email': six.u('\x80@example.com')})
-        eq_(six.text_type(result), six.u('<VerificationResult Success email=\x80@example.com>'))
+        self.assertEqual(six.text_type(result), six.u('<VerificationResult Success email=\x80@example.com>'))
 
 
 class RemoteVerifierTests(TestCase):
@@ -302,7 +300,7 @@ class RemoteVerifierTests(TestCase):
             verifier.verify('asdf', 'http://testserver')
 
         # foo parameter passed with 'bar' value.
-        eq_(post.call_args[1]['foo'], 'bar')
+        self.assertEqual(post.call_args[1]['foo'], 'bar')
 
     def test_verify_kwargs(self):
         """
@@ -316,8 +314,8 @@ class RemoteVerifierTests(TestCase):
             verifier.verify('asdf', 'http://testserver', foo='bar', baz=5)
 
         # foo parameter passed with 'bar' value.
-        eq_(post.call_args[1]['data']['foo'], 'bar')
-        eq_(post.call_args[1]['data']['baz'], 5)
+        self.assertEqual(post.call_args[1]['data']['foo'], 'bar')
+        self.assertEqual(post.call_args[1]['data']['baz'], 5)
 
     def test_verify_request_exception(self):
         """
@@ -332,7 +330,7 @@ class RemoteVerifierTests(TestCase):
             with self.assertRaises(base.BrowserIDException) as cm:
                 verifier.verify('asdf', 'http://testserver')
 
-        eq_(cm.exception.exc, request_exception)
+        self.assertEqual(cm.exception.exc, request_exception)
 
     def test_verify_invalid_json(self):
         """
@@ -345,9 +343,8 @@ class RemoteVerifierTests(TestCase):
             response.json.side_effect = ValueError("Couldn't parse json")
             post.return_value = response
             result = verifier.verify('asdf', 'http://testserver')
-        ok_(not result)
-        ok_(result.reason.startswith('Could not parse verifier response'))
-
+        self.assertTrue(not result)
+        self.assertTrue(result.reason.startswith('Could not parse verifier response'))
 
     def test_verify_success(self):
         """
@@ -362,8 +359,8 @@ class RemoteVerifierTests(TestCase):
             response.json.return_value = {"status": "okay", "email": "foo@example.com"}
             post.return_value = response
             result = verifier.verify('asdf', 'http://testserver')
-        ok_(result)
-        eq_(result.email, 'foo@example.com')
+        self.assertTrue(result)
+        self.assertEqual(result.email, 'foo@example.com')
 
 
 class MockVerifierTests(TestCase):
@@ -374,8 +371,8 @@ class MockVerifierTests(TestCase):
         """
         verifier = base.MockVerifier(None)
         result = verifier.verify('asdf', 'http://testserver')
-        ok_(not result)
-        eq_(result.reason, 'No email given to MockVerifier.')
+        self.assertTrue(not result)
+        self.assertEqual(result.reason, 'No email given to MockVerifier.')
 
     def test_verify_email(self):
         """
@@ -384,23 +381,23 @@ class MockVerifierTests(TestCase):
         """
         verifier = base.MockVerifier('a@example.com')
         result = verifier.verify('asdf', 'http://testserver')
-        ok_(result)
-        eq_(result.audience, 'http://testserver')
-        eq_(result.email, 'a@example.com')
+        self.assertTrue(result)
+        self.assertEqual(result.audience, 'http://testserver')
+        self.assertEqual(result.email, 'a@example.com')
 
     def test_verify_result_attributes(self):
         """Extra kwargs to the constructor are added to the result."""
         verifier = base.MockVerifier('a@example.com', foo='bar', baz=5)
         result = verifier.verify('asdf', 'http://testserver')
-        eq_(result.foo, 'bar')
-        eq_(result.baz, 5)
+        self.assertEqual(result.foo, 'bar')
+        self.assertEqual(result.baz, 5)
 
 
 class LocalVerifierTests(TestCase):
     def setUp(self):
         # Skip tests if PyBrowserID is not installed.
         if not pybrowserid_found:
-            raise SkipTest
+            self.skipTest('PyBrowserID required for test but not installed.')
 
         self.verifier = base.LocalVerifier()
 

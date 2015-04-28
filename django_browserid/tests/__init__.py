@@ -8,7 +8,6 @@ from django.utils.encoding import smart_text
 from django.utils.functional import wraps
 
 from mock import patch
-from nose.tools import eq_
 
 from django_browserid.auth import BrowserIDBackend
 from django_browserid.base import MockVerifier
@@ -63,7 +62,7 @@ class mock_browserid(object):
 
 class TestCase(DjangoTestCase):
     def assert_json_equals(self, json_str, value):
-        return eq_(json.loads(smart_text(json_str)), value)
+        return self.assertEqual(json.loads(smart_text(json_str)), value)
 
     def shortDescription(self):
         # Stop nose using the test docstring and instead the test method
