@@ -3,6 +3,14 @@
 History
 -------
 
+1.0.0 (2015-04-30)
+++++++++++++++++++
+- Drop support for Django 1.4 to 1.6 and add 1.8 support. We now support Django
+  1.7 and 1.8 across Python 2.7, 3.2, 3.3, and 3.4.
+
+- Removed fancy_tag dependency.
+
+
 0.11.1 (2015-01-27)
 +++++++++++++++++++
 - Fix circular import bug with jingo that was blocking people from upgrading

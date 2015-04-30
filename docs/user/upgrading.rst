@@ -5,9 +5,11 @@ in the right place. This document describes the major changes required to get
 your site up to the latest and greatest!
 
 
-0.10.1 to 0.11.1
+0.10.1 to 1.0.0
 ---------------
-No changes are necessary to switch from 0.10.1 to 0.11.1.
+No changes are necessary to switch from 0.10.1 to 1.0.0. ``fancy_tag`` was
+removed as a dependency in 1.0.0, in case you explicitly include it for your
+application.
 
 
 0.9 to 0.10.1
