@@ -1,3 +1,5 @@
+import json
+
 from django.utils.functional import lazy
 
 from mock import patch
@@ -22,26 +24,26 @@ class BrowserIDInfoTests(TestCase):
             output = helpers.browserid_info()
 
         self.assertEqual(output, self.render_to_string.return_value)
-        expected_info = {
+        expected_info = json.dumps({
             'loginUrl': '/browserid/login/',
             'logoutUrl': '/browserid/logout/',
             'csrfUrl': '/browserid/csrf/',
             'requestArgs': {'foo': 'bar', 'baz': 1},
-        }
-        self.render_to_string.assertCalledWith('browserid/info.html', {'info': expected_info})
+        })
+        self.render_to_string.assert_called_with('browserid/info.html', {'info': expected_info})
 
     def test_lazy_request_args(self):
         with self.settings(BROWSERID_REQUEST_ARGS=lazy_request_args()):
             output = helpers.browserid_info()
 
         self.assertEqual(output, self.render_to_string.return_value)
-        expected_info = {
+        expected_info = json.dumps({
             'loginUrl': '/browserid/login/',
             'logoutUrl': '/browserid/logout/',
             'csrfUrl': '/browserid/csrf/',
             'requestArgs': {'siteName': 'asdf'},
-        }
-        self.render_to_string.assertCalledWith('browserid/info.html', {'info': expected_info})
+        })
+        self.render_to_string.assert_called_with('browserid/info.html', {'info': expected_info})
 
 
 class BrowserIDJSTests(TestCase):
