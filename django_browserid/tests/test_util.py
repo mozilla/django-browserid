@@ -6,7 +6,7 @@ from django.utils import six
 from django.utils.functional import lazy
 
 from django_browserid.tests import TestCase
-from django_browserid.util import import_from_setting, LazyEncoder
+from django_browserid.util import import_from_setting, LazyEncoder, same_origin
 
 
 def _lazy_string():
@@ -64,3 +64,16 @@ class ImportFromSettingTests(TestCase):
         return it.
         """
         self.assertEqual(import_from_setting('TEST_SETTING'), 1)
+
+
+class SameOriginTests(TestCase):
+    def test_match(self):
+        self.assertTrue(same_origin('https://example.com', 'https://example.com'))
+        self.assertTrue(same_origin('https://example.com:80', 'https://example.com:80'))
+        self.assertTrue(same_origin('https://example.com:80/different/path?query=4&five=6',
+                                    'https://example.com:80/no/match#path'))
+
+    def test_no_match(self):
+        self.assertFalse(same_origin('http://example.com', 'http://example.org'))
+        self.assertFalse(same_origin('https://example.com', 'http://example.com'))
+        self.assertFalse(same_origin('http://example.com:443', 'http://example.com:80'))

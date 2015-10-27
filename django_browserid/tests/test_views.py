@@ -234,4 +234,4 @@ class CsrfTokenTests(TestCase):
     def test_never_cache(self):
         request = self.factory.get('/browserid/csrf/')
         response = self.view.get(request)
-        self.assertEqual(response['Cache-Control'], 'max-age=0')
+        self.assertTrue('max-age=0' in response['Cache-Control'])

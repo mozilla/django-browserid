@@ -7,6 +7,7 @@ import sys
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.functional import Promise
+from django.utils.six.moves.urllib.parse import urlparse
 
 try:
     from django.utils.encoding import force_unicode as force_text
@@ -53,3 +54,12 @@ def import_from_setting(setting):
         return getattr(mod, attr)
     except AttributeError as e:
         raise ImproperlyConfigured('Module {0} does not define `{1}`.'.format(module, attr))
+
+
+def same_origin(url1, url2):
+    """
+    Checks if two URLs share the same origin, IE the same protocol,
+    host, and port.
+    """
+    p1, p2 = urlparse(url1), urlparse(url2)
+    return (p1.scheme, p1.hostname, p1.port) == (p2.scheme, p2.hostname, p2.port)

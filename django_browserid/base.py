@@ -8,11 +8,11 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.utils import six
 from django.utils.encoding import python_2_unicode_compatible
-from django.utils.http import same_origin
 
 import requests
 
 from django_browserid.compat import pybrowserid_found
+from django_browserid.util import same_origin
 
 
 logger = logging.getLogger(__name__)
