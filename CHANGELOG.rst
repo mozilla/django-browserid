@@ -3,6 +3,13 @@
 History
 -------
 
+1.0.1 (2015-11-02)
+++++++++++++++++++
+- Add preliminary support for Django 1.9 and Python 3.5.
+
+- Distribute as a universal wheel.
+
+
 1.0.0 (2015-04-30)
 ++++++++++++++++++
 - Drop support for Django 1.4 to 1.6 and add 1.8 support. We now support Django
