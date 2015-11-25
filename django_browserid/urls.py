@@ -3,7 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 import logging
 
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from django.core.exceptions import ImproperlyConfigured
 
 from django_browserid import views
@@ -22,8 +22,8 @@ except ImproperlyConfigured as e:
     Verify = views.Verify
 
 
-urlpatterns = patterns('',
+urlpatterns = [
     url(r'^browserid/login/$', Verify.as_view(), name='browserid.login'),
     url(r'^browserid/logout/$', views.Logout.as_view(), name='browserid.logout'),
     url(r'^browserid/csrf/$', views.CsrfToken.as_view(), name='browserid.csrf'),
-)
+]
