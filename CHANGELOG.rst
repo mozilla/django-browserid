@@ -3,6 +3,13 @@
 History
 -------
 
+1.0.2 (2015-12-03)
+++++++++++++++++++
+- Test against the release version of Django 1.9.
+
+- Fix Django 1.10 deprecation warnings.
+
+
 1.0.1 (2015-11-02)
 ++++++++++++++++++
 - Add preliminary support for Django 1.9 and Python 3.5.
