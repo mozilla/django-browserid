@@ -18,11 +18,11 @@ matrix:
     - python: "3.4"
       env: TOX_ENV=py34_dj18
     - python: "2.7"
-      env: TOX_ENV=py27_dj19b1
+      env: TOX_ENV=py27_dj19
     - python: "3.4"
-      env: TOX_ENV=py34_dj19b1
+      env: TOX_ENV=py34_dj19
     - python: "3.5"
-      env: TOX_ENV=py35_dj19b1
+      env: TOX_ENV=py35_dj19
 install:
   - pip install tox
 script:
