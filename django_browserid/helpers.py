@@ -110,8 +110,8 @@ def browserid_login(text='Sign in', color=None, next=None,
         Supported colors are: `'dark'`, `'blue'`, and `'orange'`.
 
     :param next:
-        URL to redirect users to after they login from this link. If omitted,
-        the LOGIN_REDIRECT_URL setting will be used.
+        URL to redirect users to after they login from this link. Defaults to
+        :attr:`.views.Verify.success_url`.
 
     :param link_class:
         CSS class for the link. Defaults to `browserid-login persona-button`.
@@ -136,7 +136,7 @@ def browserid_login(text='Sign in', color=None, next=None,
         else:
             link_class += ' ' + color
 
-    next = next or getattr(settings, 'LOGIN_REDIRECT_URL', '/')
+    next = next or ''
     return browserid_button(text, next, link_class, attrs, fallback_href)
 
 
@@ -150,6 +150,10 @@ def browserid_logout(text='Sign out', next=None,
         Text to use inside the link. Defaults to 'Sign out', which is not
         localized.
 
+    :param next:
+        URL to redirect users to after they logout from this link. Defaults
+        to :attr:`.views.Logout.redirect_url`.
+
     :param link_class:
         CSS classes for the link. The classes will be appended to the
         default class `browserid-logout`.
@@ -160,7 +164,7 @@ def browserid_logout(text='Sign out', next=None,
 
         If given a string, it is parsed as JSON and is expected to be an object.
     """
-    next = next or getattr(settings, 'LOGOUT_REDIRECT_URL', '/')
+    next = next or ''
 
     if MANDATORY_LINK_CLASS_LOGOUT not in link_class.split(' '):
         link_class += ' ' + MANDATORY_LINK_CLASS_LOGOUT
