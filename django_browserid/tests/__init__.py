@@ -68,3 +68,24 @@ class TestCase(DjangoTestCase):
         # Stop nose using the test docstring and instead the test method
         # name.
         pass
+
+
+class JSON_STRING(object):
+    """
+    Test object that is considered equal to any string that, when
+    decoded as JSON, is equal to the value passed in the constructor.
+
+    Useful for testing against JSON strings with dicts where the key
+    ordering doesn't matter.
+    """
+    def __init__(self, value):
+        self.value = value
+
+    def __eq__(self, other):
+        return json.loads(other) == self.value
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
+    def __repr__(self):
+        return '<JSON_STRING {0}>'.format(self.value)

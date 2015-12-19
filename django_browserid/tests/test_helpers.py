@@ -1,11 +1,9 @@
-import json
-
 from django.utils.functional import lazy
 
 from mock import patch
 
 from django_browserid import helpers
-from django_browserid.tests import TestCase
+from django_browserid.tests import JSON_STRING, TestCase
 
 
 def _lazy_request_args():
@@ -24,7 +22,7 @@ class BrowserIDInfoTests(TestCase):
             output = helpers.browserid_info()
 
         self.assertEqual(output, self.render_to_string.return_value)
-        expected_info = json.dumps({
+        expected_info = JSON_STRING({
             'loginUrl': '/browserid/login/',
             'logoutUrl': '/browserid/logout/',
             'csrfUrl': '/browserid/csrf/',
@@ -37,7 +35,7 @@ class BrowserIDInfoTests(TestCase):
             output = helpers.browserid_info()
 
         self.assertEqual(output, self.render_to_string.return_value)
-        expected_info = json.dumps({
+        expected_info = JSON_STRING({
             'loginUrl': '/browserid/login/',
             'logoutUrl': '/browserid/logout/',
             'csrfUrl': '/browserid/csrf/',
