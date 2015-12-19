@@ -57,3 +57,4 @@ Patches and Suggestions
 - pythonik
 - Aurélien Bompard
 - Ed Morley
+- Alan Briolat
