@@ -5,6 +5,25 @@ in the right place. This document describes the major changes required to get
 your site up to the latest and greatest!
 
 
+1.0.0 to 2.0.0
+--------------
+2.0.0 introduces a small, but backwards-incompatible change that shouldn't
+affect most users. You are only affected if you:
+
+1. Use the ``browserid_login`` or ``browserid_logout`` template helpers to
+   generate your login/logout buttons, and
+2. Use custom JavaScript that relies on the ``data-next`` attribute on the
+   buttons generate by these helpers.
+
+If both of the above apply to you, then you may have to update your custom
+JavaScript, as the helpers now default to a blank ``data-next`` value instead
+of defaulting to the ``LOGIN_REDIRECT_URL``/``LOGOUT_REDIRECT_URL`` settings.
+
+The default JavaScript does not rely on this, and it's not expected that any
+project relies on this either. Most projects should be able to upgrade to the
+new version with no changes.
+
+
 0.10.1 to 1.0.0
 ---------------
 No changes are necessary to switch from 0.10.1 to 1.0.0. ``fancy_tag`` was
