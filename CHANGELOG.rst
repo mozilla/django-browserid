@@ -3,6 +3,12 @@
 History
 -------
 
+2.0.1 (2016-03-02)
+++++++++++++++++++
+- Version number bump to upload a new package to PyPI. The previously-built
+  wheel included some outdated files that we want to get rid of.
+
+
 2.0.0 (2015-12-21)
 ++++++++++++++++++
 - **Backwards Incompatible Change:** Fix behavior of ``browserid_login`` and
