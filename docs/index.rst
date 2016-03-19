@@ -1,3 +1,16 @@
+Persona is Shutting Down
+========================
+Mozilla has announced that `Persona will be shutting down November 2016`_.
+django-browserid `relies on the Persona service`_ and will stop functioning
+properly once Persona is shut down. While it is possible to self-host Persona
+and configure django-browserid to rely on your own instance, this is difficult
+and not recommended. See the wiki page linked above for recommended alternatives
+to Persona for authentication.
+
+.. _Persona will be shutting down November 2016: https://wiki.mozilla.org/Identity/Persona_Shutdown_Guidelines_for_Reliers
+.. _relies on the Persona service: http://django-browserid.readthedocs.org/en/latest/user/intro.html#persona-dependence
+
+
 django-browserid
 ================
 Release v\ |version|. (:doc:`Quickstart <user/quickstart>`)
