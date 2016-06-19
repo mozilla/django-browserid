@@ -7,6 +7,7 @@ from django.conf import settings
 from django.contrib import auth
 from django.http import HttpResponse
 from django.middleware.csrf import get_token
+from django.shortcuts import resolve_url
 from django.utils.http import is_safe_url
 from django.views.decorators.cache import never_cache
 from django.views.generic import View
@@ -53,7 +54,8 @@ class Verify(JSONView):
         of ``settings.LOGIN_REDIRECT_URL_FAILURE``, and defaults to
         ``'/'`` if the setting doesn't exist.
         """
-        return getattr(settings, 'LOGIN_REDIRECT_URL_FAILURE', '/')
+        return resolve_url(
+            getattr(settings, 'LOGIN_REDIRECT_URL_FAILURE', '/'))
 
     @property
     def success_url(self):
@@ -62,7 +64,7 @@ class Verify(JSONView):
         value of ``settings.LOGIN_REDIRECT_URL``, and defaults to
         ``'/'`` if the setting doesn't exist.
         """
-        return getattr(settings, 'LOGIN_REDIRECT_URL', '/')
+        return resolve_url(getattr(settings, 'LOGIN_REDIRECT_URL', '/'))
 
     def login_success(self):
         """Log the user into the site."""
@@ -126,7 +128,7 @@ class Logout(JSONView):
         ``settings.LOGOUT_REDIRECT_URL`` and defaults to ``/`` if the
         setting isn't found.
         """
-        return getattr(settings, 'LOGOUT_REDIRECT_URL', '/')
+        return resolve_url(getattr(settings, 'LOGOUT_REDIRECT_URL', '/'))
 
     def post(self, request):
         """Log the user out."""

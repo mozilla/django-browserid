@@ -116,6 +116,17 @@ class VerifyTests(TestCase):
         self.assertEqual(response.status_code, 403)
         self.assert_json_equals(response.content, {'redirect': '/fail'})
 
+    @mock_browserid(None)
+    def test_auth_fail_named_url(self):
+        """
+        If authentication fails, redirect to the failure URL, and resolve
+        named URLs.
+        """
+        with self.settings(LOGIN_REDIRECT_URL_FAILURE='epic_fail'):
+            response = self.verify('post', assertion='asdf')
+        self.assertEqual(response.status_code, 403)
+        self.assert_json_equals(response.content, {'redirect': '/epic-fail/'})
+
     @mock_browserid('test@example.com')
     def test_auth_success_redirect_success(self):
         """If authentication succeeds, redirect to the success URL."""
@@ -131,6 +142,23 @@ class VerifyTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assert_json_equals(response.content,
                                 {'email': 'test@example.com', 'redirect': '/success'})
+
+    @mock_browserid('test@example.com')
+    def test_auth_success_redirect_success_named_url(self):
+        """
+        If authentication succeeds, redirect to the success URL, and resolve
+        named urls.
+        """
+        user = auth.models.User.objects.create_user('asdf', 'test@example.com')
+
+        request = self.factory.post('/browserid/verify', {'assertion': 'asdf'})
+        with self.settings(LOGIN_REDIRECT_URL='epic_fail'):
+            with patch('django_browserid.views.auth.login') as login:
+                verify = views.Verify.as_view()
+                response = verify(request)
+        self.assertEqual(response.status_code, 200)
+        self.assert_json_equals(response.content,
+                                {'email': 'test@example.com', 'redirect': '/epic-fail/'})
 
     def test_sanity_checks(self):
         """Run sanity checks on all incoming requests."""
@@ -193,6 +221,20 @@ class LogoutTests(TestCase):
         auth_logout.assert_called_with(request)
         self.assertEqual(response.status_code, 200)
         self.assert_json_equals(response.content, {'redirect': '/test/foo'})
+
+    def test_redirect_named_url(self):
+        """
+        Include LOGOUT_REDIRECT_URL in the response, and resolve named URLs.
+        """
+        request = self.factory.post('/')
+        logout = views.Logout.as_view()
+        self._get_next.return_value = None
+
+        with self.settings(LOGOUT_REDIRECT_URL='epic_fail'):
+            with patch('django_browserid.views.auth.logout') as auth_logout:
+                response = logout(request)
+        self.assertEqual(response.status_code, 200)
+        self.assert_json_equals(response.content, {'redirect': '/epic-fail/'})
 
     def test_redirect_next(self):
         """
