@@ -8,5 +8,7 @@ from django.http import HttpResponse
 urlpatterns = patterns('',
     (r'', include('django_browserid.urls')),
     url(r'^epic-fail/', lambda r: HttpResponse('this is a stub'),
-        name='epic_fail')
+        name='epic_fail'),
+    url(r'^some-dummy-url/', lambda r: HttpResponse('this is a stub'),
+        name='test_url'),
 )

@@ -122,10 +122,10 @@ class VerifyTests(TestCase):
         If authentication fails, redirect to the failure URL, and resolve
         named URLs.
         """
-        with self.settings(LOGIN_REDIRECT_URL_FAILURE='epic_fail'):
+        with self.settings(LOGIN_REDIRECT_URL_FAILURE='test_url'):
             response = self.verify('post', assertion='asdf')
         self.assertEqual(response.status_code, 403)
-        self.assert_json_equals(response.content, {'redirect': '/epic-fail/'})
+        self.assert_json_equals(response.content, {'redirect': '/some-dummy-url/'})
 
     @mock_browserid('test@example.com')
     def test_auth_success_redirect_success(self):
@@ -152,13 +152,13 @@ class VerifyTests(TestCase):
         user = auth.models.User.objects.create_user('asdf', 'test@example.com')
 
         request = self.factory.post('/browserid/verify', {'assertion': 'asdf'})
-        with self.settings(LOGIN_REDIRECT_URL='epic_fail'):
+        with self.settings(LOGIN_REDIRECT_URL='test_url'):
             with patch('django_browserid.views.auth.login') as login:
                 verify = views.Verify.as_view()
                 response = verify(request)
         self.assertEqual(response.status_code, 200)
         self.assert_json_equals(response.content,
-                                {'email': 'test@example.com', 'redirect': '/epic-fail/'})
+                                {'email': 'test@example.com', 'redirect': '/some-dummy-url/'})
 
     def test_sanity_checks(self):
         """Run sanity checks on all incoming requests."""
@@ -230,11 +230,11 @@ class LogoutTests(TestCase):
         logout = views.Logout.as_view()
         self._get_next.return_value = None
 
-        with self.settings(LOGOUT_REDIRECT_URL='epic_fail'):
+        with self.settings(LOGOUT_REDIRECT_URL='test_url'):
             with patch('django_browserid.views.auth.logout') as auth_logout:
                 response = logout(request)
         self.assertEqual(response.status_code, 200)
-        self.assert_json_equals(response.content, {'redirect': '/epic-fail/'})
+        self.assert_json_equals(response.content, {'redirect': '/some-dummy-url/'})
 
     def test_redirect_next(self):
         """

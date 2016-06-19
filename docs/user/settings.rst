@@ -28,8 +28,9 @@ Core Settings
 
 Redirect URLs
 -------------
-.. note:: If you want to use named URLs instead of directly including URLs into
-   your settings file, you can use `reverse_lazy`_ to do so.
+.. note:: These settings also accepts view function names and named URL
+   patterns which can be used to reduce configuration duplication since you
+   don't have to define the URL in two places (settings and URLconf).
 
 .. attribute:: LOGIN_REDIRECT_URL
 
