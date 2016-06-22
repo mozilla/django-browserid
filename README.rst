@@ -22,7 +22,7 @@ django-browserid
 django-browserid is a library that integrates BrowserID_ authentication into
 Django_.
 
-Supported versions include Python 2.7, 3.2, and onward, and Django 1.7 and up.
+Supported versions include Python 2.7, 3.4, and onward, and Django 1.8 and up.
 For more details, check this project's `tox test suite`_ or TravisCI_.
 
 .. _Django: https://www.djangoproject.com/
