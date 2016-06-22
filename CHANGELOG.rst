@@ -3,6 +3,13 @@
 History
 -------
 
+2.0.2 (2016-06-22)
+++++++++++++++++++
+- #299: Add support for named URLs in redirection settings (thanks abompard!).
+- Removed support for Python 3 versions lower than 3.4 and for Django versions
+  lower than 1.8.
+
+
 2.0.1 (2016-03-02)
 ++++++++++++++++++
 - Version number bump to upload a new package to PyPI. The previously-built
