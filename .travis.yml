@@ -1,6 +1,7 @@
 language: python
 matrix:
   include:
+    - python: "2.7"
       env: TOX_ENV=py27_dj18
     - python: "3.2"
       env: TOX_ENV=py34_dj18
