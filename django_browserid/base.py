@@ -188,7 +188,10 @@ class RemoteVerifier(object):
         parameters = dict(self.requests_parameters, **{
             'data': {
                 'assertion': assertion,
-                'audience': audience,
+
+                # requests can't send lazily evaluated values
+                # wrapped by e.g. django.utils.functional.lazy
+                'audience': str(audience),
             }
         })
         parameters['data'].update(kwargs)
@@ -239,7 +242,7 @@ class MockVerifier(object):
         else:
             result = {
                 'status': 'okay',
-                'audience': audience,
+                'audience': str(audience),
                 'email': self.email,
                 'issuer': 'mockissuer.example.com:443',
                 'expires': '1311377222765'
@@ -276,7 +279,7 @@ if pybrowserid_found:
                 :class:`.VerificationResult`
             """
             try:
-                result = self.pybid_verifier.verify(assertion, audience)
+                result = self.pybid_verifier.verify(assertion, str(audience))
             except PyBrowserIDError as error:
                 return VerificationResult({
                     'status': 'failure',

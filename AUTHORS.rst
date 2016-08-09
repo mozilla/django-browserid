@@ -58,3 +58,4 @@ Patches and Suggestions
 - Aurélien Bompard
 - Ed Morley
 - Alan Briolat
+- jotes
