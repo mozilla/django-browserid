@@ -2,12 +2,14 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 from datetime import datetime
+from itertools import cycle
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.test.client import RequestFactory
 from django.test.utils import override_settings
 from django.utils import six
+from django.utils.functional import lazy
 
 import requests
 from mock import Mock, patch
@@ -332,6 +334,25 @@ class RemoteVerifierTests(TestCase):
 
         self.assertEqual(cm.exception.exc, request_exception)
 
+    def test_verify_lazy_audiences(self):
+        """
+        If audience is a lazily evaluated object, it should be
+        materialized during verification.
+        """
+        verifier = base.RemoteVerifier()
+        audiences = cycle(['http://url1', 'http://url2'])
+        audience = lazy(lambda: next(audiences), str)()
+
+        with patch('django_browserid.base.requests.post') as post:
+            post.return_value = self._response(content='{"status":"failure"}')
+
+            verifier.verify('asdf', audience, foo='bar', baz=5)
+            self.assertEqual(post.call_args[1]['data']['audience'], 'http://url1')
+            post.mock_reset()
+
+            verifier.verify('asdf', audience, foo='bar', baz=5)
+            self.assertEqual(post.call_args[1]['data']['audience'], 'http://url2')
+
     def test_verify_invalid_json(self):
         """
         If the response contains invalid JSON, return a failure result.
@@ -392,6 +413,18 @@ class MockVerifierTests(TestCase):
         self.assertEqual(result.foo, 'bar')
         self.assertEqual(result.baz, 5)
 
+    def test_verify_lazy_audiences(self):
+        """
+        If audience is a lazily evaluated object, it should be
+        materialized during verification.
+        """
+        verifier = base.MockVerifier('asdf')
+        audiences = cycle(['http://url1', 'http://url2'])
+        audience = lazy(lambda: next(audiences), str)()
+
+        self.assertEqual(verifier.verify('asdf', audience).audience, 'http://url1')
+        self.assertEqual(verifier.verify('asdf', audience).audience, 'http://url2')
+
 
 class LocalVerifierTests(TestCase):
     def setUp(self):
@@ -430,3 +463,27 @@ class LocalVerifierTests(TestCase):
         pybid_verifier.verify.assert_called_with('asdf', 'qwer')
         self.assertTrue(result)
         self.assertEqual(result._response, response)
+
+
+    def test_verify_lazy_audiences(self):
+        """
+        If audience is a lazily evaluated object, it should be
+        materialized during verification.
+        """
+
+        pybid_verifier = Mock()
+        self.verifier.pybid_verifier = pybid_verifier
+
+        audiences = cycle(['http://url1', 'http://url2'])
+        audience = lazy(lambda: next(audiences), str)()
+
+        response = {'status': 'okay'}
+        pybid_verifier.verify.return_value = response
+
+        self.verifier.verify('asdf', audience)
+        pybid_verifier.verify.assert_called_with('asdf', 'http://url1')
+        pybid_verifier.verify.mock_reset()
+
+        self.verifier.verify('asdf', audience)
+        pybid_verifier.verify.assert_called_with('asdf', 'http://url2')
+        pybid_verifier.verify.mock_reset()
